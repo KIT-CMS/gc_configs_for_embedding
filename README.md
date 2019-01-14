@@ -27,6 +27,8 @@ git clone https://github.com/janekbechtel/grid-control
 
 git clone https://github.com/KIT-CMS/gc_configs_for_embedding.git
 
+cd gc_configs_for_embedding
+
 python Prepare_DATA_2018_CMSSW1020.py
 
 
@@ -53,6 +55,8 @@ scramv1 b -j 12
 git clone https://github.com/janekbechtel/grid-control
 
 git clone https://github.com/KIT-CMS/gc_configs_for_embedding.git
+
+cd gc_configs_for_embedding
 
 python Prepare_DATA_2017_CMSSW944.py
 
