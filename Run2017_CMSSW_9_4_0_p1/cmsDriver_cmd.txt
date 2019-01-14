@@ -1,0 +1,88 @@
+###### cmsDriver.py commands for embedding in CMSSW_9_2_10 ######
+
+#### Embedding on Data
+
+### Step 1: Selection of Z->MuMu
+
+cmsDriver.py RECO -s RAW2DIGI,L1Reco,RECO,PAT --runUnscheduled \
+--data --scenario pp --conditions 94X_dataRun2_ReReco17_forValidation \
+--era Run2_2017 \
+--eventcontent RAWRECO,MINIAOD --datatier RAWRECO,MINIAOD \
+--customise Configuration/DataProcessing/RecoTLR.customisePostEra_Run2_2017,\
+TauAnalysis/MCEmbeddingTools/customisers.customisoptions,\
+TauAnalysis/MCEmbeddingTools/customisers.customiseSelecting \
+--filein file:test.root \
+--fileout RAWskimmed.root -n 60 --no_exec --python_filename=selection.py
+
+### Step 2: Cleaning and preparation for Z->TauTau simulation (saving LHE products)
+
+# Tau-Embedding preparation
+
+cmsDriver.py LHEprodandCLEAN --filein file:RAWskimmed.root \
+--fileout file:lhe_and_cleaned.root --runUnscheduled --data --era Run2_2017 \
+--scenario pp --conditions 94X_dataRun2_ReReco17_forValidation --eventcontent RAWRECO,MINIAOD \
+--datatier RAWRECO,MINIAOD --step RAW2DIGI,RECO,PAT \
+--customise Configuration/DataProcessing/RecoTLR.customisePostEra_Run2_2017,\
+TauAnalysis/MCEmbeddingTools/customisers.customisoptions,\
+TauAnalysis/MCEmbeddingTools/customisers.customiseLHEandCleaning \
+--no_exec -n -1 --python_filename lheprodandcleaning.py \
+--geometry DB:Extended
+
+# Muon-Embedding preparation
+
+cmsDriver.py LHEprodandCLEAN --filein file:RAWskimmed.root \
+--fileout file:lhe_and_cleaned.root --runUnscheduled --data \
+--scenario pp --conditions 94X_dataRun2_ReReco17_forValidation --eventcontent RAWRECO,MINIAOD \
+--datatier RAWRECO,MINIAOD --step RAW2DIGI,RECO,PAT \
+--customise Configuration/DataProcessing/RecoTLR.customisePostEra_Run2_2017,\
+TauAnalysis/MCEmbeddingTools/customisers.customisoptions,\
+TauAnalysis/MCEmbeddingTools/customisers.customiseLHEandCleaning \
+--customise_commands "process.externalLHEProducer.particleToEmbed = cms.int32(13)" \
+--no_exec -n -1 --python_filename lheprodandcleaning.py
+
+# Electron-Embedding preparation
+
+cmsDriver.py LHEprodandCLEAN --filein file:RAWskimmed.root \
+--fileout file:lhe_and_cleaned.root --runUnscheduled --data \
+--scenario pp --conditions 94X_dataRun2_ReReco17_forValidation --eventcontent RAWRECO,MINIAOD \
+--datatier RAWRECO,MINIAOD --step RAW2DIGI,RECO,PAT \
+--customise Configuration/DataProcessing/RecoTLR.customisePostEra_Run2_2017,\
+TauAnalysis/MCEmbeddingTools/customisers.customisoptions,\
+TauAnalysis/MCEmbeddingTools/customisers.customiseLHEandCleaning \
+--customise_commands "process.externalLHEProducer.particleToEmbed = cms.int32(11)" \
+--no_exec -n -1 --python_filename lheprodandcleaning.py
+
+### Step 3: Z->TauTau simulation
+
+cmsDriver.py TauAnalysis/MCEmbeddingTools/python/EmbeddingPythia8Hadronizer_cfi.py \
+--filein file:lhe_and_cleaned.root --fileout simulated_and_cleaned.root \
+--conditions 94X_mc2017_realistic_v10 --era Run2_2017 \
+--eventcontent RAWRECO,AODSIM --step GEN,SIM,DIGI,L1,DIGI2RAW,HLT:2e34v40,RAW2DIGI,RECO \
+--datatier RAWRECO,AODSIM --customise \
+TauAnalysis/MCEmbeddingTools/customisers.customiseGenerator,\
+TauAnalysis/MCEmbeddingTools/customisers.customisoptions \
+--beamspot Realistic50ns13TeVCollision --no_exec -n -1 --python_filename generator.py \
+--geometry DB:Extended
+
+# For event display only:
+
+cmsDriver.py PATSIM --filein file:simulated_and_cleaned_inAODSIM.root \
+--fileout file:simulated_and_cleaned_inMINIAOD.root --runUnscheduled --era Run2_2017 \
+--customise_commands "process.patTrigger.processName = cms.string('SIMembedding')" \
+--data --conditions 94X_mc2017_realistic_v10 --era Run2_2017 \
+--eventcontent MINIAODSIM --datatier MINIAODSIM --step PAT \
+--no_exec -n -1 --python_filename pat_for_sim.py
+
+### Step 4: Merging of simulated Z->TauTau process and cleaned data:
+
+cmsDriver.py PAT -s PAT \
+--filein file:simulated_and_cleaned.root  \
+--fileout file:merged.root --era Run2_2017 \
+--runUnscheduled --data --scenario pp --conditions 94X_dataRun2_ReReco17_forValidation \
+--eventcontent  MINIAODSIM --datatier USER \
+--customise \
+TauAnalysis/MCEmbeddingTools/customisers.customisoptions,\
+Configuration/DataProcessing/RecoTLR.customisePostEra_Run2_2017,\
+TauAnalysis/MCEmbeddingTools/customisers.customiseMerging \
+--customise_commands "process.patTrigger.processName = cms.string('SIMembedding')" \
+-n -1 --no_exec --python_filename=merging.py

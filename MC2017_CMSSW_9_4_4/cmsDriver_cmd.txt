@@ -1,0 +1,70 @@
+###### cmsDriver.py commands for embedding in CMSSW_8_0_21 ######
+
+### Embedding on MC
+dataset=/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIWinter17DR-NZSPU40to70_94X_upgrade2018_realistic_v8-v3/GEN-SIM-RAW
+
+
+### Step 0p5: Selection of Z->MuMu
+#--------------not yet working----------------------------
+#--filein file:input/aaa.root \
+#
+cmsDriver.py step0p5 \
+--filein "file:/portal/ekpbms2/home/jbechtel/embedding/CMSSW_9_4_4/src/gc_configs_for_embedding/08B16E08-BC15-E811-9D41-02163E01A14D.root" \
+--mc \
+--eventcontent RAWSIM --datatier GEN-SIM-RAW \
+--conditions 94X_upgrade2018_realistic_v8  --era Run2_2017 \
+--step NONE --runUnscheduled \
+--customise TauAnalysis/MCEmbeddingTools/customisers.customisoptions\
+--fileout file:PreRAWskimmed.root -n 100  --python_filename=preselection.py \
+--geometry DB:Extended  --no_exec
+
+
+cmsDriver.py step1 --filein file:PreRAWskimmed.root --fileout file:RAWskimmed.root --mc --eventcontent RAWRECOSIM,MINIAODSIMODSIM --datatier RAWRECOSIMHLT,MINIAODSIM --conditions 94X_upgrade2018_realistic_v8 --step RAW2DIGI,L1Reco,RECO,PAT --geometry DB:Extended --era Run2_2017 --python_filename selection.py --customise TauAnalysis/MCEmbeddingTools/customisers.customisoptions,TauAnalysis/MCEmbeddingTools/customisers.customiseSelecting -n -1 --no_exec --runUnscheduled
+
+### Step 2: Cleaning and preparation for Z->TauTau simulation (saving LHE products)
+
+# Tau-Embedding preparation
+
+cmsDriver.py LHEprodandCLEAN --filein file:RAWskimmed.root \
+--fileout file:lhe_and_cleaned.root --runUnscheduled --mc \
+--conditions 94X_upgrade2018_realistic_v8  --era Run2_2017 \
+--eventcontent RAWRECOSIMHLT \
+--datatier RAWRECOSIM --step RAW2DIGI,L1Reco,RECO \
+--customise TauAnalysis/MCEmbeddingTools/customisers.customisoptions,\
+TauAnalysis/MCEmbeddingTools/customisers.customiseLHEandCleaning -n -1 --python_filename lheprodandcleaning.py --geometry DB:Extended   --no_exec
+
+
+# Muon-Embedding preparation
+#--customise_commands "process.externalLHEProducer.switchToMuonEmbedding = cms.bool(True)" \
+
+### Step 3: Z->TauTau simulation
+
+cmsDriver.py TauAnalysis/MCEmbeddingTools/python/EmbeddingPythia8Hadronizer_cfi.py \
+--filein file:lhe_and_cleaned.root --fileout simulated_and_cleaned.root \
+--conditions 94X_upgrade2018_realistic_v8  --era Run2_2017 \
+--eventcontent RAWRECOSIMHLT --step GEN,SIM,DIGI,L1,DIGI2RAW,HLT,RAW2DIGI,RECO \
+--datatier RAWRECOSIMHLT --customise \
+TauAnalysis/MCEmbeddingTools/customisers.customiseGenerator,\
+TauAnalysis/MCEmbeddingTools/customisers.customisoptions \
+--customise_commands "process.source.inputCommands.append('drop *_externalLHEProducer_*_SIM')" \
+--beamspot Realistic50ns13TeVCollision -n -1 --python_filename generator.py \
+--geometry DB:Extended --no_exec
+
+
+cmsDriver.py PAT -s PAT \
+--filein file:simulated_and_cleaned.root  \
+--fileout file:merged.root \
+--runUnscheduled --mc \
+--conditions 94X_upgrade2018_realistic_v8  --era Run2_2017 \
+--eventcontent  MINIAODSIM --datatier USER \
+--customise \
+TauAnalysis/MCEmbeddingTools/customisers.customisoptions,\
+TauAnalysis/MCEmbeddingTools/customisers.customiseMerging \
+--customise_commands "process.patTrigger.processName = cms.string('SIMembedding')" \
+-n -1 --python_filename=merging.py --no_exec
+
+cmsRun preselection.py -n 11
+cmsRun selection.py -n 11
+cmsRun lheprodandcleaning.py -n 11
+cmsRun generator.py -n 11
+cmsRun merging.py -n 11

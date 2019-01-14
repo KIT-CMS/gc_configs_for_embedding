@@ -1,0 +1,8 @@
+##### Reference samples for CMSSW_8_0_18 #####
+
+#### Data
+
+### replace * with B,C,D,E,F,G,H
+
+/DoubleMuon/Run2016*-PromptReco-v*/MINIAOD
+

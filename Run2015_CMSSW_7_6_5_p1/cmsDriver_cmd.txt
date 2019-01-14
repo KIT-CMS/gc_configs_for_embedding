@@ -1,0 +1,101 @@
+###### cmsDriver.py commands for embedding in CMSSW_7_6_5_patch1 ######
+
+#### Embedding on Data ####
+
+### Step 1: Selection of Z->MuMu
+
+cmsDriver.py RECO -s RAW2DIGI,L1Reco,RECO,PAT --runUnscheduled \
+--data --scenario pp --conditions 76X_dataRun2_v15 \
+--eventcontent RAWRECO,MINIAOD --datatier RAWRECO,MINIAOD \
+--customise Configuration/DataProcessing/RecoTLR.customiseDataRun2Common_25ns,\
+TauAnalysis/MCEmbeddingTools/customisers.customisoptions,\
+TauAnalysis/MCEmbeddingTools/customisers.customiseSelecting \
+--filein /store/data/Run2015D/DoubleMuon/RAW/v1/000/256/675/00000/0E1A0432-805D-E511-92CC-02163E01439B.root \
+--fileout RAWskimmed.root -n 60 --no_exec --python_filename=selection.py --no_exec
+
+### Step 2: Cleaning and preparation for Z->TauTau simulation (saving LHE products)
+
+# Tau-Embedding preparation (NOT WORKING YET)
+
+cmsDriver.py LHEprodandCLEAN --filein file:RAWskimmed.root \
+--fileout file:lhe_and_cleaned.root --runUnscheduled --data \
+--scenario pp --conditions 76X_dataRun2_v15 --eventcontent RAWRECO,MINIAOD \
+--datatier RAWRECO,MINIAOD --step RAW2DIGI,RECO,PAT \
+--customise Configuration/DataProcessing/RecoTLR.customiseDataRun2Common_25ns,\
+TauAnalysis/MCEmbeddingTools/customisers.customisoptions,\
+TauAnalysis/MCEmbeddingTools/customisers.customiseLHEandCleaning \
+--no_exec -n -1 --python_filename lheprodandcleaning.py
+
+# Muon-Embedding preparation
+
+cmsDriver.py LHEprodandCLEAN --filein file:RAWskimmed.root \
+--fileout file:lhe_and_cleaned.root --runUnscheduled --data \
+--scenario pp --conditions 76X_dataRun2_v15 --eventcontent RAWRECO,MINIAOD \
+--datatier RAWRECO,MINIAOD --step RAW2DIGI,RECO,PAT \
+--customise Configuration/DataProcessing/RecoTLR.customiseDataRun2Common_25ns,\
+TauAnalysis/MCEmbeddingTools/customisers.customisoptions,\
+TauAnalysis/MCEmbeddingTools/customisers.customiseLHEandCleaning \
+--customise_commands "process.externalLHEProducer.switchToMuonEmbedding = cms.bool(True)" \
+--no_exec -n -1 --python_filename lheprodandcleaning.py
+
+# Muon-Embedding (mirrored) preparation
+
+cmsDriver.py LHEprodandCLEAN --filein file:RAWskimmed.root \
+--fileout file:lhe_and_cleaned.root --runUnscheduled --data \
+--scenario pp --conditions 76X_dataRun2_v15 --eventcontent RAWRECO,MINIAOD \
+--datatier RAWRECO,MINIAOD --step RAW2DIGI,RECO,PAT \
+--customise Configuration/DataProcessing/RecoTLR.customiseDataRun2Common_25ns,\
+TauAnalysis/MCEmbeddingTools/customisers.customisoptions,\
+TauAnalysis/MCEmbeddingTools/customisers.customiseLHEandCleaning \
+--customise_commands "process.externalLHEProducer.switchToMuonEmbedding = cms.bool(True)\n process.externalLHEProducer.mirror = cms.bool(True)" \
+--no_exec -n -1 --python_filename lheprodandcleaning_mirrored.py
+
+### Step 3: Z decay simulation
+
+# Muon-Embedding
+
+cmsDriver.py TauAnalysis/MCEmbeddingTools/python/EmbeddingPythia8Hadronizer_cfi.py \
+--filein file:lhe_and_cleaned.root --fileout simulated_and_cleaned.root \
+--conditions 76X_mcRun2_asymptotic_v12 --era Run2_25ns \
+--eventcontent RAWRECO,AODSIM --step GEN,SIM,DIGI,L1,DIGI2RAW,HLT:@frozen25ns,RAW2DIGI,RECO \
+--datatier RAWRECO,AODSIM --customise \
+TauAnalysis/MCEmbeddingTools/customisers.customiseGenerator,\
+TauAnalysis/MCEmbeddingTools/customisers.customisoptions \
+--customise_commands "process.generator.nAttempts = cms.uint32(10)" \
+--beamspot Realistic50ns13TeVCollision --no_exec -n -1 --python_filename generator.py
+
+# Tau-Embedding
+
+cmsDriver.py TauAnalysis/MCEmbeddingTools/python/EmbeddingPythia8Hadronizer_cfi.py \
+--filein file:lhe_and_cleaned.root --fileout simulated_and_cleaned.root \
+--conditions 76X_mcRun2_asymptotic_v12 --era Run2_25ns \
+--eventcontent RAWRECO,AODSIM --step GEN,SIM,DIGI,L1,DIGI2RAW,HLT:@frozen25ns,RAW2DIGI,RECO \
+--datatier RAWRECO,AODSIM --customise \
+TauAnalysis/MCEmbeddingTools/customisers.customiseGenerator,\
+TauAnalysis/MCEmbeddingTools/customisers.customisoptions \
+--beamspot Realistic50ns13TeVCollision --no_exec -n -1 --python_filename generator.py
+
+# For event display only:
+
+cmsDriver.py PATSIM --filein file:simulated_and_cleaned_inAODSIM.root \
+--fileout file:simulated_and_cleaned_inMINIAOD.root --runUnscheduled \
+--customise_commands "process.patTrigger.processName = cms.string('SIMembedding')" \
+--data --conditions 76X_mcRun2_asymptotic_v12 --era Run2_25ns \
+--eventcontent MINIAODSIM --datatier MINIAODSIM --step PAT \
+--no_exec -n -1 --python_filename pat_for_sim.py
+
+### Step 4: Merging of simulated Z->TauTau process and cleaned data:
+
+cmsDriver.py PAT -s PAT \
+--filein file:simulated_and_cleaned.root  \
+--fileout file:merged.root \
+--runUnscheduled --data --scenario pp --conditions 76X_dataRun2_v15 \
+--eventcontent  MINIAODSIM --datatier USER \
+--customise \
+TauAnalysis/MCEmbeddingTools/customisers.customisoptions,\
+Configuration/DataProcessing/RecoTLR.customiseDataRun2Common_25ns,\
+TauAnalysis/MCEmbeddingTools/customisers.customiseMerging \
+--customise_commands "process.patTrigger.processName = cms.string('SIMembedding')" \
+-n -1 --no_exec --python_filename=merging.py --no_exec
+
+
