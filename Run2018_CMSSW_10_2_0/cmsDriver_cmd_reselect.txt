@@ -2,6 +2,17 @@
 
 #### Embedding on Data
 
+### Step 0: Preselection from DoubleMuon
+
+cmsDriver.py RECO -s RAW2DIGI,L1Reco,RECO,PAT --runUnscheduled \
+--data --scenario pp --conditions 102X_dataRun2_v8 \
+--era Run2_2018 \
+--eventcontent RAW --datatier RAW \
+--customise Configuration/DataProcessing/RecoTLR.customisePostEra_Run2_2018,\
+TauAnalysis/MCEmbeddingTools/customisers.customiseSelecting \
+--filein file:D671E4CB-B468-E811-B0BA-FA163EFF1C10.root  \
+--fileout PreRAWskimmed.root -n -1 --no_exec --python_filename=preselection.py
+
 ### Step 1: Selection of Z->MuMu
 
 cmsDriver.py RECO -s RAW2DIGI,L1Reco,RECO,PAT --runUnscheduled \
@@ -10,7 +21,7 @@ cmsDriver.py RECO -s RAW2DIGI,L1Reco,RECO,PAT --runUnscheduled \
 --eventcontent RAWRECO --datatier RAWRECO \
 --customise Configuration/DataProcessing/RecoTLR.customisePostEra_Run2_2018,\
 TauAnalysis/MCEmbeddingTools/customisers.customiseSelecting_Reselect \
---filein file:D671E4CB-B468-E811-B0BA-FA163EFF1C10.root  \
+--filein file:PreRAWskimmed.root  \
 --fileout RAWskimmed.root -n -1 --no_exec --python_filename=selection.py
 
 ### Step 2: Cleaning and preparation for simulation (saving LHE products)
