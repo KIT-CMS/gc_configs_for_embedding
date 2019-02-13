@@ -63,11 +63,18 @@ class finale_state():
 				is_first = False
 				self.cmsRun_order.append(file_to_copy)
 	def copy_gcconfigs(self, runs=[], add_dbs=None):
+		dbs_folder="dbs"
 		for add_run in runs:
-			self.copy_file(add_run+'.dbs', copy_from_folder = 'dbs')
-			if not os.path.exists(self.name+'/'+add_run+'.conf'):
-				self.write_cfg(add_run=add_run)
-		if add_dbs:
+			if not add_dbs:
+				if os.path.exists(add_run+'.dbs'):
+					self.copy_file(add_run+'.dbs', copy_from_folder = dbs_folder)
+				else:
+					print '{}.dbs could not be found in folder {}. Please run preselection'.format(add_run,dbs_folder)
+				if not os.path.exists(self.name+'/'+add_run+'.conf'):
+					self.write_cfg(add_run=add_run)
+			else:
+				self.write_cfg(add_run=add_run, add_dbs=add_dbs)
+		if len(runs)==0 and add_dbs:
 			self.write_cfg(add_dbs=add_dbs)
 		cmsRun_order_str = 'config file = '
 		for cmsRun_cfg in self.cmsRun_order:
@@ -102,15 +109,15 @@ class finale_state():
 		out_file.close()
 		return True
 	def write_cfg(self, add_run=None, add_dbs=None):
-		try:
+		if add_run:
 			out_file = open(self.name+'/'+add_run+'.conf','w')
-		except:
-			out_file = open(self.name+'/DAS.conf','w')
+		else:
+		 	out_file = open(self.name+'/DAS.conf','w')
 		out_file.write('[global]\n')
-		out_file.write('include=grid_control_fullembedding_data_base.conf\n')
+		out_file.write('include=grid_control_fullembedding_data_base_freiburg.conf\n')
 		out_file.write('workdir = /portal/ekpbms2/home/${USER}/embedding/gc_workdir/'+self.particle_to_embed+'_'+out_file.name.split('.')[0]+'\n')
 		out_file.write('[CMSSW]\n')
-		if add_run:
+		if add_run and not add_dbs:
 			out_file.write('dataset = '+self.particle_to_embed+'_'+self.name+'_'+add_run+' :  list:'+add_run+'.dbs\n')
 		if add_dbs:
 			for akt_name in add_dbs:
