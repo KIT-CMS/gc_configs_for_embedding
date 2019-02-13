@@ -136,7 +136,8 @@ class finale_state():
 		out_file.write('while [ -f ".lock" ]\n')
 		out_file.write('do\n')
 		for akt_cfg in self.gc_cfgs:
-			out_file.write('go.py '+akt_cfg+' -G \n')
+			print akt_cfg.split("/")[1]
+			out_file.write('go.py '+akt_cfg.split("/")[1]+' -G \n')
 		out_file.write('echo "rm .lock"\n')
 		out_file.write('sleep 2\n')
 		out_file.write('done\n')
