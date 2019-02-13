@@ -30,7 +30,8 @@ class finale_state():
 	def copy_pyconfigs(self, generator_frag="", reselect=False):
 		is_first = True ## can be late used to init the first config with customize_for_gc and the later with the dummy stings 
 		self.cmsRun_order = []
-		for file_to_copy in ['preselection.py','selection.py','lheprodandcleaning.py','generator.py','merging.py']:
+		files_to_copy = ['preselection.py'] if self.finalstate=="Preselection" else ['selection.py','lheprodandcleaning.py','generator.py','merging.py']
+		for file_to_copy in files_to_copy: # ['preselection.py','selection.py','lheprodandcleaning.py','generator.py','merging.py']:
 			add_fragment_to_end=[]
 			if is_first:
 				with open('customise_for_gc.py','r') as function_to_add:
@@ -161,4 +162,6 @@ class finale_state():
 				generator_frag_map["ElEl"]="process.generator.HepMCFilter.filterParameters.Final_States=cms.vstring('ElEl')"
 				if self.particle_to_embed == "ElEmbedding":
 					generator_frag_map["ElEl"] +='\nprocess.generator.nAttempts = cms.uint32(1)'
+			elif this_finalstate=="Preselection":
+				generator_frag_map["Preselection"]=""					
 		return generator_frag_map
