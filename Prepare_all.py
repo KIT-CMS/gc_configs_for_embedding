@@ -81,13 +81,19 @@ class finale_state():
 			cmsRun_order_str += cmsRun_cfg+'\n\t\t'
 		rp_base_cfg = {}
 		rp_base_cfg['__CMSRUN_ORDER__'] = cmsRun_order_str
-		se_path_str = 'se path = srm://dcache-se-cms.desy.de:8443/srm/managerv2?SFN=/pnfs/desy.de/cms/tier2/store/user/'+os.environ["USER"]+'/gc_storage'
+		if self.finalstate=="Preselection":
+			se_path_str = 'se path = srm://cmssrm-kit.gridka.de:8443/srm/managerv2?SFN=/pnfs/gridka.de/cms/disk-only/store/user/'+os.environ["USER"]+'/gc_storage'
+		else:
+			se_path_str = se_path_str = 'se path = srm://dcache-se-cms.desy.de:8443/srm/managerv2?SFN=/pnfs/desy.de/cms/tier2/store/user/'+os.environ["USER"]+'/gc_storage'
 		rp_base_cfg['__SE_PATH__']=se_path_str
 		se_output_pattern_str= 'se output pattern = '+self.finalstate+'_'+self.identifier+'/@NICK@/@FOLDER@/@XBASE@_@GC_JOB_ID@.@XEXT@'
 		rp_base_cfg['__SE_OUTPUT_PATTERN_']=se_output_pattern_str
-		self.copy_file('grid_control_fullembedding_data_base_freiburg.conf', copy_from_folder='./' ,replace_dict=rp_base_cfg)
-		self.copy_file('grid_control_fullembedding_data_base_desy.conf', copy_from_folder='./' ,replace_dict=rp_base_cfg)
-		self.copy_file('grid_control_fullembedding_data_base_gridka.conf', copy_from_folder='./' ,replace_dict=rp_base_cfg)
+		if self.finalstate=="Preselection":
+			self.copy_file('grid_control_fullembedding_data_base_preselection.conf', copy_from_folder='./' ,replace_dict=rp_base_cfg)
+		else:
+			self.copy_file('grid_control_fullembedding_data_base_freiburg.conf', copy_from_folder='./' ,replace_dict=rp_base_cfg)
+			self.copy_file('grid_control_fullembedding_data_base_desy.conf', copy_from_folder='./' ,replace_dict=rp_base_cfg)
+			self.copy_file('grid_control_fullembedding_data_base_gridka.conf', copy_from_folder='./' ,replace_dict=rp_base_cfg)
 		
 		
 	def copy_file(self, in_file_name, copy_from_folder = None ,add_fragment_to_end=[], skip_if_not_there=False, overwrite=False, replace_dict={}):
@@ -114,7 +120,10 @@ class finale_state():
 		else:
 		 	out_file = open(self.name+'/DAS.conf','w')
 		out_file.write('[global]\n')
-		out_file.write('include=grid_control_fullembedding_data_base_freiburg.conf\n')
+		if self.finalstate=="Preselection":
+			out_file.write('include=grid_control_fullembedding_data_base_preselection.conf\n')
+		else:
+			out_file.write('include=grid_control_fullembedding_data_base_freiburg.conf\n')
 		out_file.write('workdir = /portal/ekpbms2/home/${USER}/embedding/gc_workdir/'+self.particle_to_embed+'_'+out_file.name.split('.')[0]+'\n')
 		out_file.write('[CMSSW]\n')
 		if add_run and not add_dbs:
