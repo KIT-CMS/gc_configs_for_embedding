@@ -2,12 +2,12 @@
 # using: 
 # Revision: 1.19 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: RECO -s RAW2DIGI,L1Reco,RECO,PAT --runUnscheduled --data --scenario pp --conditions 102X_dataRun2_v8 --era Run2_2018 --eventcontent RAWRECO --datatier RAWRECO --customise Configuration/DataProcessing/RecoTLR.customisePostEra_Run2_2018,TauAnalysis/MCEmbeddingTools/customisers.customiseSelecting_Reselect --filein file:D671E4CB-B468-E811-B0BA-FA163EFF1C10.root --fileout RAWskimmed.root -n -1 --no_exec --python_filename=selection.py
+# with command line options: PAT -s PAT --filein file:simulated_and_cleaned.root --fileout file:merged.root --era Run2_2018 --runUnscheduled --data --scenario pp --conditions 102X_dataRun2_Prompt_v11 --eventcontent MINIAODSIM --datatier USER --customise TauAnalysis/MCEmbeddingTools/customisers.customiseMerging_Reselect --customise_commands process.patTrigger.processName = cms.string('SIMembedding') -n -1 --no_exec --python_filename=merging.py
 import FWCore.ParameterSet.Config as cms
 
 from Configuration.StandardSequences.Eras import eras
 
-process = cms.Process('RECO',eras.Run2_2018)
+process = cms.Process('PAT',eras.Run2_2018)
 
 # import of standard configurations
 process.load('Configuration.StandardSequences.Services_cff')
@@ -16,21 +16,18 @@ process.load('FWCore.MessageService.MessageLogger_cfi')
 process.load('Configuration.EventContent.EventContent_cff')
 process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff')
-process.load('Configuration.StandardSequences.RawToDigi_Data_cff')
-process.load('Configuration.StandardSequences.L1Reco_cff')
-process.load('Configuration.StandardSequences.Reconstruction_Data_cff')
 process.load('PhysicsTools.PatAlgos.slimming.metFilterPaths_cff')
 process.load('Configuration.StandardSequences.PAT_cff')
 process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(20)
+    input = cms.untracked.int32(-1)
 )
 
 # Input source
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring('file:D671E4CB-B468-E811-B0BA-FA163EFF1C10.root'),
+    fileNames = cms.untracked.vstring('file:simulated_and_cleaned.root'),
     secondaryFileNames = cms.untracked.vstring()
 )
 
@@ -40,20 +37,76 @@ process.options = cms.untracked.PSet(
 
 # Production Info
 process.configurationMetadata = cms.untracked.PSet(
-    annotation = cms.untracked.string('RECO nevts:-1'),
+    annotation = cms.untracked.string('PAT nevts:-1'),
     name = cms.untracked.string('Applications'),
     version = cms.untracked.string('$Revision: 1.19 $')
 )
 
 # Output definition
 
-process.RAWRECOoutput = cms.OutputModule("PoolOutputModule",
+process.MINIAODSIMoutput = cms.OutputModule("PoolOutputModule",
+    compressionAlgorithm = cms.untracked.string('LZMA'),
+    compressionLevel = cms.untracked.int32(4),
     dataset = cms.untracked.PSet(
-        dataTier = cms.untracked.string('RAWRECO'),
+        dataTier = cms.untracked.string('USER'),
         filterName = cms.untracked.string('')
     ),
-    fileName = cms.untracked.string('RAWskimmed.root'),
-    outputCommands = process.RAWRECOEventContent.outputCommands,
+    dropMetaData = cms.untracked.string('ALL'),
+    eventAutoFlushCompressedSize = cms.untracked.int32(-900),
+    fastCloning = cms.untracked.bool(False),
+    fileName = cms.untracked.string('file:merged.root'),
+    outputCommands = process.MINIAODSIMEventContent.outputCommands,
+    overrideBranchesSplitLevel = cms.untracked.VPSet(
+        cms.untracked.PSet(
+            branch = cms.untracked.string('patPackedCandidates_packedPFCandidates__*'),
+            splitLevel = cms.untracked.int32(99)
+        ), 
+        cms.untracked.PSet(
+            branch = cms.untracked.string('recoGenParticles_prunedGenParticles__*'),
+            splitLevel = cms.untracked.int32(99)
+        ), 
+        cms.untracked.PSet(
+            branch = cms.untracked.string('patTriggerObjectStandAlones_slimmedPatTrigger__*'),
+            splitLevel = cms.untracked.int32(99)
+        ), 
+        cms.untracked.PSet(
+            branch = cms.untracked.string('patPackedGenParticles_packedGenParticles__*'),
+            splitLevel = cms.untracked.int32(99)
+        ), 
+        cms.untracked.PSet(
+            branch = cms.untracked.string('patJets_slimmedJets__*'),
+            splitLevel = cms.untracked.int32(99)
+        ), 
+        cms.untracked.PSet(
+            branch = cms.untracked.string('recoVertexs_offlineSlimmedPrimaryVertices__*'),
+            splitLevel = cms.untracked.int32(99)
+        ), 
+        cms.untracked.PSet(
+            branch = cms.untracked.string('recoCaloClusters_reducedEgamma_reducedESClusters_*'),
+            splitLevel = cms.untracked.int32(99)
+        ), 
+        cms.untracked.PSet(
+            branch = cms.untracked.string('EcalRecHitsSorted_reducedEgamma_reducedEBRecHits_*'),
+            splitLevel = cms.untracked.int32(99)
+        ), 
+        cms.untracked.PSet(
+            branch = cms.untracked.string('EcalRecHitsSorted_reducedEgamma_reducedEERecHits_*'),
+            splitLevel = cms.untracked.int32(99)
+        ), 
+        cms.untracked.PSet(
+            branch = cms.untracked.string('recoGenJets_slimmedGenJets__*'),
+            splitLevel = cms.untracked.int32(99)
+        ), 
+        cms.untracked.PSet(
+            branch = cms.untracked.string('patJets_slimmedJetsPuppi__*'),
+            splitLevel = cms.untracked.int32(99)
+        ), 
+        cms.untracked.PSet(
+            branch = cms.untracked.string('EcalRecHitsSorted_reducedEgamma_reducedESRecHits_*'),
+            splitLevel = cms.untracked.int32(99)
+        )
+    ),
+    overrideInputFileSplitLevels = cms.untracked.bool(True),
     splitLevel = cms.untracked.int32(0)
 )
 
@@ -61,12 +114,9 @@ process.RAWRECOoutput = cms.OutputModule("PoolOutputModule",
 
 # Other statements
 from Configuration.AlCa.GlobalTag import GlobalTag
-process.GlobalTag = GlobalTag(process.GlobalTag, '102X_dataRun2_v8', '')
+process.GlobalTag = GlobalTag(process.GlobalTag, '102X_dataRun2_Prompt_v11', '')
 
 # Path and EndPath definitions
-process.raw2digi_step = cms.Path(process.RawToDigi)
-process.L1Reco_step = cms.Path(process.L1Reco)
-process.reconstruction_step = cms.Path(process.reconstruction)
 process.Flag_trackingFailureFilter = cms.Path(process.goodVertices+process.trackingFailureFilter)
 process.Flag_goodVertices = cms.Path(process.primaryVertexFilter)
 process.Flag_CSCTightHaloFilter = cms.Path(process.CSCTightHaloFilter)
@@ -95,27 +145,21 @@ process.Flag_BadPFMuonSummer16Filter = cms.Path(process.BadPFMuonSummer16Filter)
 process.Flag_muonBadTrackFilter = cms.Path(process.muonBadTrackFilter)
 process.Flag_CSCTightHalo2015Filter = cms.Path(process.CSCTightHalo2015Filter)
 process.endjob_step = cms.EndPath(process.endOfProcess)
-process.RAWRECOoutput_step = cms.EndPath(process.RAWRECOoutput)
+process.MINIAODSIMoutput_step = cms.EndPath(process.MINIAODSIMoutput)
 
 # Schedule definition
-process.schedule = cms.Schedule(process.raw2digi_step,process.L1Reco_step,process.reconstruction_step,process.Flag_HBHENoiseFilter,process.Flag_HBHENoiseIsoFilter,process.Flag_CSCTightHaloFilter,process.Flag_CSCTightHaloTrkMuUnvetoFilter,process.Flag_CSCTightHalo2015Filter,process.Flag_globalTightHalo2016Filter,process.Flag_globalSuperTightHalo2016Filter,process.Flag_HcalStripHaloFilter,process.Flag_hcalLaserEventFilter,process.Flag_EcalDeadCellTriggerPrimitiveFilter,process.Flag_EcalDeadCellBoundaryEnergyFilter,process.Flag_ecalBadCalibFilter,process.Flag_goodVertices,process.Flag_eeBadScFilter,process.Flag_ecalLaserCorrFilter,process.Flag_trkPOGFilters,process.Flag_chargedHadronTrackResolutionFilter,process.Flag_muonBadTrackFilter,process.Flag_BadChargedCandidateFilter,process.Flag_BadPFMuonFilter,process.Flag_BadChargedCandidateSummer16Filter,process.Flag_BadPFMuonSummer16Filter,process.Flag_trkPOG_manystripclus53X,process.Flag_trkPOG_toomanystripclus53X,process.Flag_trkPOG_logErrorTooManyClusters,process.Flag_METFilters,process.endjob_step,process.RAWRECOoutput_step)
+process.schedule = cms.Schedule(process.Flag_HBHENoiseFilter,process.Flag_HBHENoiseIsoFilter,process.Flag_CSCTightHaloFilter,process.Flag_CSCTightHaloTrkMuUnvetoFilter,process.Flag_CSCTightHalo2015Filter,process.Flag_globalTightHalo2016Filter,process.Flag_globalSuperTightHalo2016Filter,process.Flag_HcalStripHaloFilter,process.Flag_hcalLaserEventFilter,process.Flag_EcalDeadCellTriggerPrimitiveFilter,process.Flag_EcalDeadCellBoundaryEnergyFilter,process.Flag_ecalBadCalibFilter,process.Flag_goodVertices,process.Flag_eeBadScFilter,process.Flag_ecalLaserCorrFilter,process.Flag_trkPOGFilters,process.Flag_chargedHadronTrackResolutionFilter,process.Flag_muonBadTrackFilter,process.Flag_BadChargedCandidateFilter,process.Flag_BadPFMuonFilter,process.Flag_BadChargedCandidateSummer16Filter,process.Flag_BadPFMuonSummer16Filter,process.Flag_trkPOG_manystripclus53X,process.Flag_trkPOG_toomanystripclus53X,process.Flag_trkPOG_logErrorTooManyClusters,process.Flag_METFilters,process.endjob_step,process.MINIAODSIMoutput_step)
 process.schedule.associate(process.patTask)
 from PhysicsTools.PatAlgos.tools.helpers import associatePatAlgosToolsTask
 associatePatAlgosToolsTask(process)
 
 # customisation of the process.
 
-# Automatic addition of the customisation function from Configuration.DataProcessing.RecoTLR
-from Configuration.DataProcessing.RecoTLR import customisePostEra_Run2_2018 
-
-#call to customisation function customisePostEra_Run2_2018 imported from Configuration.DataProcessing.RecoTLR
-process = customisePostEra_Run2_2018(process)
-
 # Automatic addition of the customisation function from TauAnalysis.MCEmbeddingTools.customisers
-from TauAnalysis.MCEmbeddingTools.customisers import customiseSelecting_Reselect 
+from TauAnalysis.MCEmbeddingTools.customisers import customiseMerging_Reselect 
 
-#call to customisation function customiseSelecting_Reselect imported from TauAnalysis.MCEmbeddingTools.customisers
-process = customiseSelecting_Reselect(process)
+#call to customisation function customiseMerging_Reselect imported from TauAnalysis.MCEmbeddingTools.customisers
+process = customiseMerging_Reselect(process)
 
 # End of customisation functions
 #do not add changes to your config after this point (unless you know what you are doing)
@@ -134,6 +178,7 @@ process = miniAOD_customizeAllData(process)
 
 # Customisation from command line
 
+process.patTrigger.processName = cms.string('SIMembedding')
 #Have logErrorHarvester wait for the same EDProducers to finish as those providing data for the OutputModule
 from FWCore.Modules.logErrorHarvester_cff import customiseLogErrorHarvesterUsingOutputCommands
 process = customiseLogErrorHarvesterUsingOutputCommands(process)

@@ -2,7 +2,7 @@
 # using: 
 # Revision: 1.19 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: TauAnalysis/MCEmbeddingTools/python/EmbeddingPythia8Hadronizer_cfi.py --filein file:lhe_and_cleaned.root --fileout simulated_and_cleaned.root --conditions 102X_upgrade2018_realistic_v16 --era Run2_2018 --eventcontent RAWRECO --step GEN,SIM,DIGI,L1,DIGI2RAW,HLT:@relval2018,RAW2DIGI,RECO --datatier RAWRECO --customise TauAnalysis/MCEmbeddingTools/customisers.customiseGenerator_Reselect --beamspot Realistic25ns13TeVEarly2018Collision --no_exec -n -1 --python_filename generator.py --geometry DB:Extended --mc
+# with command line options: TauAnalysis/MCEmbeddingTools/python/EmbeddingPythia8Hadronizer_cfi.py --filein file:lhe_and_cleaned.root --fileout simulated_and_cleaned.root --conditions 102X_upgrade2018_realistic_v12 --era Run2_2018 --eventcontent RAWRECO --step GEN,SIM,DIGI,L1,DIGI2RAW,HLT:@relval2018,RAW2DIGI,RECO --datatier RAWRECO --customise TauAnalysis/MCEmbeddingTools/customisers.customiseGenerator_Reselect --beamspot Realistic25ns13TeVEarly2018Collision --no_exec -n -1 --python_filename generator.py --geometry DB:Extended --mc
 import FWCore.ParameterSet.Config as cms
 
 from Configuration.StandardSequences.Eras import eras
@@ -95,7 +95,7 @@ process.RAWRECOoutput = cms.OutputModule("PoolOutputModule",
 process.XMLFromDBSource.label = cms.string("Extended")
 process.genstepfilter.triggerConditions=cms.vstring("generation_step")
 from Configuration.AlCa.GlobalTag import GlobalTag
-process.GlobalTag = GlobalTag(process.GlobalTag, '102X_upgrade2018_realistic_v16', '')
+process.GlobalTag = GlobalTag(process.GlobalTag, '102X_upgrade2018_realistic_v12', '')
 
 process.generator = cms.EDFilter("Pythia8HadronizerFilter",
     HepMCFilter = cms.PSet(
