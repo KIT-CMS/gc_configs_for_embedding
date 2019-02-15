@@ -82,9 +82,9 @@ class finale_state():
 		rp_base_cfg = {}
 		rp_base_cfg['__CMSRUN_ORDER__'] = cmsRun_order_str
 		if self.finalstate=="Preselection":
-			se_path_str = 'se path = srm://cmssrm-kit.gridka.de:8443/srm/managerv2?SFN=/pnfs/gridka.de/cms/disk-only/store/user/'+os.environ["USER"]+'/gc_storage'
+			se_path_str = 'se path = srm://cmssrm-kit.gridka.de:8443/srm/managerv2?SFN=/pnfs/gridka.de/cms/disk-only/store/user/sbrommer/gc_storage'
 		else:
-			se_path_str = se_path_str = 'se path = srm://dcache-se-cms.desy.de:8443/srm/managerv2?SFN=/pnfs/desy.de/cms/tier2/store/user/sbrommer/gc_storage'
+			se_path_str = se_path_str = 'se path = srm://dcache-se-cms.desy.de:8443/srm/managerv2?SFN=/pnfs/desy.de/cms/tier2/store/user/'+os.environ["USER"]+'/gc_storage'
 		rp_base_cfg['__SE_PATH__']=se_path_str
 		se_output_pattern_str= 'se output pattern = '+self.finalstate+'_'+self.identifier+'/@NICK@/@FOLDER@/@XBASE@_@GC_JOB_ID@.@XEXT@'
 		rp_base_cfg['__SE_OUTPUT_PATTERN__']=se_output_pattern_str
