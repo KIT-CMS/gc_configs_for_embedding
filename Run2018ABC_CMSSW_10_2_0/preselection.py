@@ -2,7 +2,7 @@
 # using: 
 # Revision: 1.19 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: RECO -s RAW2DIGI,L1Reco,RECO,PAT --runUnscheduled --data --scenario pp --conditions 102X_dataRun2_Sep2018_Rereco_v1 --era Run2_2018 --eventcontent RAW --datatier RAW --customise Configuration/DataProcessing/RecoTLR.customisePostEra_Run2_2018,TauAnalysis/MCEmbeddingTools/customisers.customiseSelecting --filein file:D671E4CB-B468-E811-B0BA-FA163EFF1C10.root --fileout PreRAWskimmed.root -n -1 --no_exec --python_filename=preselection.py
+# with command line options: RECO -s RAW2DIGI,L1Reco,RECO,PAT --runUnscheduled --data --scenario pp --conditions 102X_dataRun2_Sep2018Rereco_v1 --era Run2_2018 --eventcontent RAW --datatier RAW --customise Configuration/DataProcessing/RecoTLR.customisePostEra_Run2_2018,TauAnalysis/MCEmbeddingTools/customisers.customiseSelecting --filein file:D671E4CB-B468-E811-B0BA-FA163EFF1C10.root --fileout PreRAWskimmed.root -n -1 --no_exec --python_filename=preselection.py
 import FWCore.ParameterSet.Config as cms
 
 from Configuration.StandardSequences.Eras import eras
@@ -61,7 +61,7 @@ process.RAWoutput = cms.OutputModule("PoolOutputModule",
 
 # Other statements
 from Configuration.AlCa.GlobalTag import GlobalTag
-process.GlobalTag = GlobalTag(process.GlobalTag, '102X_dataRun2_Sep2018_Rereco_v1', '')
+process.GlobalTag = GlobalTag(process.GlobalTag, '102X_dataRun2_Sep2018Rereco_v1', '')
 
 # Path and EndPath definitions
 process.raw2digi_step = cms.Path(process.RawToDigi)

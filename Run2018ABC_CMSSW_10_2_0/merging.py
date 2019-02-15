@@ -2,7 +2,7 @@
 # using: 
 # Revision: 1.19 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: PAT -s PAT --filein file:simulated_and_cleaned.root --fileout file:merged.root --era Run2_2018 --runUnscheduled --data --scenario pp --conditions 102X_dataRun2_Sep2018_Rereco_v1 --eventcontent MINIAODSIM --datatier USER --customise TauAnalysis/MCEmbeddingTools/customisers.customiseMerging_Reselect --customise_commands process.patTrigger.processName = cms.string('SIMembedding') -n -1 --no_exec --python_filename=merging.py
+# with command line options: PAT -s PAT --filein file:simulated_and_cleaned.root --fileout file:merged.root --era Run2_2018 --runUnscheduled --data --scenario pp --conditions 102X_dataRun2_Sep2018Rereco_v1 --eventcontent MINIAODSIM --datatier USER --customise TauAnalysis/MCEmbeddingTools/customisers.customiseMerging_Reselect --customise_commands process.patTrigger.processName = cms.string('SIMembedding') -n -1 --no_exec --python_filename=merging.py
 import FWCore.ParameterSet.Config as cms
 
 from Configuration.StandardSequences.Eras import eras
@@ -114,7 +114,7 @@ process.MINIAODSIMoutput = cms.OutputModule("PoolOutputModule",
 
 # Other statements
 from Configuration.AlCa.GlobalTag import GlobalTag
-process.GlobalTag = GlobalTag(process.GlobalTag, '102X_dataRun2_Sep2018_Rereco_v1', '')
+process.GlobalTag = GlobalTag(process.GlobalTag, '102X_dataRun2_Sep2018Rereco_v1', '')
 
 # Path and EndPath definitions
 process.Flag_trackingFailureFilter = cms.Path(process.goodVertices+process.trackingFailureFilter)

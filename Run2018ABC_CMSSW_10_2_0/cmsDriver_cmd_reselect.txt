@@ -5,7 +5,7 @@
 ### Step 0: Preselection from DoubleMuon
 
 cmsDriver.py RECO -s RAW2DIGI,L1Reco,RECO,PAT --runUnscheduled \
---data --scenario pp --conditions 102X_dataRun2_Sep2018_Rereco_v1 \
+--data --scenario pp --conditions 102X_dataRun2_Sep2018Rereco_v1 \
 --era Run2_2018 \
 --eventcontent RAW --datatier RAW \
 --customise Configuration/DataProcessing/RecoTLR.customisePostEra_Run2_2018,\
@@ -16,7 +16,7 @@ TauAnalysis/MCEmbeddingTools/customisers.customiseSelecting \
 ### Step 1: Selection of Z->MuMu
 
 cmsDriver.py RECO -s RAW2DIGI,L1Reco,RECO,PAT --runUnscheduled \
---data --scenario pp --conditions 102X_dataRun2_Sep2018_Rereco_v1 \
+--data --scenario pp --conditions 102X_dataRun2_Sep2018Rereco_v1 \
 --era Run2_2018 \
 --eventcontent RAWRECO --datatier RAWRECO \
 --customise Configuration/DataProcessing/RecoTLR.customisePostEra_Run2_2018,\
@@ -28,7 +28,7 @@ TauAnalysis/MCEmbeddingTools/customisers.customiseSelecting_Reselect \
 
 cmsDriver.py LHEprodandCLEAN --filein file:RAWskimmed.root \
 --fileout file:lhe_and_cleaned.root --runUnscheduled --data --era Run2_2018 \
---scenario pp --conditions 102X_dataRun2_Sep2018_Rereco_v1 --eventcontent RAWRECO \
+--scenario pp --conditions 102X_dataRun2_Sep2018Rereco_v1 --eventcontent RAWRECO \
 --datatier RAWRECO --step RAW2DIGI,RECO,PAT \
 --customise Configuration/DataProcessing/RecoTLR.customisePostEra_Run2_2018,\
 TauAnalysis/MCEmbeddingTools/customisers.customiseLHEandCleaning_Reselect \
@@ -50,7 +50,7 @@ TauAnalysis/MCEmbeddingTools/customisers.customiseGenerator_Reselect \
 cmsDriver.py PAT -s PAT \
 --filein file:simulated_and_cleaned.root  \
 --fileout file:merged.root --era Run2_2018 \
---runUnscheduled --data --scenario pp --conditions 102X_dataRun2_Sep2018_Rereco_v1 \
+--runUnscheduled --data --scenario pp --conditions 102X_dataRun2_Sep2018Rereco_v1 \
 --eventcontent  MINIAODSIM --datatier USER \
 --customise \
 TauAnalysis/MCEmbeddingTools/customisers.customiseMerging_Reselect \
