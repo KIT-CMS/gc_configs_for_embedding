@@ -87,7 +87,7 @@ class finale_state():
 			se_path_str = se_path_str = 'se path = srm://dcache-se-cms.desy.de:8443/srm/managerv2?SFN=/pnfs/desy.de/cms/tier2/store/user/'+os.environ["USER"]+'/gc_storage'
 		rp_base_cfg['__SE_PATH__']=se_path_str
 		se_output_pattern_str= 'se output pattern = '+self.finalstate+'_'+self.identifier+'/@NICK@/@FOLDER@/@XBASE@_@GC_JOB_ID@.@XEXT@'
-		rp_base_cfg['__SE_OUTPUT_PATTERN_']=se_output_pattern_str
+		rp_base_cfg['__SE_OUTPUT_PATTERN__']=se_output_pattern_str
 		if self.finalstate=="Preselection":
 			self.copy_file('grid_control_fullembedding_data_base_preselection.conf', copy_from_folder='./' ,replace_dict=rp_base_cfg)
 		else:
