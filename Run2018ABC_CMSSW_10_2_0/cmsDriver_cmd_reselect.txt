@@ -54,5 +54,5 @@ cmsDriver.py PAT -s PAT \
 --eventcontent  MINIAODSIM --datatier USER \
 --customise \
 TauAnalysis/MCEmbeddingTools/customisers.customiseMerging_Reselect \
---customise_commands "process.patTrigger.processName = cms.string('SIMembedding')" \
+--customise_commands "process.patTrigger.processName = cms.string('SIMembedding') \nprocess.slimmedPatTrigger.triggerResults =  cms.InputTag("TriggerResults::SIMembedding") \nprocess.patMuons.triggerResults =  cms.InputTag("TriggerResults::SIMembedding")" \
 -n -1 --no_exec --python_filename=merging.py
