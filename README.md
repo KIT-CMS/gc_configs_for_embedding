@@ -19,6 +19,8 @@ git cms-init
 
 git cms-addpkg TauAnalysis/MCEmbeddingTools
 
+git cms-addpkg SimG4CMS
+
 git cms-merge-topic KIT-CMS:embedding_from-CMSSW_10_2_0
 
 scramv1 b -j 12
