@@ -25,7 +25,7 @@ git cms-merge-topic KIT-CMS:embedding_from-CMSSW_10_2_0
 
 scramv1 b -j 12
 
-git clone https://github.com/janekbechtel/grid-control
+git clone https://github.com/KIT-CMS/grid-control
 
 git clone https://github.com/KIT-CMS/gc_configs_for_embedding.git
 
