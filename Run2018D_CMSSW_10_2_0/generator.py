@@ -6,7 +6,10 @@
 import FWCore.ParameterSet.Config as cms
 
 from Configuration.StandardSequences.Eras import eras
-
+# In order to reduce diskusage of job, remove output of selection.py
+import os
+if os.path.exists("RAWskimmed.root"):
+  os.remove("RAWskimmed.root")
 process = cms.Process('HLT',eras.Run2_2018)
 
 # import of standard configurations
