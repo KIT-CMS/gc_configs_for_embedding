@@ -125,7 +125,12 @@ class finale_state():
 			out_file.write('include=grid_control_fullembedding_data_base_preselection.conf\n')
 		else:
 			out_file.write('include=grid_control_fullembedding_data_base_freiburg.conf\n')
-		out_file.write('workdir = /portal/ekpbms1/home/${USER}/embedding_2018/gc_workdir/'+self.particle_to_embed+'_'+out_file.name.split('.')[0]+'\n')
+		out_file.write('workdir = /portal/{host}/home/{user}/embedding/gc_workdir/{particle_to_embed}_{name}\n'.format(
+							host=os.environ["HOSTNAME"].replace(".ekp.kit.edu",""),
+							user=os.environ["USER"],
+							particle_to_embed=self.particle_to_embed,
+							name=out_file.name.split('.')[0]						
+							))
 		out_file.write('[CMSSW]\n')
 		if add_run and not add_dbs:
 			out_file.write('dataset = '+self.particle_to_embed+'_'+self.name+'_'+add_run+' :  list:'+add_run+'.dbs\n')
