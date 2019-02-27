@@ -66,8 +66,9 @@ class finale_state():
 		dbs_folder="dbs"
 		for add_run in runs:
 			if not add_dbs:
-				if os.path.exists(add_run+'.dbs'):
+				if os.path.exists(dbs_folder+"/"+add_run+'.dbs'):
 					self.copy_file(add_run+'.dbs', copy_from_folder = dbs_folder)
+					"Copied {}".format(dbs_folder+add_run+'.dbs')
 				else:
 					print '{}.dbs could not be found in folder {}. Please run preselection'.format(add_run,dbs_folder)
 				if not os.path.exists(self.name+'/'+add_run+'.conf'):
@@ -124,7 +125,7 @@ class finale_state():
 			out_file.write('include=grid_control_fullembedding_data_base_preselection.conf\n')
 		else:
 			out_file.write('include=grid_control_fullembedding_data_base_freiburg.conf\n')
-		out_file.write('workdir = /portal/ekpbms2/home/${USER}/embedding/gc_workdir/'+self.particle_to_embed+'_'+out_file.name.split('.')[0]+'\n')
+		out_file.write('workdir = /portal/ekpbms1/home/${USER}/embedding_2018/gc_workdir/'+self.particle_to_embed+'_'+out_file.name.split('.')[0]+'\n')
 		out_file.write('[CMSSW]\n')
 		if add_run and not add_dbs:
 			out_file.write('dataset = '+self.particle_to_embed+'_'+self.name+'_'+add_run+' :  list:'+add_run+'.dbs\n')
@@ -145,7 +146,6 @@ class finale_state():
 		out_file.write('while [ -f ".lock" ]\n')
 		out_file.write('do\n')
 		for akt_cfg in self.gc_cfgs:
-			print akt_cfg.split("/")[1]
 			out_file.write('go.py '+akt_cfg.split("/")[1]+' -G \n')
 		out_file.write('echo "rm .lock"\n')
 		out_file.write('sleep 2\n')
