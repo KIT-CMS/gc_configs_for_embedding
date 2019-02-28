@@ -93,9 +93,7 @@ class finale_state():
 			self.copy_file('grid_control_fullembedding_data_base_preselection.conf', copy_from_folder='./' ,replace_dict=rp_base_cfg)
 		else:
 			self.copy_file('grid_control_fullembedding_data_base_freiburg.conf', copy_from_folder='./' ,replace_dict=rp_base_cfg)
-			self.copy_file('grid_control_fullembedding_data_base_desy.conf', copy_from_folder='./' ,replace_dict=rp_base_cfg)
-			self.copy_file('grid_control_fullembedding_data_base_gridka.conf', copy_from_folder='./' ,replace_dict=rp_base_cfg)
-		
+			self.copy_file('grid_control_fullembedding_data_base_naf.conf', copy_from_folder='./' ,replace_dict=rp_base_cfg)		
 		
 	def copy_file(self, in_file_name, copy_from_folder = None ,add_fragment_to_end=[], skip_if_not_there=False, overwrite=False, replace_dict={}):
 		if not copy_from_folder:
@@ -121,16 +119,27 @@ class finale_state():
 		else:
 		 	out_file = open(self.name+'/DAS.conf','w')
 		out_file.write('[global]\n')
-		if self.finalstate=="Preselection":
+		if "naf" in os.environ["HOSTNAME"]:
+			out_file.write('include=grid_control_fullembedding_data_base_naf.conf\n')
+		elif self.finalstate=="Preselection":
 			out_file.write('include=grid_control_fullembedding_data_base_preselection.conf\n')
 		else:
 			out_file.write('include=grid_control_fullembedding_data_base_freiburg.conf\n')
-		out_file.write('workdir = /portal/{host}/home/{user}/embedding/gc_workdir/{particle_to_embed}_{name}\n'.format(
-							host=os.environ["HOSTNAME"].replace(".ekp.kit.edu",""),
-							user=os.environ["USER"],
-							particle_to_embed=self.particle_to_embed,
-							name=out_file.name.split('.')[0]						
-							))
+		if "ekp.kit.edu" in os.environ["HOSTNAME"]:
+			out_file.write('workdir = /portal/{host}/home/{user}/embedding/gc_workdir/{particle_to_embed}_{name}\n'.format(
+								host=os.environ["HOSTNAME"].replace(".ekp.kit.edu",""),
+								user=os.environ["USER"],
+								particle_to_embed=self.particle_to_embed,
+								name=out_file.name.split('.')[0]						
+								))
+		elif "naf" in os.environ["HOSTNAME"]:
+			out_file.write('workdir = /nfs/dust/cms/user/{user}/embedding/gc_workdir/{particle_to_embed}_{name}\n'.format(
+								user=os.environ["USER"],
+								particle_to_embed=self.particle_to_embed,
+								name=out_file.name.split('.')[0]						
+								))
+		else:
+			print "Host for job submission unknown. Please set workdir manually"
 		out_file.write('[CMSSW]\n')
 		if add_run and not add_dbs:
 			out_file.write('dataset = '+self.particle_to_embed+'_'+self.name+'_'+add_run+' :  list:'+add_run+'.dbs\n')
