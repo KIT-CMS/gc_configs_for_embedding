@@ -4,7 +4,7 @@ This package collects the configs (cmsRun, gridcontrol, inputs dbs files) for em
 
 ## 2018 
 
-Checkout script: [Here](scripts/checkout_2018.sh
+Checkout script: [Here](scripts/checkout_2018.sh)
 
 ```sh
 export VO_CMS_SW_DIR=/cvmfs/cms.cern.ch
