@@ -10,7 +10,7 @@ from Configuration.StandardSequences.Eras import eras
 import os
 if os.path.exists("RAWskimmed.root"):
   os.remove("RAWskimmed.root")
-  
+
 process = cms.Process('HLT',eras.Run2_2018)
 
 # import of standard configurations
@@ -29,7 +29,7 @@ process.load('Configuration.StandardSequences.SimIdeal_cff')
 process.load('Configuration.StandardSequences.Digi_cff')
 process.load('Configuration.StandardSequences.SimL1Emulator_cff')
 process.load('Configuration.StandardSequences.DigiToRaw_cff')
-process.load('HLTrigger.Configuration.HLT_2018v22_cff')
+process.load('HLTrigger.Configuration.HLT_2018v32_cff')
 process.load('Configuration.StandardSequences.RawToDigi_cff')
 process.load('Configuration.StandardSequences.Reconstruction_cff')
 process.load('Configuration.StandardSequences.EndOfProcess_cff')

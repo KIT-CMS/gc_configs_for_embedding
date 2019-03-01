@@ -10,7 +10,7 @@ from Configuration.StandardSequences.Eras import eras
 import os
 if os.path.exists("lhe_and_cleaned.root"):
   os.remove("lhe_and_cleaned.root")
-  
+
 process = cms.Process('PAT',eras.Run2_2018)
 
 # import of standard configurations
