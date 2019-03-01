@@ -4,7 +4,7 @@ This package collects the configs (cmsRun, gridcontrol, inputs dbs files) for em
 
 ## 2018 
 
-Checkout script: [Here][scripts/checkout_2018.sh]
+Checkout script: [Here](scripts/checkout_2018.sh
 
 ```sh
 export VO_CMS_SW_DIR=/cvmfs/cms.cern.ch
@@ -29,9 +29,9 @@ git cms-merge-topic KIT-CMS:embedding_from-CMSSW_10_2_0
 
 scramv1 b -j 12
 
-git clone https://github.com/KIT-CMS/grid-control
+git clone git@github.com:KIT-CMS/grid-control.git
 
-git clone https://github.com/KIT-CMS/gc_configs_for_embedding.git
+git clone git@github.com:KIT-CMS/gc_configs_for_embedding.git
 
 cd gc_configs_for_embedding
 
