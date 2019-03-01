@@ -1,10 +1,12 @@
 # gc_configs_for_embedding
 
-This package collects the configs (cmsRun, gridcontroll, inputs dbs files) for embedding, such that one can starts a large scale production
+This package collects the configs (cmsRun, gridcontrol, inputs dbs files) for embedding, such that one can starts a large scale production
 
 ## 2018 
 
+Checkout script: [Here][scripts/checkout_2018.sh]
 
+```sh
 export VO_CMS_SW_DIR=/cvmfs/cms.cern.ch
 
 source $VO_CMS_SW_DIR/cmsset_default.sh
@@ -34,10 +36,11 @@ git clone https://github.com/KIT-CMS/gc_configs_for_embedding.git
 cd gc_configs_for_embedding
 
 python Prepare_DATA_2018_CMSSW1020.py
-
+```
 
 ## 2017
 
+```sh
 export VO_CMS_SW_DIR=/cvmfs/cms.cern.ch
 
 source $VO_CMS_SW_DIR/cmsset_default.sh
@@ -63,10 +66,11 @@ git clone https://github.com/KIT-CMS/gc_configs_for_embedding.git
 cd gc_configs_for_embedding
 
 python Prepare_DATA_2017_CMSSW944.py
-
+```
 
 ## 2016
 
+```sh
 export VO_CMS_SW_DIR=/cvmfs/cms.cern.ch
 
 source $VO_CMS_SW_DIR/cmsset_default.sh
@@ -88,3 +92,4 @@ git clone https://github.com/KIT-CMS/gc_configs_for_embedding.git
 cd gc_configs_for_embedding
 
 python Prepare_DATA_2016_CMSSW826.py
+```
