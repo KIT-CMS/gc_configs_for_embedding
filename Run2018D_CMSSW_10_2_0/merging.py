@@ -2,14 +2,11 @@
 # using: 
 # Revision: 1.19 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: PAT -s PAT --filein file:simulated_and_cleaned.root --fileout file:merged.root --era Run2_2018 --runUnscheduled --data --scenario pp --conditions 102X_dataRun2_Prompt_v11 --eventcontent MINIAODSIM --datatier USER --customise TauAnalysis/MCEmbeddingTools/customisers.customiseMerging_Reselect --customise_commands process.patTrigger.processName = cms.string('SIMembedding') -n -1 --no_exec --python_filename=merging.py
+# with command line options: PAT -s PAT --filein file:simulated_and_cleaned.root --fileout file:merged.root --era Run2_2018 --runUnscheduled --data --scenario pp --conditions 102X_dataRun2_Prompt_v13 --eventcontent MINIAODSIM --datatier USER --customise TauAnalysis/MCEmbeddingTools/customisers.customiseMerging_Reselect --customise_commands process.patTrigger.processName = cms.string("SIMembedding") \nprocess.slimmedPatTrigger.triggerResults =  cms.InputTag("TriggerResults::SIMembedding") \nprocess.patMuons.triggerResults =  cms.InputTag("TriggerResults::SIMembedding") -n -1 --no_exec --python_filename=merging.py
 import FWCore.ParameterSet.Config as cms
 
 from Configuration.StandardSequences.Eras import eras
-# In order to reduce diskusage of job, remove output of lheprodandcleaning.py
-import os
-if os.path.exists("lhe_and_cleaned.root"):
-  os.remove("lhe_and_cleaned.root")
+
 process = cms.Process('PAT',eras.Run2_2018)
 
 # import of standard configurations
@@ -181,7 +178,9 @@ process = miniAOD_customizeAllData(process)
 
 # Customisation from command line
 
-process.patTrigger.processName = cms.string('SIMembedding')
+process.patTrigger.processName = cms.string("SIMembedding") 
+process.slimmedPatTrigger.triggerResults =  cms.InputTag("TriggerResults::SIMembedding") 
+process.patMuons.triggerResults =  cms.InputTag("TriggerResults::SIMembedding")
 #Have logErrorHarvester wait for the same EDProducers to finish as those providing data for the OutputModule
 from FWCore.Modules.logErrorHarvester_cff import customiseLogErrorHarvesterUsingOutputCommands
 process = customiseLogErrorHarvesterUsingOutputCommands(process)

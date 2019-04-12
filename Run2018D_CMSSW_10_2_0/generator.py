@@ -2,14 +2,11 @@
 # using: 
 # Revision: 1.19 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: TauAnalysis/MCEmbeddingTools/python/EmbeddingPythia8Hadronizer_cfi.py --filein file:lhe_and_cleaned.root --fileout simulated_and_cleaned.root --conditions 102X_upgrade2018_realistic_v12 --era Run2_2018 --eventcontent RAWRECO --step GEN,SIM,DIGI,L1,DIGI2RAW,HLT:@relval2018,RAW2DIGI,RECO --datatier RAWRECO --customise TauAnalysis/MCEmbeddingTools/customisers.customiseGenerator_Reselect --beamspot Realistic25ns13TeVEarly2018Collision --no_exec -n -1 --python_filename generator.py --geometry DB:Extended --mc
+# with command line options: TauAnalysis/MCEmbeddingTools/python/EmbeddingPythia8Hadronizer_cfi.py --filein file:lhe_and_cleaned.root --fileout simulated_and_cleaned.root --conditions 102X_upgrade2018_realistic_v18 --era Run2_2018 --eventcontent RAWRECO --step GEN,SIM,DIGI,L1,DIGI2RAW,HLT:@relval2018,RAW2DIGI,RECO --datatier RAWRECO --customise TauAnalysis/MCEmbeddingTools/customisers.customiseGenerator_Reselect --beamspot Realistic25ns13TeVEarly2018Collision --no_exec -n -1 --python_filename generator.py --geometry DB:Extended --mc
 import FWCore.ParameterSet.Config as cms
 
 from Configuration.StandardSequences.Eras import eras
-# In order to reduce diskusage of job, remove output of selection.py
-import os
-if os.path.exists("RAWskimmed.root"):
-  os.remove("RAWskimmed.root")
+
 process = cms.Process('HLT',eras.Run2_2018)
 
 # import of standard configurations
@@ -28,7 +25,7 @@ process.load('Configuration.StandardSequences.SimIdeal_cff')
 process.load('Configuration.StandardSequences.Digi_cff')
 process.load('Configuration.StandardSequences.SimL1Emulator_cff')
 process.load('Configuration.StandardSequences.DigiToRaw_cff')
-process.load('HLTrigger.Configuration.HLT_2018v22_cff')
+process.load('HLTrigger.Configuration.HLT_2018v32_cff')
 process.load('Configuration.StandardSequences.RawToDigi_cff')
 process.load('Configuration.StandardSequences.Reconstruction_cff')
 process.load('Configuration.StandardSequences.EndOfProcess_cff')

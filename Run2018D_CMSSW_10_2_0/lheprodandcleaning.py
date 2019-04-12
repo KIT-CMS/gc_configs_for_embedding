@@ -2,7 +2,7 @@
 # using: 
 # Revision: 1.19 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: LHEprodandCLEAN --filein file:RAWskimmed.root --fileout file:lhe_and_cleaned.root --runUnscheduled --data --era Run2_2018 --scenario pp --conditions 102X_dataRun2_Prompt_v11 --eventcontent RAWRECO --datatier RAWRECO --step RAW2DIGI,RECO,PAT --customise Configuration/DataProcessing/RecoTLR.customisePostEra_Run2_2018,TauAnalysis/MCEmbeddingTools/customisers.customiseLHEandCleaning_Reselect --no_exec -n -1 --python_filename lheprodandcleaning.py
+# with command line options: LHEprodandCLEAN --filein file:RAWskimmed.root --fileout file:lhe_and_cleaned.root --runUnscheduled --data --era Run2_2018 --scenario pp --conditions 102X_dataRun2_Prompt_v13 --eventcontent RAWRECO --datatier RAWRECO --step RAW2DIGI,RECO,PAT --customise Configuration/DataProcessing/RecoTLR.customisePostEra_Run2_2018,TauAnalysis/MCEmbeddingTools/customisers.customiseLHEandCleaning_Reselect --no_exec -n -1 --python_filename lheprodandcleaning.py
 import FWCore.ParameterSet.Config as cms
 
 from Configuration.StandardSequences.Eras import eras
