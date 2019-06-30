@@ -60,7 +60,7 @@ git cms-init
 
 git cms-addpkg TauAnalysis/MCEmbeddingTools
 
-git cms-merge-topic perahrens:embeddingReRecoElId_cmssw94x
+git cms-merge-topic KIT-CMS:embeddingReRecoElId_cmssw94x
 
 scramv1 b -j 12
 
@@ -86,7 +86,7 @@ cd CMSSW_8_0_26_patch1/src
 
 cmsenv
 
-git cms-merge-topic swayand:fixingforembedding_cmss8026p1
+git cms-merge-topic KIT-CMS:fixingforembedding_cmss8026p1
 
 scramv1 b -j12
 
