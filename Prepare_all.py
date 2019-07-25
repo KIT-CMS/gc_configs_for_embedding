@@ -125,7 +125,7 @@ class finale_state():
 			out_file.write('include=grid_control_fullembedding_data_base_preselection.conf\n')
 		else:
 			out_file.write('include=grid_control_fullembedding_data_base_freiburg.conf\n')
-		if "ekp.kit.edu" in os.environ["HOSTNAME"]:
+		if "etp.kit.edu" in os.environ["HOSTNAME"]:
 			out_file.write('workdir = /portal/{host}/home/{user}/embedding/gc_workdir/{particle_to_embed}_{name}\n'.format(
 								host=os.environ["HOSTNAME"].replace(".ekp.kit.edu",""),
 								user=os.environ["USER"],
