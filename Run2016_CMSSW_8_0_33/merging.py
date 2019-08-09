@@ -141,4 +141,3 @@ for command in drops:
     process.AODSIMoutput.outputCommands.remove(command)
 
 process.dedxHitInfo.useTrajectory = cms.bool(False)
-
