@@ -22,7 +22,7 @@ process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(10)
+    input = cms.untracked.int32(-1)
 )
 
 """ process.Timing = cms.Service("Timing",
@@ -33,11 +33,7 @@ process.maxEvents = cms.untracked.PSet(
 
 # Input source
 process.source = cms.Source("PoolSource",
-    #fileNames = cms.untracked.vstring('file:/portal/ekpbms2/home/jbechtel/embedding/legacy/CMSSW_8_0_33/src/gc_configs_for_embedding/ElTau_data_2016_CMSSW8033/merged.root'),
-    #fileNames = cms.untracked.vstring('file:/portal/ekpbms1/home/sbrommer/embedding_2016_legacy/CMSSW_8_0_33/src/legacy_test/merged.root'),
-    #fileNames = cms.untracked.vstring('file:/storage/gridka-nrg/sbrommer/gc_storage/Embedding_16_legacy/ElTau_data_2016_CMSSW8033/TauEmbedding_ElTau_data_2016_CMSSW8033_DoubleMuon_C-v2/26/merged_1125.root'),
-    fileNames = cms.untracked.vstring('file:merged_2.root'), # fast file
-    #fileNames = cms.untracked.vstring('file:root://cms-xrd-global.cern.ch///store/user/sbrommer/gc_storage/embedding_16_legacy/ElTau_data_2016_CMSSW8033/TauEmbedding_ElTau_data_2016_CMSSW8033_Run2016B-v2/49/merged_3948.root'), # slow file
+    fileNames = cms.untracked.vstring('file:merged.root'),
     secondaryFileNames = cms.untracked.vstring()
 )
 process.options = cms.untracked.PSet(
