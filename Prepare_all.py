@@ -89,7 +89,7 @@ class finale_state():
 		rp_base_cfg['__SE_PATH__']=se_path_str
 		se_output_pattern_str= 'se output pattern = '+self.finalstate+'_'+self.identifier+'/@NICK@/@FOLDER@/@XBASE@_@GC_JOB_ID@.@XEXT@'
 		rp_base_cfg['__SE_OUTPUT_PATTERN__']=se_output_pattern_str
-		rp_base_cfg['__partition_lfn_modifier__'] = '<xrootd:nrg>'
+		rp_base_cfg['__partition_lfn_modifier__'] = 'partition lfn modifier = <xrootd:nrg>'
 		if self.finalstate=="Preselection":
 			self.copy_file('grid_control_fullembedding_data_base_preselection.conf', copy_from_folder='./' ,replace_dict=rp_base_cfg)
 		else:
