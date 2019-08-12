@@ -52,7 +52,7 @@ class finale_state():
 					add_fragment_to_end.append('process.externalLHEProducer.particleToEmbed = cms.int32(13)')
 				if self.particle_to_embed == "ElEmbedding":
 					add_fragment_to_end.append('process.externalLHEProducer.particleToEmbed = cms.int32(11)')
-			if file_to_copy == 'merging.py':
+			if file_to_copy == 'merging.py' and not "2016" in self.identifier:
 				if "Run201" in self.inputfolder:
 					add_fragment_to_end.append('from TauAnalysis.MCEmbeddingTools.customisers import customiseKeepPrunedGenParticles')
 					if reselect:
