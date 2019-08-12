@@ -7,6 +7,13 @@ import FWCore.ParameterSet.Config as cms
 
 from Configuration.StandardSequences.Eras import eras
 
+# In order to reduce diskusage of job, remove output of lheprodandcleaning.py
+import os
+if os.path.exists("lhe_and_cleaned.root"):
+  os.remove("lhe_and_cleaned.root")
+
+
+
 process = cms.Process('PAT',eras.Run2_2016)
 
 # import of standard configurations
