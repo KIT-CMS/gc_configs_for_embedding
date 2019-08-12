@@ -36,12 +36,14 @@ def write_while(name):
 
 
 def copy_file(out_file, folder, filestream, replace_dict={}):
-    if os.path.isdir(folder):
-        for replace in replace_dict:  ## replace Variable by the value.
-            filestream = filestream.replace(replace, replace_dict[replace])
-        out_file = open("{}/{}".format(folder, out_file), 'w')
-        out_file.write(filestream)
-        out_file.close()
+    if not os.path.isdir(folder):
+        os.mkdir(folder)
+    for replace in replace_dict:  ## replace Variable by the value.
+        filestream = filestream.replace(replace, replace_dict[replace])
+    out_file = open("{}/{}".format(folder, out_file), 'w')
+    out_file.write(filestream)
+    out_file.close()
+        
 
 # the are to different eras, one for B-F and one for G,H
 for i,runs in enumerate(runs):
@@ -51,17 +53,25 @@ for i,runs in enumerate(runs):
         in_file = open("{}/{}".format(inputfolder, script), 'r')
         file_str = in_file.read()
         in_file.close()
-        copy_file(script, "{}_{}".format(final_state, identifier), in_file)
+        copy_file(script, "{}_{}".format(final_state, identifier), file_str)
 
         # next generate the grid-control configs
         rp_base_cfg = {}
-        rp_base_cfg['__CMSRUN_ORDER__'] = script
+        rp_base_cfg['__CMSRUN_ORDER__'] = "config file = {}".format(script)
         se_path_str = 'se path = srm://cmssrm-kit.gridka.de:8443/srm/managerv2?SFN=/pnfs/gridka.de/cms/disk-only/store/user/' + os.environ[
             "USER"] + '/gc_storage/embedding_16_legacy_miniaod'
         rp_base_cfg['__SE_PATH__'] = se_path_str
         se_output_pattern_str = 'se output pattern = ' + final_state + '_' + identifier + '/@NICK@/@FOLDER@/@XBASE@_@GC_JOB_ID@.@XEXT@'
         rp_base_cfg['__SE_OUTPUT_PATTERN__'] = se_output_pattern_str
-        rp_base_cfg['__partition_lfn_modifier__'] = '<srm:nrg>'
+        rp_base_cfg['__partition_lfn_modifier__'] = 'partition lfn modifier = <srm:nrg>'
+        for config in ["grid_control_fullembedding_data_base_naf.conf","grid_control_fullembedding_data_base_freiburg.conf"]:
+            in_file = open(config,'r')
+            file_str = in_file.read()
+            if i == 0: # for B-F
+                outputname = config.replace(".conf","_BF.conf")
+            else:
+                outputname = config.replace(".conf","_GH.conf")
+            copy_file(outputname, "{}_{}".format(final_state, identifier), file_str, rp_base_cfg)
 
         # finally generate the different configs for the different runs
         if final_state == "MuEmb":
@@ -72,9 +82,15 @@ for i,runs in enumerate(runs):
             particle = "TauEmbedding"
         for run in runs:
             if "naf" in os.environ["HOSTNAME"]:
-                out_file = 'include=grid_control_fullembedding_data_base_naf.conf\n'
+                if i == 0:
+                    out_file = 'include=grid_control_fullembedding_data_base_naf_BF.conf\n'
+                else:
+                    out_file = 'include=grid_control_fullembedding_data_base_naf_GH.conf\n'
             else:
-                out_file = 'include=grid_control_fullembedding_data_base_freiburg.conf\n'
+                if i == 0:
+                    out_file = 'include=grid_control_fullembedding_data_base_freiburg_BF.conf\n'
+                else:
+                    out_file = 'include=grid_control_fullembedding_data_base_freiburg_GH.conf\n'
             if "etp.kit.edu" in os.environ["HOSTNAME"]:
                 out_file += 'workdir = /portal/{host}/home/{user}/embedding/gc_workdir/miniaod_step/{particle}_{name}\n'.format(
                     host=os.environ["HOSTNAME"].replace(".ekp.kit.edu", ""),
