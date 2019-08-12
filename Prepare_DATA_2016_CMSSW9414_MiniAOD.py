@@ -68,6 +68,7 @@ for i, runs in enumerate(runs):
         rp_base_cfg['__SE_OUTPUT_PATTERN__'] = se_output_pattern_str
         rp_base_cfg[
             '__partition_lfn_modifier__'] = 'partition lfn modifier = <srm:nrg>'
+        rp_base_cfg['__SE_OUTPUT_FILE__'] = 'se output files = merged_miniaod.root'
         for config in [
                 "grid_control_fullembedding_data_base_naf.conf",
                 "grid_control_fullembedding_data_base_freiburg.conf"
