@@ -11,6 +11,8 @@ scram project CMSSW_9_4_14
 cd CMSSW_8_0_33/src
 cmsenv
 git cms-merge-topic KIT-CMS:emb_2016_legacy
+git cms-addpkg SimG4CMS
+git cms-addpkg SimG4Core
 scramv1 b -j 12
 
 git clone git@github.com:KIT-CMS/grid-control.git
