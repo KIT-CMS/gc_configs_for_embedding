@@ -92,8 +92,7 @@ for i,runs in enumerate(runs):
                 else:
                     out_file = 'include=grid_control_fullembedding_data_base_freiburg_GH.conf\n'
             if "etp.kit.edu" in os.environ["HOSTNAME"]:
-                out_file += 'workdir = /portal/{host}/home/{user}/embedding/gc_workdir/miniaod_step/{particle}_{name}\n'.format(
-                    host=os.environ["HOSTNAME"].replace(".ekp.kit.edu", ""),
+                out_file += 'workdir = /portal/ekpbms2/home/{user}/embedding/legacy/gc_workdir/miniaod_step/{particle}_{name}\n'.format( 
                     user=os.environ["USER"],
                     particle=particle,
                     name=final_state + "_" + identifier)

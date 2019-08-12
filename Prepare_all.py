@@ -127,8 +127,7 @@ class finale_state():
 		else:
 			out_file.write('include=grid_control_fullembedding_data_base_freiburg.conf\n')
 		if "etp.kit.edu" in os.environ["HOSTNAME"]:
-			out_file.write('workdir = /portal/{host}/home/{user}/embedding/gc_workdir/{particle_to_embed}_{name}\n'.format(
-								host=os.environ["HOSTNAME"].replace(".ekp.kit.edu",""),
+			out_file.write('workdir = /portal/ekpbms2/home/{user}/embedding/legacy/gc_workdir/{particle_to_embed}_{name}\n'.format(
 								user=os.environ["USER"],
 								particle_to_embed=self.particle_to_embed,
 								name=out_file.name.split('.')[0]						
