@@ -81,6 +81,9 @@ for i, runs in enumerate(runs):
                 outputname = config.replace(".conf", "_GH.conf")
             copy_file(outputname, "{}_{}".format(final_state, identifier),
                       file_str, rp_base_cfg)
+        for aod_list in os.listdir("dbs/aod_filelists"):
+            if final_state in aod_list:
+                copy_file(aod_list, "{}_{}".format(final_state, identifier), open("dbs/aod_filelists/"+aod_list, "r").read())
 
         # finally generate the different configs for the different runs
         if final_state == "MuEmb":
