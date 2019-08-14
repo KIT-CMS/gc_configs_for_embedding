@@ -91,6 +91,7 @@ class finale_state():
 		rp_base_cfg['__SE_OUTPUT_PATTERN__']=se_output_pattern_str
 		rp_base_cfg['__partition_lfn_modifier__'] = 'partition lfn modifier = <xrootd:nrg>'
 		rp_base_cfg['__SE_OUTPUT_FILE__'] = 'se output files = merged.root'
+		
 		if self.finalstate=="Preselection":
 			self.copy_file('grid_control_fullembedding_data_base_preselection.conf', copy_from_folder='./' ,replace_dict=rp_base_cfg)
 		else:
@@ -169,7 +170,7 @@ class finale_state():
 		os.chmod(self.name+'/while.sh',stat.S_IRWXU)
 	def make_generator_frag_map(self,this_finalstate,generator_frag_map=None):
 		if generator_frag_map is None:
-			generator_frag_map = {}
+			generator_frag_map = {}	
 			if this_finalstate=="MuTau":
 				generator_frag_map["MuTau"] = "process.generator.HepMCFilter.filterParameters.MuHadCut = cms.string('Mu.Pt > 18 && Had.Pt > 18 && Mu.Eta < 2.2 && Had.Eta < 2.4')"
 				generator_frag_map["MuTau"]+="\n"
@@ -190,8 +191,10 @@ class finale_state():
 				generator_frag_map["MuMu"]="process.generator.HepMCFilter.filterParameters.Final_States=cms.vstring('MuMu')"
 				if self.particle_to_embed == "MuEmbedding":
 					generator_frag_map["MuMu"] +='\nprocess.generator.nAttempts = cms.uint32(1)'
-			elif this_finalstate=="ElEl":
-				generator_frag_map["ElEl"]="process.generator.HepMCFilter.filterParameters.Final_States=cms.vstring('ElEl')"
+			elif this_finalstate=="ElEl":	
+				generator_frag_map["ElEl"] = "process.generator.HepMCFilter.filterParameters.ElElCut = cms.string('El1.Pt > 19 && El2.Pt > 9')"
+                                generator_frag_map["ElEl"]+="\n"
+				generator_frag_map["ElEl"]+="process.generator.HepMCFilter.filterParameters.Final_States=cms.vstring('ElEl')"
 				if self.particle_to_embed == "ElEmbedding":
 					generator_frag_map["ElEl"] +='\nprocess.generator.nAttempts = cms.uint32(1)'
 			elif this_finalstate=="Preselection":
