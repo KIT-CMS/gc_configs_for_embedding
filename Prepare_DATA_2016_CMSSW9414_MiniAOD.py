@@ -105,15 +105,17 @@ for i, runs in enumerate(runs):
                 else:
                     out_file += 'include = grid_control_fullembedding_data_base_freiburg_GH.conf\n'
             if "etp.kit.edu" in os.environ["HOSTNAME"]:
-                out_file += 'workdir = /portal/ekpbms2/home/{user}/embedding/legacy/gc_workdir/miniaod_step/{particle}_{name}\n'.format(
+                out_file += 'workdir = /portal/ekpbms2/home/{user}/embedding/legacy/gc_workdir/miniaod_step/{particle}_{name}/{run}\n'.format(
                     user=os.environ["USER"],
                     particle=particle,
-                    name=final_state + "_" + identifier)
+                    name=final_state + "_" + identifier,
+                    run=run)
             elif "naf" in os.environ["HOSTNAME"]:
-                out_file += 'workdir = /nfs/dust/cms/user/{user}/embedding/gc_workdir/miniaod_step/{particle}_{name}\n'.format(
+                out_file += 'workdir = /nfs/dust/cms/user/{user}/embedding/gc_workdir/miniaod_step/{particle}_{name}/{run}\n'.format(
                     user=os.environ["USER"],
                     particle=particle,
-                    name=final_state + "_" + identifier)
+                    name=final_state + "_" + identifier,
+                    run=run)
             else:
                 print "Host for job submission unknown. Please set workdir manually"
             out_file += '[CMSSW]\n'
