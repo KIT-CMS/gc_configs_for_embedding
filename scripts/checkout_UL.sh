@@ -15,7 +15,7 @@ git cms-addpkg SimG4CMS
 
 git cms-addpkg SimG4Core
 
-git cms-merge-topic KIT-CMS:embedding_from-CMSSW_10_2_0
+git cms-merge-topic KIT-CMS:embedding_UL_10_6_12
 
 scramv1 b -j 12
 
