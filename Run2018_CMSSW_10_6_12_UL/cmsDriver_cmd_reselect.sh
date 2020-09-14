@@ -34,12 +34,30 @@ TauAnalysis/MCEmbeddingTools/customisers.customiseLHEandCleaning_Reselect \
 
 ### Step 3: Simulation of the hard process
 cmsDriver.py TauAnalysis/MCEmbeddingTools/python/EmbeddingPythia8Hadronizer_cfi.py \
---filein file:lhe_and_cleaned.root --fileout simulated_and_cleaned.root \
+--filein file:lhe_and_cleaned.root --fileout simulated_and_cleaned_preHLT.root \
 --conditions 106X_upgrade2018_realistic_v11_L1v1 --era Run2_2018 \
---eventcontent RAWRECO --step GEN,SIM,DIGI,L1,DIGI2RAW,HLT,RAW2DIGI,RECO \
+--eventcontent RAWRECO --step GEN,SIM,DIGI,L1,DIGI2RAW \
+--datatier RAWSIM --customise \
+TauAnalysis/MCEmbeddingTools/customisers.customiseGenerator_Reselect \
+--beamspot Realistic25ns13TeVEarly2018Collision --no_exec -n -1 --python_filename generator_preHLT.py \
+--geometry DB:Extended --mc
+
+cmsDriver.py TauAnalysis/MCEmbeddingTools/python/EmbeddingPythia8Hadronizer_cfi.py \
+--filein file:simulated_and_cleaned_preHLT.root --fileout simulated_and_cleaned_posthlt.root \
+--conditions 102X_upgrade2018_realistic_v15 --era Run2_2018 \
+--eventcontent RAWSIM --step HLT:2018v32 \
+--datatier RAWSIM \
+--customise_commands 'process.source.bypassVersionCheck = cms.untracked.bool(True)' \
+--beamspot Realistic25ns13TeVEarly2018Collision --no_exec -n -1 --python_filename generator_HLT.py \
+--geometry DB:Extended --mc
+
+cmsDriver.py TauAnalysis/MCEmbeddingTools/python/EmbeddingPythia8Hadronizer_cfi.py \
+--filein file:simulated_and_cleaned_posthlt.root --fileout simulated_and_cleaned.root \
+--conditions 106X_upgrade2018_realistic_v11_L1v1 --era Run2_2018 \
+--eventcontent RAWSIM --step RAW2DIGI,RECO \
 --datatier RAWRECO --customise \
 TauAnalysis/MCEmbeddingTools/customisers.customiseGenerator_Reselect \
---beamspot Realistic25ns13TeVEarly2018Collision --no_exec -n -1 --python_filename generator.py \
+--beamspot Realistic25ns13TeVEarly2018Collision --no_exec -n -1 --python_filename generator_postHLT.py \
 --geometry DB:Extended --mc
 
 ### Step 4: Merging of simulated hard process and cleaned data:
@@ -50,5 +68,5 @@ cmsDriver.py PAT -s PAT \
 --eventcontent  MINIAODSIM --datatier USER \
 --customise \
 TauAnalysis/MCEmbeddingTools/customisers.customiseMerging_Reselect \
---customise_commands 'process.patTrigger.processName = cms.string("SIMembedding") \nprocess.slimmedPatTrigger.triggerResults =  cms.InputTag("TriggerResults::SIMembedding") \nprocess.patMuons.triggerResults =  cms.InputTag("TriggerResults::SIMembedding")' \
+--customise_commands 'process.patTrigger.processName = cms.string("SIMembeddingHLT") \nprocess.slimmedPatTrigger.triggerResults =  cms.InputTag("TriggerResults::SIMembeddingHLT") \nprocess.patMuons.triggerResults =  cms.InputTag("TriggerResults::SIMembeddingHLT")' \
 -n -1 --no_exec --python_filename=merging.py
