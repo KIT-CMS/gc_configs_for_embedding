@@ -52,7 +52,7 @@ class finale_state():
         files_to_copy = ['preselection.py'
                          ] if self.finalstate == "Preselection" else [
                              'selection.py', 'lheprodandcleaning.py',
-                             'generator.py', 'merging.py'
+                             'generator_preHLT.py', 'generator_HLT.py', 'generator_postHLT.py', 'merging.py'
                          ]
         for file_to_copy in files_to_copy:  # ['preselection.py','selection.py','lheprodandcleaning.py','generator.py','merging.py']:
             add_fragment_to_end = []
