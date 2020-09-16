@@ -178,9 +178,9 @@ process = miniAOD_customizeAllData(process)
 
 # Customisation from command line
 
-process.patTrigger.processName = cms.string("SIMembedding") 
-process.slimmedPatTrigger.triggerResults =  cms.InputTag("TriggerResults::SIMembedding") 
-process.patMuons.triggerResults =  cms.InputTag("TriggerResults::SIMembedding")
+process.patTrigger.processName = cms.string("SIMembeddingHLT")
+process.slimmedPatTrigger.triggerResults =  cms.InputTag("TriggerResults::SIMembeddingHLT")
+process.patMuons.triggerResults =  cms.InputTag("TriggerResults::SIMembeddingHLT")
 #Have logErrorHarvester wait for the same EDProducers to finish as those providing data for the OutputModule
 from FWCore.Modules.logErrorHarvester_cff import customiseLogErrorHarvesterUsingOutputCommands
 process = customiseLogErrorHarvesterUsingOutputCommands(process)

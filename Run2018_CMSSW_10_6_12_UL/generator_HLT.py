@@ -2,7 +2,7 @@
 # using: 
 # Revision: 1.19 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: TauAnalysis/MCEmbeddingTools/python/EmbeddingPythia8Hadronizer_cfi.py --filein file:simulated_and_cleaned_preHLT.root --fileout simulated_and_cleaned_posthlt.root --conditions 102X_upgrade2018_realistic_v15 --era Run2_2018 --eventcontent RAWRECO --step HLT:2018v32 --datatier RAWRECO --customise_commands process.source.bypassVersionCheck = cms.untracked.bool(True) --beamspot Realistic25ns13TeVEarly2018Collision --no_exec -n -1 --python_filename generator_HLT.py --geometry DB:Extended --mc
+# with command line options: TauAnalysis/MCEmbeddingTools/python/EmbeddingPythia8Hadronizer_cfi.py --filein file:simulated_and_cleaned_preHLT.root --fileout simulated_and_cleaned_posthlt.root --conditions 102X_upgrade2018_realistic_v15 --era Run2_2018 --eventcontent RAWSIM --step HLT:2018v32 --datatier RAWSIM --customise_commands process.source.bypassVersionCheck = cms.untracked.bool(True) --beamspot Realistic25ns13TeVEarly2018Collision --no_exec -n -1 --python_filename generator_HLT.py --geometry DB:Extended --mc
 import FWCore.ParameterSet.Config as cms
 
 from Configuration.StandardSequences.Eras import eras
@@ -62,12 +62,12 @@ process.GlobalTag = GlobalTag(process.GlobalTag, '102X_upgrade2018_realistic_v15
 
 # Path and EndPath definitions
 process.endjob_step = cms.EndPath(process.endOfProcess)
-process.RAWRECOoutput_step = cms.EndPath(process.RAWRECOoutput)
+process.RAWSIMoutput_step = cms.EndPath(process.RAWSIMoutput)
 
 # Schedule definition
 process.schedule = cms.Schedule()
 process.schedule.extend(process.HLTSchedule)
-process.schedule.extend([process.endjob_step,process.RAWRECOoutput_step])
+process.schedule.extend([process.endjob_step,process.RAWSIMoutput_step])
 from PhysicsTools.PatAlgos.tools.helpers import associatePatAlgosToolsTask
 associatePatAlgosToolsTask(process)
 
