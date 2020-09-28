@@ -1,0 +1,186 @@
+runlist:
+  2016_preVFP:
+    [
+      "Run2016_preVFB_B",
+      "Run2016_preVFB_C",
+      "Run2016_preVFB_D",
+      "Run2016_preVFB_E",
+      "Run2016_preVFB_F",
+    ]
+  2016_postVFP: ["2016_postVFP_F", "2016_postVFP_G", "2016_postVFP_H"]
+  2017: ["Run2017B", "Run2017C", "Run2017D", "Run2017E", "Run2017F"]
+  2018: ["Run2018A", "Run2018B", "Run2018C", "Run2018D"]
+generator_cuts:
+  2016_preVFP:
+    "MuTau":
+      "lep1_pt":
+      "lep1_eta":
+      "lep2_pt":
+      "lep2_eta":
+      "attempts": 1000
+    "ElTau":
+      "lep1_pt":
+      "lep1_eta":
+      "lep2_pt":
+      "lep2_eta":
+      "attempts": 1000
+    "ElMu":
+      "lep1_pt":
+      "lep1_eta":
+      "lep2_pt":
+      "lep2_eta":
+      "attempts": 1000
+    "TauTau":
+      "lep1_pt":
+      "lep1_eta":
+      "lep2_pt":
+      "lep2_eta":
+      "attempts": 1000
+    "MuEmb":
+      "lep1_pt":
+      "lep1_eta":
+      "lep2_pt":
+      "lep2_eta":
+      "attempts": 1
+    "ElEmb":
+      "lep1_pt":
+      "lep1_eta":
+      "lep2_pt":
+      "lep2_eta":
+      "attempts": 1
+  2016_postVFP:
+    "MuTau":
+      "lep1_pt":
+      "lep1_eta":
+      "lep2_pt":
+      "lep2_eta":
+      "attempts": 1000
+    "ElTau":
+      "lep1_pt":
+      "lep1_eta":
+      "lep2_pt":
+      "lep2_eta":
+      "attempts": 1000
+    "ElMu":
+      "lep1_pt":
+      "lep1_eta":
+      "lep2_pt":
+      "lep2_eta":
+      "attempts": 1000
+    "TauTau":
+      "lep1_pt":
+      "lep1_eta":
+      "lep2_pt":
+      "lep2_eta":
+      "attempts": 1000
+    "MuEmb":
+      "lep1_pt":
+      "lep1_eta":
+      "lep2_pt":
+      "lep2_eta":
+      "attempts": 1
+    "ElEmb":
+      "lep1_pt":
+      "lep1_eta":
+      "lep2_pt":
+      "lep2_eta":
+      "attempts": 1
+  2017:
+    "MuTau":
+      "lep1_pt":
+      "lep1_eta":
+      "lep2_pt":
+      "lep2_eta":
+      "attempts": 1000
+    "ElTau":
+      "lep1_pt":
+      "lep1_eta":
+      "lep2_pt":
+      "lep2_eta":
+      "attempts": 1000
+    "ElMu":
+      "lep1_pt":
+      "lep1_eta":
+      "lep2_pt":
+      "lep2_eta":
+      "attempts": 1000
+    "TauTau":
+      "lep1_pt":
+      "lep1_eta":
+      "lep2_pt":
+      "lep2_eta":
+      "attempts": 1000
+    "MuEmb":
+      "lep1_pt":
+      "lep1_eta":
+      "lep2_pt":
+      "lep2_eta":
+      "attempts": 1
+    "ElEmb":
+      "lep1_pt":
+      "lep1_eta":
+      "lep2_pt":
+      "lep2_eta":
+      "attempts": 1
+  2018:
+    "MuTau":
+      "lep1_pt":
+      "lep1_eta":
+      "lep2_pt":
+      "lep2_eta":
+      "attempts": 1000
+    "ElTau":
+      "lep1_pt":
+      "lep1_eta":
+      "lep2_pt":
+      "lep2_eta":
+      "attempts": 1000
+    "ElMu":
+      "lep1_pt":
+      "lep1_eta":
+      "lep2_pt":
+      "lep2_eta":
+      "attempts": 1000
+    "TauTau":
+      "lep1_pt":
+      "lep1_eta":
+      "lep2_pt":
+      "lep2_eta":
+      "attempts": 1000
+    "MuEmb":
+      "lep1_pt":
+      "lep1_eta":
+      "lep2_pt":
+      "lep2_eta":
+      "attempts": 1
+    "ElEmb":
+      "lep1_pt":
+      "lep1_eta":
+      "lep2_pt":
+      "lep2_eta":
+      "attempts": 1
+finalstate_map:
+  "MuTau":
+    "name": "MuHad"
+    "lep1_name": "Mu"
+    "lep2_name": "Had"
+  "ElTau":
+    "name": "ElHad"
+    "lep1_name": "El"
+    "lep2_name": "Had"
+  "ElMu":
+    "name": "ElMu"
+    "lep1_name": "El"
+    "lep2_name": "Mu"
+  "TauTau":
+    "name": "HadHad"
+    "lep1_name": "Had1"
+    "lep2_name": "Had2"
+  "MuEmb":
+    "name": "MuMu"
+    "lep1_name": "Mu1"
+    "lep2_name": "Mu2"
+  "ElEmb":
+    "name": "ElEl"
+    "lep1_name": "El1"
+    "lep2_name": "El2"
