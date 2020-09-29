@@ -19,18 +19,17 @@ def parse_arguments():
     parser.add_argument(
         "--final-state",
         type=str,
-        required=True,
         choices=["MuTau", "ElTau", "ElMu", "TauTau", "MuEmb", "ElEmb"],
         help="Name the final state you want to process")
     parser.add_argument("--mode",
                         type=str,
                         required=True,
-                        choices=['preselection', 'full', 'setup'],
+                        choices=['preselection', 'all', 'setup'],
                         help="Setup preselection or full embedding chain")
     parser.add_argument("--backend",
                         type=str,
                         choices=['etp', 'naf', 'cern'],
-                        help="Setup preselection or full embedding chain")
+                        help="Select the condor backend that is used")
 
     return parser.parse_args()
 
@@ -48,58 +47,62 @@ def build_tarball(cmssw_dir, era, type):
     return (outputfile)
 
 
-def setup_env(workdir, era):
-    print("Setting up main CMSSW ")
-    rc = subprocess.call("scripts/UL_checkouts/checkout_UL_{ERA}.sh ".format(ERA=era))
-    all_subdirs = [d for d in os.listdir('.') if os.path.isdir(d)]
-    latest_subdir = max(all_subdirs, key=os.path.getmtime)
-    build_tarball(latest_subdir, era, "main")
+def setup_env(era, config):
+    cmssw = [config["cmssw_version"][era]["main"], config["cmssw_version"][era]["hlt"]]
+    print("Setting up main CMSSW : ")
+    #rc = subprocess.call("scripts/UL_checkouts/checkout_UL_{ERA}.sh".format(ERA=era))
+    os.system("bash scripts/UL_checkouts/checkout_UL_{ERA}.sh {VERSION}".format(ERA=era, VERSION=cmssw[0]))
+    # all_subdirs = [d for d in os.listdir('.') if os.path.isdir(d)]
+    # latest_subdir = max(all_subdirs, key=os.path.getmtime)
+    build_tarball(cmssw[0], era, "main")
     print("Setting up HLT CMSSW ")
 
-    rc = subprocess.call("scripts/UL_checkouts/checkout_UL_{ERA}_HLT.sh ".format(ERA=era))
-    all_subdirs = [d for d in os.listdir('.') if os.path.isdir(d)]
-    latest_subdir = max(all_subdirs, key=os.path.getmtime)
-    build_tarball(latest_subdir, era, "HLT")
+    rc = subprocess.call("scripts/UL_checkouts/checkout_UL_{ERA}_HLT.sh {VERSION}".format(ERA=era, VERSION=cmssw[1]))
+    # all_subdirs = [d for d in os.listdir('.') if os.path.isdir(d)]
+    # latest_subdir = max(all_subdirs, key=os.path.getmtime)
+    build_tarball(cmssw[1], era, "HLT")
 
 
-def setup_cmsRun(era, finalstate, mode):
-    configdict = yaml.load(open("ul_config", 'r'))
-    for run in configdict["runlist"][era]:
+def setup_cmsRun(era, finalstate, mode, config):
+    
+    print(config["runlist"])
+    for run in config["runlist"][era]:
         dbs_map = {}
         dbs_map["DoubleMuon_{}-v1".format(
             run)] = "/DoubleMuon/{}-v1/RAW".format(run)
         if mode == "preselection":
-            finale_state(finalstate=finalstate,
+            config = finale_state(finalstate=finalstate,
                          identifier="data_{}_preselection".format(era),
                          runs=[run],
                          era=era,
                          inputfolder="Run2018_CMSSW_10_6_12_UL",
                          add_dbs=dbs_map,
-                         reselect=False)
+                         reselect=False, preselection=True, config=config)
+            config.setup_all()
     if mode == "all":
-        finale_state(finalstate=finalstate,
+        config = finale_state(finalstate=finalstate,
                      identifier="data_{}".format(era),
-                     runs=configdict["runlist"][era],
+                     runs=config["runlist"][era],
                      era=era,
                      inputfolder="Run2018_CMSSW_10_6_12_UL",
                      add_dbs=None,
-                     reselect=False)
+                     reselect=False, config=config)
+        config.setup_all()
 
-
-def setup_gc(era, final_state, mode, backend):
+def setup_gc(era, final_state, mode, backend, config):
     pass
 
 
 if __name__ == "__main__":
     args = parse_arguments()
+    config = yaml.load(open("scripts/ul_config.yaml", 'r'))
     # first setup CMSSW enviorements
     if args.mode == "setup":
-        setup_env(args.era)
+        setup_env(args.era, config)
     else:
-        setup_cmsRun(args.era, args.final_state, args.mode)
-        setup_gc(args.era, args.final_state, args.mode, args.backend)
+        setup_cmsRun(args.era, args.final_state, args.mode, config)
+        setup_gc(args.era, args.final_state, args.mode, args.backend, config)
     # build the required config with the modified config files and generator cuts
     # generate the two tarballs
     # write the grid control config
     # write the while script
-    main(args)

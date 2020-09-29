@@ -1,11 +1,9 @@
+#!/bin/bash
 export VO_CMS_SW_DIR=/cvmfs/cms.cern.ch
-
 source $VO_CMS_SW_DIR/cmsset_default.sh
-
 scram project CMSSW_10_2_16_UL
 cd CMSSW_10_2_16_UL/src
-
-cmsenv
+eval `scramv1 runtime -sh`
 
 git cms-init
 git cms-addpkg TauAnalysis/MCEmbeddingTools

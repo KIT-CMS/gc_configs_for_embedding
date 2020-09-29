@@ -1,4 +1,5 @@
 import os, stat
+import yaml
 
 
 class finale_state():
@@ -11,44 +12,55 @@ class finale_state():
                  add_dbs=None,
                  inputfolder="Run2016_CMSSW_8_0_26",
                  generator_frag_map=None,
-                 reselect=False):
-        if finalstate == 'ElEmb':
-            self.finalstate = 'ElEl'
-            self.particle_to_embed = 'ElEmbedding'
-        elif finalstate == 'MuEmb':
-            self.finalstate = 'MuMu'
-            self.particle_to_embed = 'MuEmbedding'
-        else:
-            self.finalstate = finalstate
-            self.particle_to_embed = 'TauEmbedding'
+                 reselect=False,
+                 preselection=False, config):
+        self.finalstate = config["finalstate_map"][finalstate]["name"]
+        self.particle_to_embed = config["finalstate_map"][finalstate]["embeddedParticle"]
+        self.cmssw_version = config["cmssw_version"][era]["main"]
+        self.preselection = preselection
+        self.inputfolder = inputfolder
+        self.cmsRun_order = []
+        self.reselect = reselect
+        self.runs = runs
+        self.add_dbs = add_dbs
+        # if finalstate == 'ElEmb':
+        #     self.finalstate = 'ElEl'
+        #     self.particle_to_embed = 'ElEmbedding'
+        # elif finalstate == 'MuEmb':
+        #     self.finalstate = 'MuMu'
+        #     self.particle_to_embed = 'MuEmbedding'
+        # else:
+        #     self.finalstate = finalstate
+        #     self.particle_to_embed = 'TauEmbedding'
         self.identifier = identifier
-        self.name = self.finalstate + "_" + identifier
+        if self.preselection:
+            self.name = identifier
+        else:
+            self.name = self.finalstate + "_" + identifier
         self.gc_cfgs = []
         self.era = era
         self.generator_frag = ""
-        self.inputfolder = inputfolder
-        self.cmsRun_order = [
-            'selection.py', 'lheprodandcleaning.py', 'generator_preHLT.py',
-            'generator_HLT.py', 'generator_postHLT.py', 'merging.py'
-        ]
-        self.reselect = reselect
+        
 
+    def setup_all(self):
         if not os.path.exists(self.name):
             os.mkdir(self.name)
-        self.generator_frag = self.make_generator_frag(
-            finalstate=self.finalstate)
+        if not self.preselection:
+            self.generator_frag = self.make_generator_frag(
+                finalstate=self.finalstate, preselection=self.preselection)
 
-        self.copy_pyconfigs(generator_frag=self.generator_frag,
-                            reselect=self.reselect)
-        # self.copy_gcconfigs(runs=runs, add_dbs=add_dbs)
+        self.cmsRun_order = self.copy_pyconfigs(generator_frag=self.generator_frag,
+                            reselect=self.reselect, preselection=self.preselection)
+        if self.preselection:
+            self.copy_gcconfigs(runs=self.runs, add_dbs=self.add_dbs, preselection=self.preselection)
         # self.write_while()
 
-    def copy_pyconfigs(self, generator_frag="", reselect=False):
+    def copy_pyconfigs(self, generator_frag="", reselect=False,preselection=False):
         is_first = True  ## can be late used to init the first config with customize_for_gc and the later with the dummy stings
-        self.cmsRun_order = []
+        cmsRun_order = []
         files_to_copy = [
             'preselection.py'
-        ] if self.finalstate == "Preselection" else [
+        ] if preselection else [
             'selection.py', 'lheprodandcleaning.py', 'generator_preHLT.py',
             'generator_HLT.py', 'generator_postHLT.py', 'merging.py'
         ]
@@ -63,7 +75,7 @@ class finale_state():
             else:
                 add_fragment_to_end.append(
                     '####@FILE_NAMES@, @SKIP_EVENTS@, @MAX_EVENTS@')
-            if file_to_copy in ['lheprodandcleaning.py', 'generator.py']:
+            if file_to_copy in ['lheprodandcleaning.py', 'generator_preHLT.py', 'generator_postHLT.py', 'generator_HLT.py']:
                 add_fragment_to_end.append(
                     'from IOMC.RandomEngine.RandomServiceHelper import RandomNumberServiceHelper'
                 )
@@ -75,7 +87,7 @@ class finale_state():
                     'print("Generator random seed: %s" % process.RandomNumberGeneratorService.generator.initialSeed)'
                 )
 
-                if file_to_copy == 'generator.py':
+                if file_to_copy == 'generator_preHLT.py':
                     add_fragment_to_end.append(generator_frag)
             if file_to_copy == 'lheprodandcleaning.py':
                 if self.particle_to_embed == "MuEmbedding":
@@ -103,9 +115,10 @@ class finale_state():
                               add_fragment_to_end=add_fragment_to_end,
                               skip_if_not_there=True):
                 is_first = False
-                self.cmsRun_order.append(file_to_copy)
+                cmsRun_order.append(file_to_copy)
+        return cmsRun_order
 
-    def copy_gcconfigs(self, runs=[], add_dbs=None):
+    def copy_gcconfigs(self, runs=[], add_dbs=None, preselection=False):
         dbs_folder = "dbs"
         for add_run in runs:
             if not add_dbs:
@@ -118,29 +131,32 @@ class finale_state():
                         '{}.dbs could not be found in folder {}. Please run preselection'
                         .format(add_run, dbs_folder))
                 if not os.path.exists(self.name + '/' + add_run + '.conf'):
-                    self.write_cfg(add_run=add_run)
+                    self.write_cfg(add_run=add_run, preselection=preselection)
             else:
-                self.write_cfg(add_run=add_run, add_dbs=add_dbs)
+                self.write_cfg(add_run=add_run, add_dbs=add_dbs, preselection=preselection)
         if len(runs) == 0 and add_dbs:
-            self.write_cfg(add_dbs=add_dbs)
+            self.write_cfg(add_dbs=add_dbs, preselection=preselection)
         cmsRun_order_str = 'config file = '
         for cmsRun_cfg in self.cmsRun_order:
             cmsRun_order_str += cmsRun_cfg + '\n\t\t'
         rp_base_cfg = {}
         rp_base_cfg['__CMSRUN_ORDER__'] = cmsRun_order_str
-        if self.finalstate == "Preselection":
+        if preselection:
             se_path_str = 'se path = srm://cmssrm-kit.gridka.de:8443/srm/managerv2?SFN=/pnfs/gridka.de/cms/disk-only/store/user/sbrommer/gc_storage'
+            se_output_pattern_str = 'se output pattern = ' + "preselection" + '_' + self.identifier + '/@NICK@/@FOLDER@/@XBASE@_@GC_JOB_ID@.@XEXT@'
+            rp_base_cfg['__CMSSW_BASE__'] = os.path.dirname(os.path.abspath(self.cmssw_version)) 
         else:
             se_path_str = 'se path = srm://cmssrm-kit.gridka.de:8443/srm/managerv2?SFN=/pnfs/gridka.de/cms/disk-only/store/user/' + os.environ[
                 "USER"] + '/gc_storage/' + self.identifier
+            se_output_pattern_str = 'se output pattern = ' + self.finalstate + '_' + self.identifier + '/@NICK@/@FOLDER@/@XBASE@_@GC_JOB_ID@.@XEXT@'
         rp_base_cfg['__SE_PATH__'] = se_path_str
-        se_output_pattern_str = 'se output pattern = ' + self.finalstate + '_' + self.identifier + '/@NICK@/@FOLDER@/@XBASE@_@GC_JOB_ID@.@XEXT@'
+        
         rp_base_cfg['__SE_OUTPUT_PATTERN__'] = se_output_pattern_str
         rp_base_cfg[
             '__partition_lfn_modifier__'] = 'partition lfn modifier = <xrootd:nrg>'
         rp_base_cfg['__SE_OUTPUT_FILE__'] = 'se output files = merged.root'
 
-        if self.finalstate == "Preselection":
+        if preselection:
             self.copy_file(
                 'scripts/base_configs/grid_control_fullembedding_data_base_preselection.conf',
                 copy_from_folder='./',
@@ -162,6 +178,7 @@ class finale_state():
                   skip_if_not_there=False,
                   overwrite=False,
                   replace_dict={}):
+        print(add_fragment_to_end)
         if not copy_from_folder:
             copy_from_folder = self.inputfolder
         if skip_if_not_there and not os.path.isfile(
@@ -184,7 +201,7 @@ class finale_state():
         out_file.close()
         return True
 
-    def write_cfg(self, add_run=None, add_dbs=None):
+    def write_cfg(self, add_run=None, add_dbs=None, preselection):
         if add_run:
             out_file = open(self.name + '/' + add_run + '.conf', 'w')
         else:
@@ -193,7 +210,7 @@ class finale_state():
         if "naf" in os.environ["HOSTNAME"]:
             out_file.write(
                 'include=grid_control_fullembedding_data_base_naf.conf\n')
-        elif self.finalstate == "Preselection":
+        elif preselection:
             out_file.write(
                 'include=grid_control_fullembedding_data_base_preselection.conf\n'
             )
@@ -247,64 +264,33 @@ class finale_state():
     #     os.chmod(self.name + '/while.sh', stat.S_IRWXU)
 
 
-    def make_generator_frag(self, finalstate):
-        configdict = yaml.load(open("ul_config", 'r'))
+    def make_generator_frag(self, finalstate, preselection=False):
+        configdict = yaml.load(open("scripts/ul_config.yaml", 'r'))
         generator_frag = ""
         cuts = configdict["generator_cuts"][self.era][finalstate]
         naming_map = configdict["finalstate_map"][finalstate]
-        generator_frag += "process.generator.HepMCFilter.filterParameters.{CHANNEL}Cut = cms.string('{LEP1}.Pt > {LEP1_PT_CUT} && {LEP2}.Pt > {LEP2_PT_CUT} && {LEP1}.Eta < {LEP1_ETA_CUT} && {LEP2}.Eta < {LEP2_ETA_CUT}')".format(
-            CHANNEL=naming_map["name"],
-            LEP1=naming_map["lep1_name"],
-            LEP2=naming_map["lep1_name"],
+        cutstring = "({LEP1}.Pt > {LEP1_PT_CUT} && {LEP2}.Pt > {LEP2_PT_CUT} && {LEP1}.Eta < {LEP1_ETA_CUT} && {LEP2}.Eta < {LEP2_ETA_CUT})".format(LEP1=naming_map["lep1_name"],
+        LEP2=naming_map["lep2_name"],
+        LEP1_PT_CUT=cuts["lep1_pt"],
+        LEP2_PT_CUT=cuts["lep2_pt"],
+        LEP1_ETA_CUT=cuts["lep1_eta"],
+        LEP2_ETA_CUT=cuts["lep2_eta"])
+        if finalstate == "ElMu":
+            # in this channel add the rotated version of the cut as well, as el and mu can be both first or second lepton
+            cutstring += "|| ({LEP1}.Pt > {LEP2_PT_CUT} && {LEP2}.Pt > {LEP1_PT_CUT} && {LEP1}.Eta < {LEP2_ETA_CUT} && {LEP2}.Eta < {LEP1_ETA_CUT})".format(LEP1=naming_map["lep1_name"],
+            LEP2=naming_map["lep2_name"],
             LEP1_PT_CUT=cuts["lep1_pt"],
             LEP2_PT_CUT=cuts["lep2_pt"],
             LEP1_ETA_CUT=cuts["lep1_eta"],
             LEP2_ETA_CUT=cuts["lep2_eta"])
+            generator_frag += "process.generator.HepMCFilter.filterParameters.{CHANNEL}Cut = cms.string('{CUTSTRING}')".format(
+            CHANNEL=naming_map["name"], CUTSTRING=cutstring)
+        else:
+            generator_frag += "process.generator.HepMCFilter.filterParameters.{CHANNEL}Cut = cms.string('{CUTSTRING}')".format(
+                CHANNEL=naming_map["name"], CUTSTRING=cutstring)
         generator_frag += "\n"
         generator_frag += "process.generator.HepMCFilter.filterParameters.Final_States=cms.vstring('{CHANNEL}')".format(
             CHANNEL=naming_map["name"])
         generator_frag += '\nprocess.generator.nAttempts = cms.uint32({ATTEMPTS})'.format(
             ATTEMPTS=cuts["attempts"])
         return generator_frag
-        #     if finalstate == "MuTau":
-        #         generator_frag_map[
-        #             "MuTau"] = "process.generator.HepMCFilter.filterParameters.MuHadCut = cms.string('Mu.Pt > 18 && Had.Pt > 18 && Mu.Eta < 2.2 && Had.Eta < 2.4')"
-        #         generator_frag_map["MuTau"] += "\n"
-        #         generator_frag_map[
-        #             "MuTau"] += "process.generator.HepMCFilter.filterParameters.Final_States=cms.vstring('MuHad')"
-        #     elif finalstate == "ElTau":
-        #         generator_frag_map[
-        #             "ElTau"] = "process.generator.HepMCFilter.filterParameters.ElHadCut = cms.string('El.Pt > 18 && Had.Pt > 18 && El.Eta < 2.2 && Had.Eta < 2.4')"
-        #         generator_frag_map["ElTau"] += "\n"
-        #         generator_frag_map[
-        #             "ElTau"] += "process.generator.HepMCFilter.filterParameters.Final_States=cms.vstring('ElHad')"
-        #     elif finalstate == "ElMu":
-        #         generator_frag_map[
-        #             "ElMu"] = "process.generator.HepMCFilter.filterParameters.ElMuCut = cms.string('(El.Pt > 19 && Mu.Pt > 9) || (El.Pt > 9 && Mu.Pt > 19)')"
-        #         generator_frag_map["ElMu"] += "\n"
-        #         generator_frag_map[
-        #             "ElMu"] += "process.generator.HepMCFilter.filterParameters.Final_States=cms.vstring('ElMu')"
-        #     elif finalstate == "TauTau":
-        #         generator_frag_map[
-        #             "TauTau"] = "process.generator.HepMCFilter.filterParameters.HadHadCut = cms.string('Had1.Pt > 20 && Had2.Pt > 20 && Had1.Eta < 2.2 && Had2.Eta < 2.2')"
-        #         generator_frag_map["TauTau"] += "\n"
-        #         generator_frag_map[
-        #             "TauTau"] += "process.generator.HepMCFilter.filterParameters.Final_States=cms.vstring('HadHad')"
-        #     elif finalstate == "MuMu":
-        #         generator_frag_map[
-        #             "MuMu"] = "process.generator.HepMCFilter.filterParameters.Final_States=cms.vstring('MuMu')"
-        #         if self.particle_to_embed == "MuEmbedding":
-        #             generator_frag_map[
-        #                 "MuMu"] += '\nprocess.generator.nAttempts = cms.uint32(1)'
-        #     elif finalstate == "ElEl":
-        #         generator_frag_map[
-        #             "ElEl"] = "process.generator.HepMCFilter.filterParameters.ElElCut = cms.string('El1.Pt > 19 && El2.Pt > 9')"
-        #         generator_frag_map["ElEl"] += "\n"
-        #         generator_frag_map[
-        #             "ElEl"] += "process.generator.HepMCFilter.filterParameters.Final_States=cms.vstring('ElEl')"
-        #         if self.particle_to_embed == "ElEmbedding":
-        #             generator_frag_map[
-        #                 "ElEl"] += '\nprocess.generator.nAttempts = cms.uint32(1)'
-        #     elif finalstate == "Preselection":
-        #         generator_frag_map["Preselection"] = ""
-        # return generator_frag_map
