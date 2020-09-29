@@ -2,10 +2,11 @@ import os, stat
 import yaml
 
 
-class finale_state():
+class FinalState():
     def __init__(self,
                  era,
                  finalstate,
+                 workdir,
                  identifier="",
                  generator_frag="",
                  runs=[],
@@ -13,15 +14,20 @@ class finale_state():
                  inputfolder="Run2016_CMSSW_8_0_26",
                  generator_frag_map=None,
                  reselect=False,
-                 preselection=False, config):
-        self.finalstate = config["finalstate_map"][finalstate]["name"]
-        self.particle_to_embed = config["finalstate_map"][finalstate]["embeddedParticle"]
+                 preselection=False, config={}):
+        if preselection:
+            self.finalstate = "preselection"
+            self.particle_to_embed = "preselection"
+        else:
+            self.finalstate = config["finalstate_map"][finalstate]["name"]
+            self.particle_to_embed = config["finalstate_map"][finalstate]["embeddedParticle"]
         self.cmssw_version = config["cmssw_version"][era]["main"]
         self.preselection = preselection
         self.inputfolder = inputfolder
         self.cmsRun_order = []
         self.reselect = reselect
         self.runs = runs
+        self.workdir = workdir
         self.add_dbs = add_dbs
         # if finalstate == 'ElEmb':
         #     self.finalstate = 'ElEl'
@@ -144,7 +150,7 @@ class finale_state():
         if preselection:
             se_path_str = 'se path = srm://cmssrm-kit.gridka.de:8443/srm/managerv2?SFN=/pnfs/gridka.de/cms/disk-only/store/user/sbrommer/gc_storage'
             se_output_pattern_str = 'se output pattern = ' + "preselection" + '_' + self.identifier + '/@NICK@/@FOLDER@/@XBASE@_@GC_JOB_ID@.@XEXT@'
-            rp_base_cfg['__CMSSW_BASE__'] = os.path.dirname(os.path.abspath(self.cmssw_version)) 
+            rp_base_cfg['__CMSSW_BASE__'] = os.path.join(os.path.dirname(os.path.abspath(self.cmssw_version)),self.cmssw_version + "/")
         else:
             se_path_str = 'se path = srm://cmssrm-kit.gridka.de:8443/srm/managerv2?SFN=/pnfs/gridka.de/cms/disk-only/store/user/' + os.environ[
                 "USER"] + '/gc_storage/' + self.identifier
@@ -178,7 +184,6 @@ class finale_state():
                   skip_if_not_there=False,
                   overwrite=False,
                   replace_dict={}):
-        print(add_fragment_to_end)
         if not copy_from_folder:
             copy_from_folder = self.inputfolder
         if skip_if_not_there and not os.path.isfile(
@@ -201,7 +206,7 @@ class finale_state():
         out_file.close()
         return True
 
-    def write_cfg(self, add_run=None, add_dbs=None, preselection):
+    def write_cfg(self, add_run=None, add_dbs=None, preselection=False):
         if add_run:
             out_file = open(self.name + '/' + add_run + '.conf', 'w')
         else:
@@ -217,21 +222,17 @@ class finale_state():
         else:
             out_file.write(
                 'include=grid_control_fullembedding_data_base_freiburg.conf\n')
-        if "etp.kit.edu" in os.environ["HOSTNAME"]:
-            out_file.write(
-                'workdir = /portal/ekpbms2/home/{user}/embedding/legacy/gc_workdir/{particle_to_embed}_{name}\n'
-                .format(user=os.environ["USER"],
-                        particle_to_embed=self.particle_to_embed,
-                        name=out_file.name.split('.')[0]))
-        elif "naf" in os.environ["HOSTNAME"]:
-            out_file.write(
-                'workdir = /nfs/dust/cms/user/{user}/embedding/gc_workdir/{particle_to_embed}_{name}\n'
-                .format(user=os.environ["USER"],
-                        particle_to_embed=self.particle_to_embed,
-                        name=out_file.name.split('.')[0]))
+        if "etp.kit.edu" in os.environ["HOSTNAME"] and self.workdir == "":
+            workdir = '/work/{user}/embedding/UL/gc_workdir'.format(user=os.environ["USER"])
+        elif "naf" in os.environ["HOSTNAME"] and self.workdir == "":
+            workdir = '/nfs/dust/cms/user/{user}/embedding/gc_workdir'.format(user=os.environ["USER"])
         else:
-            print(
-                "Host for job submission unknown. Please set workdir manually")
+            workdir = self.workdir
+        out_file.write(
+            'workdir = {WORKDIR}/{particle_to_embed}_{name}\n'
+            .format(WORKDIR=workdir,
+                    particle_to_embed=self.particle_to_embed,
+                    name=out_file.name.split('.')[0]))
         out_file.write('[CMSSW]\n')
         if add_run and not add_dbs:
             out_file.write('dataset = ' + self.particle_to_embed + '_' +

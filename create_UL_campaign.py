@@ -2,8 +2,8 @@ import argparse
 import subprocess
 import os
 import yaml
-from scripts.Prepare_all_UL import finale_state
-
+from scripts.Prepare_all_UL import FinalState
+from scripts.filelist_generator import Filelist
 
 def parse_arguments():
     parser = argparse.ArgumentParser(
@@ -24,8 +24,8 @@ def parse_arguments():
     parser.add_argument("--mode",
                         type=str,
                         required=True,
-                        choices=['preselection', 'all', 'setup'],
-                        help="Setup preselection or full embedding chain")
+                        choices=['preselection', 'all', 'setup', 'filelist'],
+                        help="Different commands that are possible")
     parser.add_argument("--backend",
                         type=str,
                         choices=['etp', 'naf', 'cern'],
@@ -63,31 +63,33 @@ def setup_env(era, config):
     build_tarball(cmssw[1], era, "HLT")
 
 
-def setup_cmsRun(era, finalstate, mode, config):
+def setup_cmsRun(era, finalstate, mode, config, workdir):
     
-    print(config["runlist"])
     for run in config["runlist"][era]:
         dbs_map = {}
         dbs_map["DoubleMuon_{}-v1".format(
             run)] = "/DoubleMuon/{}-v1/RAW".format(run)
-        if mode == "preselection":
-            config = finale_state(finalstate=finalstate,
-                         identifier="data_{}_preselection".format(era),
-                         runs=[run],
-                         era=era,
-                         inputfolder="Run2018_CMSSW_10_6_12_UL",
-                         add_dbs=dbs_map,
-                         reselect=False, preselection=True, config=config)
-            config.setup_all()
-    if mode == "all":
-        config = finale_state(finalstate=finalstate,
+    if mode == "preselection":
+        task_config = FinalState(finalstate=finalstate,
+                        identifier="data_{}".format(era),
+                        runs=config["runlist"][era],
+                        era=era,
+                        inputfolder="Run2018_CMSSW_10_6_12_UL",
+                        add_dbs=dbs_map, workdir=workdir,
+                        reselect=False, preselection=True, config=config)
+        task_config.setup_all()
+    elif mode == "all":
+        task_config = FinalState(finalstate=finalstate,
                      identifier="data_{}".format(era),
                      runs=config["runlist"][era],
-                     era=era,
+                     era=era, workdir=workdir,
                      inputfolder="Run2018_CMSSW_10_6_12_UL",
                      add_dbs=None,
                      reselect=False, config=config)
-        config.setup_all()
+        task_config.setup_all()
+    else:
+        "Nothing to setup --> Ending"
+    
 
 def setup_gc(era, final_state, mode, backend, config):
     pass
@@ -99,8 +101,10 @@ if __name__ == "__main__":
     # first setup CMSSW enviorements
     if args.mode == "setup":
         setup_env(args.era, config)
+    elif args.mode == "filelist":
+        build_filelist()
     else:
-        setup_cmsRun(args.era, args.final_state, args.mode, config)
+        setup_cmsRun(args.era, args.final_state, args.mode, config,args.workdir)
         setup_gc(args.era, args.final_state, args.mode, args.backend, config)
     # build the required config with the modified config files and generator cuts
     # generate the two tarballs
