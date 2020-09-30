@@ -161,8 +161,8 @@ def build_filelist(mode, era, config, workdir, finalstate):
                                             era=era,
                                             finalstate=finalstate,
                                             run=run)
-            filelist.build_filelist()
-            #print("Saving output in {}".format())
+
+            print("Saving output in {}".format(filelist.build_filelist()))
     else:
         #TODO
         pass
