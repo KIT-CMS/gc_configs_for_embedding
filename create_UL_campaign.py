@@ -4,6 +4,7 @@ import os
 import yaml
 from scripts.Prepare_all_UL import FinalState
 from scripts.filelist_generator import PreselectionFilelist, FullFilelist
+import getpass
 
 
 def parse_arguments():
@@ -22,6 +23,9 @@ def parse_arguments():
         type=str,
         choices=["MuTau", "ElTau", "ElMu", "TauTau", "MuEmb", "ElEmb"],
         help="Name the final state you want to process")
+    parser.add_argument("--run",
+                        type=str,
+                        help="Name the final state you want to process")
     parser.add_argument("--mode",
                         type=str,
                         required=True,
@@ -31,8 +35,8 @@ def parse_arguments():
                         type=str,
                         required=True,
                         choices=[
-                            'setup_cmssw', 'setup_jobs', 'create_filelist',
-                            'publish_dataset'
+                            'setup_cmssw', 'setup_jobs', 'upload_tarballs',
+                            'create_filelist', 'publish_dataset'
                         ],
                         help="Different commands that are possible")
     parser.add_argument("--backend",
@@ -43,17 +47,10 @@ def parse_arguments():
     return parser.parse_args()
 
 
-def build_tarball(cmssw_dir, era, type):
-    print("building tarball...")
-    outputfile = "cmssw_{ERA}_{TYPE}.tar.gz".format(ERA=era, TYPE=type)
-    cmd = "tar --dereference -czf {FILE} {DIR}/*".format(
-        FILE=outputfile,
-        DIR=cmssw_dir,
-    )
-    print(cmd)
-    os.system(cmd)
-    print("finished tarball...")
-    return (outputfile)
+def possible_runs(era):
+    config = yaml.load(open("scripts/ul_config.yaml", 'r'))
+    runlist = config["runlist"][era]
+    return runlist
 
 
 class Task(object):
@@ -65,6 +62,11 @@ class Task(object):
         self.runlist = config["runlist"][era]
         self.gc_path = os.path.abspath("grid-control")
         self.backend = backend
+        self.cmssw_versions = {
+            "main": self.config["cmssw_version"][self.era]["main"],
+            "hlt": self.config["cmssw_version"][self.era]["hlt"]
+        }
+        self.username = getpass.getuser()
 
     @classmethod
     def build_filelist(self):
@@ -74,23 +76,20 @@ class Task(object):
     def setup_cmsRun(self):
         pass
 
-    def setup_env(self):
-        cmssw = [
-            self.config["cmssw_version"][self.era]["main"],
-            self.config["cmssw_version"][self.era]["hlt"]
-        ]
+    @classmethod
+    def upload_tarballs(self):
+        pass
 
+    def setup_env(self):
         print("Setting up main CMSSW")
         os.system(
             "bash scripts/UL_checkouts/checkout_UL_{ERA}.sh {VERSION}".format(
-                ERA=self.era, VERSION=cmssw[0]))
-        build_tarball(cmssw[0], self.era, "main")
+                ERA=self.era, VERSION=self.cmssw_versions["main"]))
 
         print("Setting up HLT CMSSW ")
         os.system(
             "bash scripts/UL_checkouts/checkout_UL_{ERA}_HLT.sh {VERSION}".
-            format(ERA=self.era, VERSION=cmssw[1]))
-        build_tarball(cmssw[1], self.era, "HLT")
+            format(ERA=self.era, VERSION=self.cmssw_versions["hlt"]))
 
 
 class PreselectionTask(Task):
@@ -122,6 +121,9 @@ class PreselectionTask(Task):
                                  config=self.config)
         task_config.setup_all()
 
+    def upload_tarballs(self):
+        print("Not needed for preselection --> Exiting ")
+
 
 class EmbeddingTask(Task):
     def __init__(self, era, workdir, configdir, config, backend, finalstate):
@@ -148,6 +150,26 @@ class EmbeddingTask(Task):
                                  reselect=False,
                                  config=self.config)
         task_config.setup_all()
+
+    def upload_tarballs(self):
+        print("building tarball...")
+        for version in self.cmssw_versions.values():
+            outputfile = "cmssw_{VERSION}.tar.gz".format(VERSION=version)
+            cmd = "tar --dereference -czf {FILE} {CMSSW_FOLDER}/*".format(
+                FILE=outputfile,
+                CMSSW_FOLDER=version,
+            )
+            print(cmd)
+            os.system(cmd)
+            print("finished building tarball...")
+            print("upload tarball...")
+            cmd = "gfal-copy {outputfile} {tarballpath}".format(
+                outputfile=outputfile,
+                tarballpath=config["output_paths"]["tarballs"].replace("{USER}",
+                    self.username))
+            print(cmd)
+            os.system(cmd)
+            print("finished uploading tarball...")
 
 
 def setup_gc(era, final_state, mode, backend, config):
@@ -178,9 +200,11 @@ if __name__ == "__main__":
                                 args.backend)
     else:
         task = EmbeddingTask(args.era, args.workdir, configdir, config,
-                             args.backend, args.finalstate)
+                             args.backend, args.final_state)
     if args.task == "setup_cmssw":
         task.setup_env()
+    elif args.task == "upload_tarballs":
+        task.upload_tarballs()
     elif args.task == "create_filelist":
         task.build_filelist()
     elif args.task == "setup_jobs":
