@@ -2,7 +2,7 @@ import argparse
 import subprocess
 import os
 import yaml
-from scripts.Prepare_all_UL import FinalState
+from scripts.EmbeddingTask import Preselection, FullTask
 from scripts.filelist_generator import PreselectionFilelist, FullFilelist
 import getpass
 
@@ -29,7 +29,7 @@ def parse_arguments():
     parser.add_argument("--mode",
                         type=str,
                         required=True,
-                        choices=['preselection', 'all'],
+                        choices=['preselection', 'full'],
                         help="Select preselection mode of full embedding mode")
     parser.add_argument("--task",
                         type=str,
@@ -105,21 +105,8 @@ class PreselectionTask(Task):
             filelist.build_filelist()
 
     def setup_cmsRun(self):
-        dbs_map = {}
-        for run in self.runlist:
-            dbs_map["DoubleMuon_{}-v1".format(
-                run)] = "/DoubleMuon/{}-v1/RAW".format(run)
-        task_config = FinalState(finalstate="preselection",
-                                 identifier="data_{}".format(self.era),
-                                 runs=self.runlist,
-                                 era=self.era,
-                                 inputfolder="Run2018_CMSSW_10_6_12_UL",
-                                 add_dbs=dbs_map,
-                                 workdir=self.workdir,
-                                 reselect=False,
-                                 preselection=True,
-                                 config=self.config)
-        task_config.setup_all()
+        task = Preselection(era=self.era, workdir=self.workdir, identifier="data_{}".format(self.era), runs=self.runlist, inputfolder="Run2018_CMSSW_10_6_12_UL", config=self.config)
+        task.setup_all()
 
     def upload_tarballs(self):
         print("Not needed for preselection --> Exiting ")
@@ -140,16 +127,8 @@ class EmbeddingTask(Task):
             filelist.build_filelist()
 
     def setup_cmsRun(self):
-        task_config = FinalState(finalstate=self.finalstate,
-                                 identifier="data_{}".format(self.era),
-                                 runs=self.runlist,
-                                 era=self.era,
-                                 workdir=self.workdir,
-                                 inputfolder="Run2018_CMSSW_10_6_12_UL",
-                                 add_dbs=None,
-                                 reselect=False,
-                                 config=self.config)
-        task_config.setup_all()
+        task = FullTask(finalstate=self.finalstate,era=self.era, workdir=self.workdir, identifier="data_{}".format(self.era), runs=self.runlist, inputfolder="Run2018_CMSSW_10_6_12_UL",config=self.config)
+        task.setup_all()
 
     def upload_tarballs(self):
         print("building tarball...")
@@ -170,24 +149,6 @@ class EmbeddingTask(Task):
             print(cmd)
             os.system(cmd)
             print("finished uploading tarball...")
-
-
-def setup_gc(era, final_state, mode, backend, config):
-    pass
-
-
-def build_filelist(mode, era, config, workdir, finalstate):
-    if mode == "preselection":
-        for run in config["runlist"][era]:
-            filelist = PreselectionFilelist(workdir=workdir,
-                                            era=era,
-                                            finalstate=finalstate,
-                                            run=run)
-
-            print("Saving output in {}".format(filelist.build_filelist()))
-    else:
-        #TODO
-        pass
 
 
 if __name__ == "__main__":

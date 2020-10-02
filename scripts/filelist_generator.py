@@ -22,7 +22,7 @@ class PreselectionFilelist(Filelist):
         if not os.path.exists("dbs/ul/"):
             os.mkdir("dbs/ul/")
         gc_config_folder = os.path.join(
-            "{configdir}/data_{era}_preselection".format(
+            "{configdir}/data_{era}".format(
                 configdir=self.configdir, era=self.era))
         gc_config_path = os.path.join(gc_config_folder,
                                       "{run}.conf".format(run=self.run))
