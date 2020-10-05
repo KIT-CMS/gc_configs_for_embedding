@@ -2,99 +2,106 @@
 
 This package collects the configs (cmsRun, gridcontrol, inputs dbs files) for embedding, such that one can start a large scale production
 
-## 2018 
+## UL Campaign
 
-Checkout script: [Here](scripts/checkout_2018.sh)
+The setup is done automatically, using the `create_UL_campaign.py` tool.
 
-```sh
-export VO_CMS_SW_DIR=/cvmfs/cms.cern.ch
+```
+usage: create_UL_campaign.py [-h] [--workdir WORKDIR] --era {2018}
+                             [--final-state {MuTau,ElTau,ElMu,TauTau,MuEmb,ElEmb}]
+                             [--run RUN] --mode {preselection,full} --task
+                             {setup_cmssw,upload_tarballs,setup_jobs,run_production,create_filelist,publish_dataset}
+                             [--backend {etp,naf,cern}]
 
-source $VO_CMS_SW_DIR/cmsset_default.sh
+Setup Grid Control for Embedding Production
 
-scram project CMSSW_10_2_4_patch1
+optional arguments:
+  -h, --help            show this help message and exit
+  --workdir WORKDIR     path to the workdir
+  --era {2018}          Era used for the production
+  --final-state {MuTau,ElTau,ElMu,TauTau,MuEmb,ElEmb}
+                        Name the final state you want to process
+  --run RUN             Name of the Run you want to process
+  --mode {preselection,full}
+                        Select preselection mode of full embedding mode
+  --task {setup_cmssw,upload_tarballs,setup_jobs,run_production,create_filelist,publish_dataset}
+                        Different commands that are possible
+  --backend {etp,naf,cern}
+                        Select the condor backend that is used -- TODO --
 
-# for Run2018D use
-# scram project CMSSW_10_2_5_patch1
-
-cd CMSSW_10_2_4_patch1/src
-# for Run2018D use
-# cd CMSSW_10_2_5_patch1/src
-
-cmsenv
-
-git cms-init
-
-git cms-addpkg TauAnalysis/MCEmbeddingTools
-
-git cms-addpkg SimG4CMS
-
-git cms-addpkg SimG4Core
-
-git cms-merge-topic KIT-CMS:embedding_from-CMSSW_10_2_0
-
-scramv1 b -j 12
-
-git clone git@github.com:KIT-CMS/grid-control.git
-
-git clone git@github.com:KIT-CMS/gc_configs_for_embedding.git
-
-cd gc_configs_for_embedding
-
-python Prepare_DATA_2018_CMSSW1020.py
 ```
 
-## 2017
+### Setup
 
-```sh
-export VO_CMS_SW_DIR=/cvmfs/cms.cern.ch
-
-source $VO_CMS_SW_DIR/cmsset_default.sh
-
-scram project CMSSW_9_4_4
-
-cd CMSSW_9_4_4/src
-
-cmsenv
-
-git cms-init
-
-git cms-addpkg TauAnalysis/MCEmbeddingTools
-
-git cms-merge-topic KIT-CMS:embeddingReRecoElId_cmssw94x
-
-scramv1 b -j 12
-
-git clone https://github.com/janekbechtel/grid-control
-
-git clone https://github.com/KIT-CMS/gc_configs_for_embedding.git
-
-cd gc_configs_for_embedding
-
-python Prepare_DATA_2017_CMSSW944.py
+Install the framework using
+```
+git clone --recursive @github.com:KIT-CMS/gc_configs_for_embedding.git
 ```
 
-## 2016
 
-```sh
-export VO_CMS_SW_DIR=/cvmfs/cms.cern.ch
+### Preselection
 
-source $VO_CMS_SW_DIR/cmsset_default.sh
-
-cmsrel CMSSW_8_0_26_patch1
-
-cd CMSSW_8_0_26_patch1/src
-
-cmsenv
-
-git cms-merge-topic KIT-CMS:fixingforembedding_cmss8026p1
-
-scramv1 b -j12
-
-git clone https://github.com/janekbechtel/grid-control
-
-git clone https://github.com/KIT-CMS/gc_configs_for_embedding.git
-
-cd gc_configs_for_embedding
-
-python Prepare_DATA_2016_CMSSW826.py
+#### Setup
+For the preselection, only a single CMSSW version is needed. The version can be installed using
+```bash
+./create_UL_campaign.py --mode preselection --era 2018 --task setup_cmssw
 ```
+
+then, the different preselection tasks for all runs in a single era can be setup using
+```bash
+./create_UL_campaign.py --mode preselection --era 2018 --task setup_jobs --run all
+```
+or a single run can be specified by using the name of the run instead of `all`.
+### Production
+The Production of the preselection can be started using
+```bash
+./create_UL_campaign.py --mode preselection --era 2018 --task run_production --run all
+```
+This will automatically start the fitting grid control tasks.
+### Output Collection
+After successful completion of the preselection task, the output filelist can be generated using
+```bash
+./create_UL_campaign.py --mode preselection --era 2018 --task create_filelist --run all
+```
+
+### Full Campaign
+
+#### Setup
+For the full campaign, two CMSSW versions are needed. They are setup using
+```bash
+./create_UL_campaign.py --mode full --era 2018 --task setup_cmssw --final-state $FINALSTATENAME
+```
+The possible Final State names are:
+```
+FINALSTATENAME = ["MuTau", "ElTau", "ElMu", "TauTau", "MuEmb", "ElEmb"]
+```
+After this setup, the two tarballs containing the CMSSW code are generated and uploaded to the grid storage using
+```bash
+./create_UL_campaign.py --mode full --era 2018 --task upload_tarballs --final-state $FINALSTATENAME
+```
+Job setup is done using
+```bash
+./create_UL_campaign.py --mode full --era 2018 --task setup_jobs --final-state $FINALSTATENAME --run all
+```
+for all runs of an era or by specified the name of the run instead of using `all`.
+
+### Production
+The Production of a full campaign can be started using
+```bash
+./create_UL_campaign.py --mode full --era 2018 --task run_production --run all --final-state $FINALSTATENAME
+```
+This will automatically start the fitting grid control tasks.
+
+### Output Collection
+After successful completion of the preselection task, the output filelist can be generated using
+```bash
+./create_UL_campaign.py --mode preselection --era 2018 --task create_filelist --run all
+```
+### Publish Dataset
+
+TODO
+
+
+## older campaigns
+
+for older campaign, use the [`rereco`](https://github.com/KIT-CMS/gc_configs_for_embedding/tree/rereco) branch
