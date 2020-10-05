@@ -277,7 +277,7 @@ class FullTask(FinalState):
         se_path_str = ('se path = {path}').format(
             path=self.config['output_paths']['main'].replace(
                 '{USER}', self.username))
-        se_output_pattern_str = 'se output pattern = ' + 'main' + '_' + self.identifier + '/@NICK@/@FOLDER@/@XBASE@_@GC_JOB_ID@.@XEXT@'
+        se_output_pattern_str = 'se output pattern = ' + 'main' + '_' + self.identifier + '/@NICK@/@XBASE@_@GC_JOB_ID@.@XEXT@'
         rp_base_cfg['__CMSSW_BASE__'] = os.path.join(
             os.path.dirname(os.path.abspath(self.cmssw_version)),
             self.cmssw_version + '/')
@@ -291,7 +291,9 @@ class FullTask(FinalState):
         rp_base_cfg['__CMSSW_HLT__'] = self.config['cmssw_version'][
             self.era]['hlt']
         rp_base_cfg['__TARBALL_PATH__'] = self.config['output_paths'][
-            'tarballs']
+            'tarballs'].replace('{USER}', self.username)
+        rp_base_cfg['__EXE__'] = os.path.join(
+            os.path.dirname(os.path.abspath("scripts")), "scripts/base_configs/full_embedding.sh")
         self.copy_file('scripts/base_configs/grid_control_ul_main.conf',
                        copy_from_folder='./',
                        replace_dict=rp_base_cfg)

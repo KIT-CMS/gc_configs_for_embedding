@@ -7,6 +7,12 @@ import FWCore.ParameterSet.Config as cms
 
 from Configuration.Eras.Era_Run2_2018_cff import Run2_2018
 
+if len(sys.argv) == 3:
+    inputfile = sys.argv[2]
+else:
+    inputfile = "PreRAWskimmed.root"
+print("Using inputfile: {}".format(inputfile))
+
 process = cms.Process('RECO',Run2_2018)
 
 # import of standard configurations
@@ -30,7 +36,7 @@ process.maxEvents = cms.untracked.PSet(
 
 # Input source
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring('file:PreRAWskimmed.root'),
+    fileNames = cms.untracked.vstring('file:{}'.format(inputfile)),
     secondaryFileNames = cms.untracked.vstring()
 )
 
