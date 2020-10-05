@@ -104,4 +104,4 @@ TODO
 
 ## older campaigns
 
-for older campaign, use the `rereco` branch
+for older campaign, use the [`rereco`](https://github.com/KIT-CMS/gc_configs_for_embedding/tree/rereco) branch
