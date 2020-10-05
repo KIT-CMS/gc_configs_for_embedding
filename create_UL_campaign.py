@@ -25,7 +25,7 @@ def parse_arguments():
         help="Name the final state you want to process")
     parser.add_argument("--run",
                         type=str,
-                        help="Name the final state you want to process")
+                        help="Name of the Run you want to process")
     parser.add_argument("--mode",
                         type=str,
                         required=True,
@@ -54,12 +54,12 @@ def possible_runs(era):
 
 
 class Task(object):
-    def __init__(self, era, workdir, configdir, config, backend):
+    def __init__(self, era, workdir, configdir, config, backend, run):
         self.era = era
         self.workdir = workdir
         self.config = config
         self.configdir = configdir
-        self.runlist = config["runlist"][era]
+        self.runlist = self.validate_run(run)
         self.gc_path = os.path.abspath("grid-control")
         self.backend = backend
         self.cmssw_versions = {
@@ -91,10 +91,20 @@ class Task(object):
             "bash scripts/UL_checkouts/checkout_UL_{ERA}_HLT.sh {VERSION}".
             format(ERA=self.era, VERSION=self.cmssw_versions["hlt"]))
 
+    def validate_run(self):
+        if self.run == "all":
+            return self.config["runlist"][self.era]
+        elif self.run in self.config["runlist"][self.era]:
+            return [self.run]
+        else:
+            print("Run name unknown: Known runs are: {}".format(
+                self.config["runlist"][self.era]))
+            raise ValueError
+
 
 class PreselectionTask(Task):
-    def __init__(self, era, workdir, configdir, config, backend):
-        Task.__init__(self, era, workdir, configdir, config, backend)
+    def __init__(self, era, workdir, configdir, config, backend, run):
+        Task.__init__(self, era, workdir, configdir, config, backend, run)
 
     def build_filelist(self):
         for run in self.runlist:
@@ -105,7 +115,12 @@ class PreselectionTask(Task):
             filelist.build_filelist()
 
     def setup_cmsRun(self):
-        task = Preselection(era=self.era, workdir=self.workdir, identifier="data_{}".format(self.era), runs=self.runlist, inputfolder="Run2018_CMSSW_10_6_12_UL", config=self.config)
+        task = Preselection(era=self.era,
+                            workdir=self.workdir,
+                            identifier="data_{}".format(self.era),
+                            runs=self.runlist,
+                            inputfolder="Run2018_CMSSW_10_6_12_UL",
+                            config=self.config)
         task.setup_all()
 
     def upload_tarballs(self):
@@ -113,8 +128,9 @@ class PreselectionTask(Task):
 
 
 class EmbeddingTask(Task):
-    def __init__(self, era, workdir, configdir, config, backend, finalstate):
-        Task.__init__(self, era, workdir, configdir, config, backend)
+    def __init__(self, era, workdir, configdir, config, backend, run,
+                 finalstate):
+        Task.__init__(self, era, workdir, configdir, config, backend, run)
         self.finalstate = finalstate
 
     def build_filelist(self):
@@ -127,7 +143,13 @@ class EmbeddingTask(Task):
             filelist.build_filelist()
 
     def setup_cmsRun(self):
-        task = FullTask(finalstate=self.finalstate,era=self.era, workdir=self.workdir, identifier="data_{}".format(self.era), runs=self.runlist, inputfolder="Run2018_CMSSW_10_6_12_UL",config=self.config)
+        task = FullTask(finalstate=self.finalstate,
+                        era=self.era,
+                        workdir=self.workdir,
+                        identifier="data_{}".format(self.era),
+                        runs=self.runlist,
+                        inputfolder="Run2018_CMSSW_10_6_12_UL",
+                        config=self.config)
         task.setup_all()
 
     def upload_tarballs(self):
@@ -142,10 +164,11 @@ class EmbeddingTask(Task):
             os.system(cmd)
             print("finished building tarball...")
             print("upload tarball...")
-            cmd = "gfal-copy {outputfile} {tarballpath}".format(
+            cmd = "gfal-copy {outputfile} {tarballpath}/{TARBALLNAME}".format(
                 outputfile=outputfile,
-                tarballpath=config["output_paths"]["tarballs"].replace("{USER}",
-                    self.username))
+                tarballpath=config["output_paths"]["tarballs"].replace(
+                    "{USER}", self.username),
+                TARBALLNAME=outputfile)
             print(cmd)
             os.system(cmd)
             print("finished uploading tarball...")
@@ -158,10 +181,10 @@ if __name__ == "__main__":
     # first setup CMSSW enviorements
     if args.mode == "preselection":
         task = PreselectionTask(args.era, args.workdir, configdir, config,
-                                args.backend)
+                                args.backend, args.run)
     else:
         task = EmbeddingTask(args.era, args.workdir, configdir, config,
-                             args.backend, args.final_state)
+                             args.backend, args.run, args.final_state)
     if args.task == "setup_cmssw":
         task.setup_env()
     elif args.task == "upload_tarballs":
@@ -170,7 +193,5 @@ if __name__ == "__main__":
         task.build_filelist()
     elif args.task == "setup_jobs":
         task.setup_cmsRun()
-    # build the required config with the modified config files and generator cuts
-    # generate the two tarballs
-    # write the grid control config
+
     # write the while script
