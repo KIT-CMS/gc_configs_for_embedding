@@ -9,7 +9,7 @@ runlist:
     ]
   "2016_postVFP": ["2016_postVFP_F", "2016_postVFP_G", "2016_postVFP_H"]
   "2017": ["Run2017B", "Run2017C", "Run2017D", "Run2017E", "Run2017F"]
-  "2018": ["Run2018A"]
+  "2018": ["Run2018A", "Run2018B", "Run2018C", "Run2018D"]
 generator_cuts:
   "2016_preVFP":
     "MuTau":

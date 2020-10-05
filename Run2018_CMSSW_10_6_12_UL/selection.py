@@ -4,7 +4,7 @@
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
 # with command line options: RECO -s RAW2DIGI,L1Reco,RECO,PAT --runUnscheduled --data --scenario pp --conditions 106X_dataRun2_v28 --era Run2_2018 --eventcontent RAWRECO --datatier RAWRECO --customise Configuration/DataProcessing/RecoTLR.customisePostEra_Run2_2018,TauAnalysis/MCEmbeddingTools/customisers.customiseSelecting_Reselect --filein file:PreRAWskimmed.root --fileout RAWskimmed.root -n -1 --no_exec --python_filename=selection.py
 import FWCore.ParameterSet.Config as cms
-
+import sys
 from Configuration.Eras.Era_Run2_2018_cff import Run2_2018
 
 if len(sys.argv) == 3:

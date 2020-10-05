@@ -1,5 +1,5 @@
+#!/usr/bin/env python
 import argparse
-import subprocess
 import os
 import yaml
 from scripts.EmbeddingTask import Preselection, FullTask
@@ -10,7 +10,7 @@ import getpass
 def parse_arguments():
     parser = argparse.ArgumentParser(
         description="Setup Grid Control for Embedding Production")
-    parser.add_argument("--workdir", type=str, help="path to the workdir")
+    parser.add_argument("--workdir", type=str, help="path to the workdir", default="")
     parser.add_argument(
         "--era",
         type=str,
@@ -35,14 +35,14 @@ def parse_arguments():
                         type=str,
                         required=True,
                         choices=[
-                            'setup_cmssw', 'setup_jobs', 'upload_tarballs',
+                            'setup_cmssw', 'upload_tarballs', 'setup_jobs', 'run_production'
                             'create_filelist', 'publish_dataset'
                         ],
                         help="Different commands that are possible")
     parser.add_argument("--backend",
                         type=str,
                         choices=['etp', 'naf', 'cern'],
-                        help="Select the condor backend that is used")
+                        help="Select the condor backend that is used -- TODO --")
 
     return parser.parse_args()
 
@@ -80,6 +80,10 @@ class Task(object):
     def upload_tarballs(self):
         pass
 
+    @classmethod
+    def run_production(self):
+        pass
+
     def setup_env(self):
         print("Setting up main CMSSW")
         os.system(
@@ -91,15 +95,15 @@ class Task(object):
             "bash scripts/UL_checkouts/checkout_UL_{ERA}_HLT.sh {VERSION}".
             format(ERA=self.era, VERSION=self.cmssw_versions["hlt"]))
 
-    def validate_run(self):
-        if self.run == "all":
+    def validate_run(self, run):
+        if run == "all":
             return self.config["runlist"][self.era]
-        elif self.run in self.config["runlist"][self.era]:
-            return [self.run]
+        elif run in self.config["runlist"][self.era]:
+            return [run]
         else:
             print("Run name unknown: Known runs are: {}".format(
                 self.config["runlist"][self.era]))
-            raise ValueError
+            exit()
 
 
 class PreselectionTask(Task):
@@ -125,6 +129,12 @@ class PreselectionTask(Task):
 
     def upload_tarballs(self):
         print("Not needed for preselection --> Exiting ")
+
+    def run_production(self):
+        print("Running production for Preselection - {era} - {run}".format(self.era, self.runlist))
+        configlist = []
+        for run in self.runlist:
+            configlist.append()
 
 
 class EmbeddingTask(Task):
@@ -188,6 +198,8 @@ if __name__ == "__main__":
     if args.task == "setup_cmssw":
         task.setup_env()
     elif args.task == "upload_tarballs":
+        task.upload_tarballs()
+    elif args.task == "run_production":
         task.upload_tarballs()
     elif args.task == "create_filelist":
         task.build_filelist()

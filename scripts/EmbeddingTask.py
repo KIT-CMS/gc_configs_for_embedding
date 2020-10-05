@@ -252,12 +252,15 @@ class FullTask(FinalState):
             inputdata = {}
             inputdata['nfiles'] = 0
             if os.path.exists(inputfile):
-                print('taking files from {}').format(inputfile)
+                print('Using filelist from {}').format(inputfile)
                 with open(inputfile, 'r') as (file):
                     for line in file.readlines():
                         if 'se list' in line:
-                            inputdata['selist'] = line.split(' = ')[1].strip(
-                                '\n')
+                            if "gridka" in line:
+                                inputdata['selist'] = "root://cmsxrootd-kit.gridka.de:1094"
+                            else:
+                                inputdata['selist'] = line.split(' = ')[1].strip(
+                                    '\n')
                         if 'prefix' in line:
                             inputdata['prefix'] = line.split(' = ')[1].strip(
                                 '\n')
@@ -319,6 +322,7 @@ class FullTask(FinalState):
         out_file.write('[constants]\n')
         out_file.write('INPUTPATH = ' + inputdata['selist'] + '/' +
                        inputdata['prefix'] + '\n')
+        out_file.write('NICK = {particle_to_embed}_{finalstate}_{run}\n'.format(particle_to_embed=self.particle_to_embed, finalstate=self.finalstate, run=run))
         out_file.write('[parameters]\n')
         out_file.write(
             ('FILENUMBER = range(0,{max})').format(max=inputdata['nfiles']))

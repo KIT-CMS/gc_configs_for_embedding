@@ -33,6 +33,7 @@ cmsRun generator_preHLT.py
 echo "now switchting CMSSW for HLT step"
 scram project ${CMSSW_HLT}
 tar -xf cmssw_${CMSSW_HLT}.tar.gz
+rm cmssw_${CMSSW_HLT}.tar.gz
 cd ${CMSSW_HLT}/src
 eval $(scram runtime -sh)
 cd -
@@ -49,4 +50,3 @@ cmsRun generator_postHLT.py
 cmsRun merging.py
 echo " --------------"
 echo " Finished Production !"
-echo "Write output file ...."
