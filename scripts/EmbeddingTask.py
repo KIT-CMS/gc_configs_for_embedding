@@ -1,7 +1,7 @@
 import os, stat, yaml, getpass
 
 
-class FinalState:
+class GeneralTask:
     def __init__(self, era, workdir, identifier, runs, inputfolder, config):
         self.config = config
         self.inputfolder = inputfolder
@@ -27,6 +27,9 @@ class FinalState:
     def setup_path(self):
         if not os.path.exists(self.name):
             os.mkdir(self.name)
+
+    def get_name(self):
+        return self.name
 
     def copy_file(self,
                   in_file_name,
@@ -65,9 +68,9 @@ class FinalState:
         print('--> Done ')
 
 
-class Preselection(FinalState):
+class Preselection(GeneralTask):
     def __init__(self, era, workdir, identifier, runs, inputfolder, config):
-        FinalState.__init__(self, era, workdir, identifier, runs, inputfolder,
+        GeneralTask.__init__(self, era, workdir, identifier, runs, inputfolder,
                             config)
         self.preselection = True
         self.finalstate = 'preselection'
@@ -144,10 +147,10 @@ class Preselection(FinalState):
         out_file.close()
 
 
-class FullTask(FinalState):
+class FullTask(GeneralTask):
     def __init__(self, era, workdir, finalstate, identifier, runs, inputfolder,
                  config):
-        FinalState.__init__(self, era, workdir, identifier, runs, inputfolder,
+        GeneralTask.__init__(self, era, workdir, identifier, runs, inputfolder,
                             config)
         self.preselection = False
         self.finalstate = finalstate

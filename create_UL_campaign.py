@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import argparse
 import os
+import stat
 import yaml
 from scripts.EmbeddingTask import Preselection, FullTask
 from scripts.filelist_generator import PreselectionFilelist, FullFilelist
@@ -10,7 +11,10 @@ import getpass
 def parse_arguments():
     parser = argparse.ArgumentParser(
         description="Setup Grid Control for Embedding Production")
-    parser.add_argument("--workdir", type=str, help="path to the workdir", default="")
+    parser.add_argument("--workdir",
+                        type=str,
+                        help="path to the workdir",
+                        default="")
     parser.add_argument(
         "--era",
         type=str,
@@ -35,14 +39,16 @@ def parse_arguments():
                         type=str,
                         required=True,
                         choices=[
-                            'setup_cmssw', 'upload_tarballs', 'setup_jobs', 'run_production'
-                            'create_filelist', 'publish_dataset'
+                            'setup_cmssw', 'upload_tarballs', 'setup_jobs',
+                            'run_production', 'create_filelist',
+                            'publish_dataset'
                         ],
                         help="Different commands that are possible")
-    parser.add_argument("--backend",
-                        type=str,
-                        choices=['etp', 'naf', 'cern'],
-                        help="Select the condor backend that is used -- TODO --")
+    parser.add_argument(
+        "--backend",
+        type=str,
+        choices=['etp', 'naf', 'cern'],
+        help="Select the condor backend that is used -- TODO --")
 
     return parser.parse_args()
 
@@ -68,21 +74,31 @@ class Task(object):
         }
         self.username = getpass.getuser()
 
-    @classmethod
-    def build_filelist(self):
-        pass
-
-    @classmethod
-    def setup_cmsRun(self):
-        pass
-
-    @classmethod
-    def upload_tarballs(self):
-        pass
-
-    @classmethod
     def run_production(self):
-        pass
+        print("Running production for - {era} - {run}".format(
+            era=self.era, run=self.runlist))
+        configlist = []
+        for run in self.runlist:
+            configlist.append("{name}/{run}.conf".format(
+                name=self.task.get_name(), run=run))
+        out_file = open('{name}/while.sh'.format(name=self.task.get_name()),
+                        'w')
+        out_file.write('#!/bin/bash\n')
+        out_file.write('\n')
+        out_file.write('touch .lock\n')
+        out_file.write('\n')
+        out_file.write('while [ -f ".lock" ]\n')
+        out_file.write('do\n')
+        for config in configlist:
+            out_file.write('{gc_path}/go.py {configpath} -G \n'.format(
+                gc_path=self.gc_path, configpath=config))
+        out_file.write('echo "rm .lock"\n')
+        out_file.write('sleep 2\n')
+        out_file.write('done\n')
+        out_file.close()
+        os.chmod('{name}/while.sh'.format(name=self.task.get_name()),
+                 stat.S_IRWXU)
+        os.system("./{name}/while.sh".format(name=self.task.get_name()))
 
     def setup_env(self):
         print("Setting up main CMSSW")
@@ -105,10 +121,32 @@ class Task(object):
                 self.config["runlist"][self.era]))
             exit()
 
+    @classmethod
+    def build_filelist(self):
+        pass
+
+    @classmethod
+    def publish_dataset(self):
+        pass
+
+    @classmethod
+    def setup_cmsRun(self):
+        pass
+
+    @classmethod
+    def upload_tarballs(self):
+        pass
+
 
 class PreselectionTask(Task):
     def __init__(self, era, workdir, configdir, config, backend, run):
         Task.__init__(self, era, workdir, configdir, config, backend, run)
+        self.task = Preselection(era=self.era,
+                                 workdir=self.workdir,
+                                 identifier="data_{}".format(self.era),
+                                 runs=self.runlist,
+                                 inputfolder="Run2018_CMSSW_10_6_12_UL",
+                                 config=self.config)
 
     def build_filelist(self):
         for run in self.runlist:
@@ -119,22 +157,13 @@ class PreselectionTask(Task):
             filelist.build_filelist()
 
     def setup_cmsRun(self):
-        task = Preselection(era=self.era,
-                            workdir=self.workdir,
-                            identifier="data_{}".format(self.era),
-                            runs=self.runlist,
-                            inputfolder="Run2018_CMSSW_10_6_12_UL",
-                            config=self.config)
-        task.setup_all()
+        self.task.setup_all()
 
     def upload_tarballs(self):
         print("Not needed for preselection --> Exiting ")
 
-    def run_production(self):
-        print("Running production for Preselection - {era} - {run}".format(self.era, self.runlist))
-        configlist = []
-        for run in self.runlist:
-            configlist.append()
+    def publish_dataset(self):
+        print("Ne need to publish preselection datasets --> Exiting")
 
 
 class EmbeddingTask(Task):
@@ -142,6 +171,13 @@ class EmbeddingTask(Task):
                  finalstate):
         Task.__init__(self, era, workdir, configdir, config, backend, run)
         self.finalstate = finalstate
+        self.task = FullTask(finalstate=self.finalstate,
+                             era=self.era,
+                             workdir=self.workdir,
+                             identifier="data_{}".format(self.era),
+                             runs=self.runlist,
+                             inputfolder="Run2018_CMSSW_10_6_12_UL",
+                             config=self.config)
 
     def build_filelist(self):
         for run in self.runlist:
@@ -152,15 +188,11 @@ class EmbeddingTask(Task):
                                     run=run)
             filelist.build_filelist()
 
+    def publish_dataset(self):
+        print("Implementation to be done")
+
     def setup_cmsRun(self):
-        task = FullTask(finalstate=self.finalstate,
-                        era=self.era,
-                        workdir=self.workdir,
-                        identifier="data_{}".format(self.era),
-                        runs=self.runlist,
-                        inputfolder="Run2018_CMSSW_10_6_12_UL",
-                        config=self.config)
-        task.setup_all()
+        self.task.setup_all()
 
     def upload_tarballs(self):
         print("building tarball...")
@@ -200,10 +232,12 @@ if __name__ == "__main__":
     elif args.task == "upload_tarballs":
         task.upload_tarballs()
     elif args.task == "run_production":
-        task.upload_tarballs()
+        task.run_production()
     elif args.task == "create_filelist":
         task.build_filelist()
     elif args.task == "setup_jobs":
         task.setup_cmsRun()
-
-    # write the while script
+    elif args.task == "publish_dataset":
+        task.publish_dataset()
+    else:
+        exit()
