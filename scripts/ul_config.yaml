@@ -148,16 +148,16 @@ generator_cuts:
       "lep2_eta": 2.2
       "attempts": 1000
     "MuEmb":
-      "lep1_pt":
-      "lep1_eta":
-      "lep2_pt":
-      "lep2_eta":
+      "lep1_pt": 17
+      "lep1_eta": 2.5
+      "lep2_pt": 8
+      "lep2_eta": 2.5
       "attempts": 1
     "ElEmb":
-      "lep1_pt":
-      "lep1_eta":
-      "lep2_pt":
-      "lep2_eta":
+      "lep1_pt": 22
+      "lep1_eta": 2.5
+      "lep2_pt": 10
+      "lep2_eta": 2.5
       "attempts": 1
 finalstate_map:
   "MuTau":
