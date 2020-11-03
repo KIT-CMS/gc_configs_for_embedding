@@ -35,7 +35,7 @@ optional arguments:
 
 Install the framework using
 ```
-git clone --recursive @github.com:KIT-CMS/gc_configs_for_embedding.git
+git clone --recursive git@github.com:KIT-CMS/gc_configs_for_embedding.git
 ```
 
 
@@ -44,7 +44,7 @@ git clone --recursive @github.com:KIT-CMS/gc_configs_for_embedding.git
 #### Setup
 For the preselection, only a single CMSSW version is needed. The version can be installed using
 ```bash
-./create_UL_campaign.py --mode preselection --era 2018 --task setup_cmssw
+./create_UL_campaign.py --mode preselection --era 2018 --task setup_cmssw --run all
 ```
 
 then, the different preselection tasks for all runs in a single era can be setup using
