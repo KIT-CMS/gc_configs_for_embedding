@@ -1,4 +1,5 @@
 import os, stat, yaml, getpass
+from scripts.read_filelist_from_das import read_filelist_from_das
 
 
 class GeneralTask:
@@ -71,7 +72,7 @@ class GeneralTask:
 class Preselection(GeneralTask):
     def __init__(self, era, workdir, identifier, runs, inputfolder, config):
         GeneralTask.__init__(self, era, workdir, identifier, runs, inputfolder,
-                            config)
+                             config)
         self.preselection = True
         self.finalstate = 'preselection'
         self.particle_to_embed = 'preselection'
@@ -138,12 +139,19 @@ class Preselection(GeneralTask):
                 name=out_file.name.split('.')[0]))
         out_file.write('[CMSSW]\n')
         dbs_name = ('/DoubleMuon/{RUN}-v1/RAW').format(RUN=run)
+        filelistname = "DoubleMuon_{run}_RAW.dbs".format(
+            name=self.name,
+            run=run)
+        read_filelist_from_das(
+            "{particle}_{name}_DoubleMuon_{run}".format(
+                particle=self.particle_to_embed, name=self.name, run=run),
+            dbs_name, "{name}/{filelistname}".format(name=self.name, filelistname=filelistname), False, "root://cms-xrd-global.cern.ch/")
         out_file.write((
-            'dataset = {particle}_{name}_DoubleMuon_{run} :  dbs: {dbs_name} \n'
+            'dataset = {particle}_{name}_DoubleMuon_{run} : list:{filelistname} \n'
         ).format(particle=self.particle_to_embed,
                  name=self.name,
                  run=run,
-                 dbs_name=dbs_name))
+                 filelistname=filelistname))
         out_file.close()
 
 
@@ -151,7 +159,7 @@ class FullTask(GeneralTask):
     def __init__(self, era, workdir, finalstate, identifier, runs, inputfolder,
                  config):
         GeneralTask.__init__(self, era, workdir, identifier, runs, inputfolder,
-                            config)
+                             config)
         self.preselection = False
         self.finalstate = finalstate
         self.particle_to_embed = config['finalstate_map'][finalstate][
@@ -260,10 +268,11 @@ class FullTask(GeneralTask):
                     for line in file.readlines():
                         if 'se list' in line:
                             if "gridka" in line:
-                                inputdata['selist'] = "root://cmsxrootd-kit.gridka.de:1094"
+                                inputdata[
+                                    'selist'] = "root://cmsxrootd-kit.gridka.de:1094"
                             else:
-                                inputdata['selist'] = line.split(' = ')[1].strip(
-                                    '\n')
+                                inputdata['selist'] = line.split(
+                                    ' = ')[1].strip('\n')
                         if 'prefix' in line:
                             inputdata['prefix'] = line.split(' = ')[1].strip(
                                 '\n')
@@ -299,7 +308,8 @@ class FullTask(GeneralTask):
         rp_base_cfg['__TARBALL_PATH__'] = self.config['output_paths'][
             'tarballs'].replace('{USER}', self.username)
         rp_base_cfg['__EXE__'] = os.path.join(
-            os.path.dirname(os.path.abspath("scripts")), "scripts/base_configs/full_embedding.sh")
+            os.path.dirname(os.path.abspath("scripts")),
+            "scripts/base_configs/full_embedding.sh")
         self.copy_file('scripts/base_configs/grid_control_ul_main.conf',
                        copy_from_folder='./',
                        replace_dict=rp_base_cfg)
@@ -325,7 +335,11 @@ class FullTask(GeneralTask):
         out_file.write('[constants]\n')
         out_file.write('INPUTPATH = ' + inputdata['selist'] + '/' +
                        inputdata['prefix'] + '\n')
-        out_file.write('NICK = {particle_to_embed}_{finalstate}_{run}\n'.format(particle_to_embed=self.particle_to_embed, finalstate=self.finalstate, run=run))
+        out_file.write(
+            'NICK = {particle_to_embed}_{finalstate}_{run}\n'.format(
+                particle_to_embed=self.particle_to_embed,
+                finalstate=self.finalstate,
+                run=run))
         out_file.write('[parameters]\n')
         out_file.write(
             ('FILENUMBER = range(0,{max})').format(max=inputdata['nfiles']))
