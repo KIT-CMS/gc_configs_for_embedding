@@ -236,7 +236,10 @@ if __name__ == "__main__":
     elif args.task == "create_filelist":
         task.build_filelist()
     elif args.task == "setup_jobs":
-        task.setup_cmsRun()
+        if args.workdir == "":
+	    print("No workdir is set, please specify the workdir using --workdir /path/to/workdir")
+	    raise Exception
+	task.setup_cmsRun()
     elif args.task == "publish_dataset":
         task.publish_dataset()
     else:
