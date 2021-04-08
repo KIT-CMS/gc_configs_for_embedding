@@ -78,7 +78,7 @@ class Preselection(GeneralTask):
         self.particle_to_embed = 'preselection'
         self.cmsRun_order = ['preselection.py']
         self.name = identifier + '_preselection'
-        self.cmssw_version = self.config['cmssw_version'][era]['hlt']
+        self.cmssw_version = self.config['cmssw_version'][era]['main']
 
     def build_generator_fragment(self):
         print('No generator fragment needed for preselection')
