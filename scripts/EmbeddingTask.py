@@ -1,6 +1,6 @@
 import os, stat, yaml, getpass
 from scripts.read_filelist_from_das import read_filelist_from_das
-
+from shutil import copyfile
 
 class GeneralTask:
     def __init__(self, era, workdir, identifier, runs, inputfolder, config):
@@ -78,7 +78,7 @@ class Preselection(GeneralTask):
         self.particle_to_embed = 'preselection'
         self.cmsRun_order = ['preselection.py']
         self.name = identifier + '_preselection'
-        self.cmssw_version = self.config['cmssw_version'][era]['hlt']
+        self.cmssw_version = self.config['cmssw_version'][era]['main']
 
     def build_generator_fragment(self):
         print('No generator fragment needed for preselection')
@@ -162,8 +162,7 @@ class FullTask(GeneralTask):
                              config)
         self.preselection = False
         self.finalstate = finalstate
-        self.particle_to_embed = config['finalstate_map'][finalstate][
-            'embeddedParticle']
+        self.particle_to_embed = config['finalstate_map'][finalstate]['embeddedParticle']
         self.cmsRun_order = [
             'selection.py', 'lheprodandcleaning.py', 'generator_preHLT.py',
             'generator_HLT.py', 'generator_postHLT.py', 'merging.py'
@@ -284,10 +283,11 @@ class FullTask(GeneralTask):
                     '{} could not be found in folder {}. Please run preselection'
                 ).format(inputfile, dbs_folder)
                 exit()
-            if not os.path.exists(self.name + '/' + run + '.conf'):
-                self.write_gc_config('grid_control_ul_main.conf', run,
-                                     inputdata)
-
+            if os.path.exists(self.name + '/' + run + '.conf'):
+                print("Moving existing config to grid_control_ul_main.conf.bak")
+                copyfile(os.path.join(self.name, 'grid_control_ul_main.conf'), os.path.join(self.name, 'grid_control_ul_main.conf.bak'))
+            self.write_gc_config('grid_control_ul_main.conf', run,
+                                    inputdata)
         rp_base_cfg = {}
         se_path_str = ('se path = {path}').format(
             path=self.config['output_paths']['main'].replace(
