@@ -4,8 +4,11 @@ import os
 import stat
 import yaml
 from scripts.EmbeddingTask import Preselection, FullTask, Nano
-from scripts.filelist_generator import PreselectionFilelist, FullFilelist
+from scripts.filelist_generator import PreselectionFilelist, FullFilelist, NanoFilelist
 import getpass
+from rich.console import Console
+
+console = Console()
 
 
 def parse_arguments():
@@ -56,6 +59,16 @@ def parse_arguments():
         choices=["etp", "naf", "cern"],
         help="Select the condor backend that is used -- TODO --",
     )
+    parser.add_argument(
+        "--custom-configdir",
+        type=str,
+        help="If this is set, use the configdir from the given folder",
+    )
+    parser.add_argument(
+        "--mc",
+        action="store_true",
+        help="If this is set, mc embedding is run instead of data embedding",
+    )
 
     return parser.parse_args()
 
@@ -67,11 +80,12 @@ def possible_runs(era):
 
 
 class Task(object):
-    def __init__(self, era, workdir, configdir, config, backend, run):
+    def __init__(self, era, workdir, configdir, config, backend, run, isMC=False):
         self.era = era
         self.workdir = workdir
         self.config = config
         self.configdir = configdir
+        self.isMC = isMC
         self.runlist = self.validate_run(run)
         self.gc_path = os.path.abspath("grid-control")
         self.backend = backend
@@ -80,9 +94,12 @@ class Task(object):
             "hlt": self.config["cmssw_version"][self.era]["hlt"],
         }
         self.username = getpass.getuser()
+        self.identifier = "data_{}".format(self.era)
+        if isMC:
+            self.identifier = "mc_{}".format(self.era)
 
     def run_production(self):
-        print(
+        console.rule(
             "Running production for - {era} - {run}".format(
                 era=self.era, run=self.runlist
             )
@@ -113,14 +130,14 @@ class Task(object):
         os.system("./{name}/while.sh".format(name=self.task.get_name()))
 
     def setup_env(self):
-        print("Setting up main CMSSW")
+        console.rule("Setting up main CMSSW")
         os.system(
             "bash scripts/UL_checkouts/checkout_UL_{ERA}.sh {VERSION}".format(
                 ERA=self.era, VERSION=self.cmssw_versions["main"]
             )
         )
 
-        print("Setting up HLT CMSSW ")
+        console.rule("Setting up HLT CMSSW ")
         os.system(
             "bash scripts/UL_checkouts/checkout_UL_{ERA}_HLT.sh {VERSION}".format(
                 ERA=self.era, VERSION=self.cmssw_versions["hlt"]
@@ -133,7 +150,7 @@ class Task(object):
         elif run in self.config["runlist"][self.era]:
             return [run]
         else:
-            print(
+            console.log(
                 "Run name unknown: Known runs are: {}".format(
                     self.config["runlist"][self.era]
                 )
@@ -158,15 +175,16 @@ class Task(object):
 
 
 class PreselectionTask(Task):
-    def __init__(self, era, workdir, configdir, config, backend, run):
-        Task.__init__(self, era, workdir, configdir, config, backend, run)
+    def __init__(self, era, workdir, configdir, config, backend, run, isMC):
+        Task.__init__(self, era, workdir, configdir, config, backend, run, isMC)
         self.task = Preselection(
             era=self.era,
             workdir=self.workdir,
-            identifier="data_{}".format(self.era),
+            identifier=self.identifier,
             runs=self.runlist,
             inputfolder="Run2018_CMSSW_10_6_12_UL",
             config=self.config,
+            isMC=self.isMC,
         )
 
     def build_filelist(self):
@@ -176,6 +194,8 @@ class PreselectionTask(Task):
                 era=self.era,
                 grid_control_path=self.gc_path,
                 run=run,
+                finalstate="preselection",
+                isMC=self.isMC,
             )
             filelist.build_filelist()
 
@@ -183,32 +203,36 @@ class PreselectionTask(Task):
         self.task.setup_all()
 
     def upload_tarballs(self):
-        print("Not needed for preselection --> Exiting ")
+        console.log("Not needed for preselection --> Exiting ")
 
     def publish_dataset(self):
-        print("Ne need to publish preselection datasets --> Exiting")
+        console.log("Ne need to publish preselection datasets --> Exiting")
 
 
 class NanoTask(Task):
-    def __init__(self, era, workdir, configdir, config, backend, run):
-        Task.__init__(self, era, workdir, configdir, config, backend, run)
+    def __init__(self, era, workdir, configdir, config, backend, run, finalstate, isMC):
+        Task.__init__(self, era, workdir, configdir, config, backend, run, isMC)
+        self.finalstate = finalstate
         self.task = Nano(
             era=self.era,
             finalstate=self.finalstate,
             workdir=self.workdir,
-            identifier="data_{}".format(self.era),
+            identifier=self.identifier,
             runs=self.runlist,
             inputfolder="Run2018_CMSSW_10_6_12_UL",
             config=self.config,
+            isMC=self.isMC,
         )
 
     def build_filelist(self):
         for run in self.runlist:
-            filelist = PreselectionFilelist(
+            filelist = NanoFilelist(
                 configdir=self.configdir,
                 era=self.era,
                 grid_control_path=self.gc_path,
                 run=run,
+                finalstate=self.finalstate,
+                isMC=self.isMC,
             )
             filelist.build_filelist()
 
@@ -216,24 +240,25 @@ class NanoTask(Task):
         self.task.setup_all()
 
     def upload_tarballs(self):
-        print("Not needed for preselection --> Exiting ")
+        console.log("Not needed for preselection --> Exiting ")
 
     def publish_dataset(self):
-        print("To be implemented ...")
+        console.log("To be implemented ...")
 
 
 class EmbeddingTask(Task):
-    def __init__(self, era, workdir, configdir, config, backend, run, finalstate):
-        Task.__init__(self, era, workdir, configdir, config, backend, run)
+    def __init__(self, era, workdir, configdir, config, backend, run, finalstate, isMC):
+        Task.__init__(self, era, workdir, configdir, config, backend, run, isMC)
         self.finalstate = finalstate
         self.task = FullTask(
             finalstate=self.finalstate,
             era=self.era,
             workdir=self.workdir,
-            identifier="data_{}".format(self.era),
+            identifier=self.identifier,
             runs=self.runlist,
             inputfolder="Run2018_CMSSW_10_6_12_UL",
             config=self.config,
+            isMC=self.isMC,
         )
 
     def build_filelist(self):
@@ -242,29 +267,29 @@ class EmbeddingTask(Task):
                 configdir=self.configdir,
                 era=self.era,
                 grid_control_path=self.gc_path,
-                finalstate=self.finalstate,
                 run=run,
+                finalstate=self.finalstate,
+                isMC=self.isMC,
             )
             filelist.build_filelist()
 
     def publish_dataset(self):
-        print("Implementation to be done")
+        console.log("Implementation to be done")
 
     def setup_cmsRun(self):
         self.task.setup_all()
 
     def upload_tarballs(self):
-        print("building tarball...")
+        console.rule("building tarball...")
         for version in self.cmssw_versions.values():
             outputfile = "cmssw_{VERSION}.tar.gz".format(VERSION=version)
             cmd = "tar --dereference -czf {FILE} {CMSSW_FOLDER}/*".format(
                 FILE=outputfile,
                 CMSSW_FOLDER=version,
             )
-            print(cmd)
             os.system(cmd)
-            print("finished building tarball...")
-            print("upload tarball...")
+            console.log("finished building tarball...")
+            console.log("upload tarball...")
             cmd = "gfal-copy -f {outputfile} {tarballpath}/{TARBALLNAME}".format(
                 outputfile=outputfile,
                 tarballpath=config["output_paths"]["tarballs"].replace(
@@ -272,19 +297,32 @@ class EmbeddingTask(Task):
                 ),
                 TARBALLNAME=outputfile,
             )
-            print(cmd)
             os.system(cmd)
-            print("finished uploading tarball...")
+            console.rule("finished uploading tarball...")
 
 
 if __name__ == "__main__":
     args = parse_arguments()
-    config = yaml.load(open("scripts/ul_config.yaml", "r"))
-    configdir = os.path.dirname(os.path.realpath(__file__))
-    # first setup CMSSW enviorements
+    config = yaml.safe_load(open("scripts/ul_config.yaml", "r"))
+    if args.custom_configdir:
+        configdir = args.custom_configdir
+    else:
+        configdir = os.path.dirname(os.path.realpath(__file__))
+    # first setup CMSSW environments
     if args.mode == "preselection":
         task = PreselectionTask(
-            args.era, args.workdir, configdir, config, args.backend, args.run
+            args.era, args.workdir, configdir, config, args.backend, args.run, args.mc
+        )
+    elif args.mode == "nanoAOD":
+        task = Nano(
+            args.era,
+            args.workdir,
+            configdir,
+            config,
+            args.backend,
+            args.run,
+            args.final_state,
+            args.mc,
         )
     else:
         task = EmbeddingTask(
@@ -295,6 +333,7 @@ if __name__ == "__main__":
             args.backend,
             args.run,
             args.final_state,
+            args.mc,
         )
     if args.task == "setup_cmssw":
         task.setup_env()
