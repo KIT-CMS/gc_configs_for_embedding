@@ -70,3 +70,13 @@ cmsDriver.py PAT -s PAT \
 TauAnalysis/MCEmbeddingTools/customisers.customiseMerging_Reselect \
 --customise_commands 'process.patTrigger.processName = cms.string("SIMembeddingHLT") \nprocess.slimmedPatTrigger.triggerResults =  cms.InputTag("TriggerResults::SIMembeddingHLT") \nprocess.patMuons.triggerResults =  cms.InputTag("TriggerResults::SIMembeddingHLT")' \
 -n -1 --no_exec --python_filename=merging.py
+
+### NanoAOD Setp
+
+cmsDriver.py  -s NANO \
+--data --eventcontent NANOAOD --datatier NANOAOD \
+--no_exec --conditions 106X_dataRun2_v28 \
+--era Run2_2018 \
+--filein file:test_18.root \
+--fileout file:test_nano_18.root \
+--python_filename=embedding_nanoAOD.py

@@ -1,2 +1,5 @@
 *.root
 *.pyc
+*.tar.gz
+*_data_*/
+*_mc_*/
