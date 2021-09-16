@@ -50,7 +50,7 @@ process.NANOAODoutput = cms.OutputModule("NanoAODOutputModule",
         dataTier = cms.untracked.string('NANOAOD'),
         filterName = cms.untracked.string('')
     ),
-    fileName = cms.untracked.string('file:test_nano_18.root'),
+    fileName = cms.untracked.string('file:merged_nano.root'),
     outputCommands = process.NANOAODEventContent.outputCommands
 )
 
