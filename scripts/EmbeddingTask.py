@@ -3,7 +3,7 @@ from scripts.read_filelist_from_das import read_filelist_from_das
 from shutil import copyfile
 
 class GeneralTask:
-    def __init__(self, era, workdir, identifier, runs, inputfolder, config):
+    def __init__(self, era, workdir, identifier, runs, inputfolder, config, isMC):
         self.config = config
         self.inputfolder = inputfolder
         self.runs = runs
@@ -12,6 +12,10 @@ class GeneralTask:
         self.era = era
         self.name = ''
         self.username = getpass.getuser()
+        if isMC:
+            self.datatype = 'mc'
+        else:
+            self.datatype = 'data'
 
     @classmethod
     def build_generator_fragment():
@@ -70,9 +74,9 @@ class GeneralTask:
 
 
 class Preselection(GeneralTask):
-    def __init__(self, era, workdir, identifier, runs, inputfolder, config):
+    def __init__(self, era, workdir, identifier, runs, inputfolder, config, isMC):
         GeneralTask.__init__(self, era, workdir, identifier, runs, inputfolder,
-                             config)
+                             config, isMC)
         self.preselection = True
         self.finalstate = 'preselection'
         self.particle_to_embed = 'preselection'
@@ -154,12 +158,91 @@ class Preselection(GeneralTask):
                  filelistname=filelistname))
         out_file.close()
 
+class Nano(GeneralTask):
+    def __init__(self, era, workdir, finalstate, identifier, runs, inputfolder, config, isMC):
+        GeneralTask.__init__(self, era, workdir, identifier, runs, inputfolder,
+                             config, isMC)
+        self.nanoAOD = True
+        self.finalstate = finalstate
+        self.particle_to_embed = 'preselection'
+        self.cmsRun_order = ['embedding_nanoAOD.py']
+        self.name = identifier + '_nanoAOD'
+        self.cmssw_version = self.config['cmssw_version'][era]['main']
+
+    def build_generator_fragment(self):
+        print('No generator fragment needed for preselection')
+
+    def build_python_configs(self):
+        print('Setting up python configs')
+        add_fragment_to_end = []
+        with open('scripts/customise_for_gc.py', 'r') as (function_to_add):
+            add_fragment_to_end.append(function_to_add.read())
+        add_fragment_to_end.append('process = customise_for_gc(process)')
+        self.copy_file(self.cmsRun_order[0],
+                       add_fragment_to_end=add_fragment_to_end,
+                       skip_if_not_there=True)
+
+    def build_gc_configs(self):
+        print('Setting up gc configs')
+        for run in self.runs:
+            self.write_gc_config(
+                'grid_control_fullembedding_{datatype}_base_preselection.conf'.format(datatype=self.datatype), run)
+
+        rp_base_cfg = {}
+        rp_base_cfg['__CMSRUN_ORDER__'] = 'config file = preselection.py'
+        se_path_str = ('se path = {path}').format(
+            path=self.config['output_paths']['preselection'].replace(
+                '{USER}', self.username))
+        se_output_pattern_str = 'se output pattern = ' + 'preselection' + '_' + self.identifier + '/@NICK@/@FOLDER@/@XBASE@_@GC_JOB_ID@.@XEXT@'
+        rp_base_cfg['__CMSSW_BASE__'] = os.path.join(
+            os.path.dirname(os.path.abspath(self.cmssw_version)),
+            self.cmssw_version + '/')
+        rp_base_cfg['__SE_PATH__'] = se_path_str
+        rp_base_cfg['__SE_OUTPUT_PATTERN__'] = se_output_pattern_str
+        rp_base_cfg[
+            '__partition_lfn_modifier__'] = 'partition lfn modifier = <xrootd:nrg>'
+        rp_base_cfg[
+            '__SE_OUTPUT_FILE__'] = 'se output files = PreRAWskimmed.root'
+        self.copy_file(
+            'scripts/base_configs/grid_control_fullembedding_{datatype}_base_preselection.conf'.format(datatype=self.datatype),
+            copy_from_folder='./',
+            replace_dict=rp_base_cfg)
+
+    def write_gc_config(self, outfile, run):
+        out_file = open(self.name + '/' + run + '.conf', 'w')
+        out_file.write('[global]\n')
+        out_file.write(('include={}\n').format(outfile))
+        if 'etp.kit.edu' in os.environ['HOSTNAME'] and self.workdir == '':
+            workdir = ('/work/{user}/embedding/UL/gc_workdir').format(
+                user=os.environ['USER'])
+        elif 'naf' in os.environ['HOSTNAME'] and self.workdir == '':
+            workdir = (
+                '/nfs/dust/cms/user/{user}/embedding/gc_workdir').format(
+                    user=os.environ['USER'])
+        else:
+            workdir = self.workdir
+        out_file.write(
+            ('workdir = {WORKDIR}/{particle_to_embed}_{name}\n').format(
+                WORKDIR=workdir,
+                particle_to_embed=self.particle_to_embed,
+                name=out_file.name.split('.')[0]))
+        out_file.write('[CMSSW]\n')
+        dbs_folder = 'dbs/ul_embeddded'
+        inputfile = dbs_folder + '/' + self.particle_to_embed + run + '.dbs'
+        out_file.write((
+            'dataset = {particle}_{name}_{run} : list:{filelistname} \n'
+        ).format(particle=self.particle_to_embed,
+                 name=self.name,
+                 run=run,
+                 filelistname=inputfile))
+        out_file.close()
+
 
 class FullTask(GeneralTask):
     def __init__(self, era, workdir, finalstate, identifier, runs, inputfolder,
-                 config):
+                 config, isMC):
         GeneralTask.__init__(self, era, workdir, identifier, runs, inputfolder,
-                             config)
+                             config, isMC)
         self.preselection = False
         self.finalstate = finalstate
         self.particle_to_embed = config['finalstate_map'][finalstate]['embeddedParticle']
