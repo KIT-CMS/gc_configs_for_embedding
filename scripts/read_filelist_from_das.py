@@ -21,7 +21,7 @@ def read_filelist_from_das(nick, query, outputfile, phys03, xootd_prefix):
     else:
         das_query += " instance=prod/global"
     print("  DAS Query: {}".format(das_query))
-    cmd = "dasgoclient --query '{}' --json".format(das_query)
+    cmd = "/cvmfs/cms.cern.ch/common/dasgoclient --query '{}' --json".format(das_query)
     output = subprocess.Popen([cmd], shell=True, stdout=subprocess.PIPE)
     jsonS = output.communicate()[0]
     filelist = json.loads(jsonS)

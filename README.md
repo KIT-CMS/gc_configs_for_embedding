@@ -1,6 +1,21 @@
-# gc_configs_for_embedding
+# Embedding Configurations
 
 This package collects the configs (cmsRun, gridcontrol, inputs dbs files) for embedding, such that one can start a large scale production
+
+## Current Status
+
+Code Portation: 
+
+- [ ] UL2016preVFP
+- [ ] UL2016postVFP
+- [ ] UL2017
+- [x] UL2018
+
+Additional features needed
+
+- [ ] Fiellist creation for completed Embedding Datasets
+- [ ] Dataset Publication
+- [ ] Extention to other computer infrastructures than KIT 
 
 ## UL Campaign
 
@@ -31,17 +46,23 @@ optional arguments:
 
 ```
 
+---
+
 ### Setup
 
 Install the framework using
 ```
 git clone --recursive git@github.com:KIT-CMS/gc_configs_for_embedding.git
 ```
+---
 
+## Configurations
 
-### Preselection
+The large part of the embedding specific configuration settings can be found in [scripts/ul_config.yaml](scripts/ul_config.yaml)
 
-#### Setup
+## Preselection
+
+### Setup
 For the preselection, only a single CMSSW version is needed. The version can be installed using
 ```bash
 ./create_UL_campaign.py --mode preselection --era 2018 --task setup_cmssw --run all
@@ -49,9 +70,10 @@ For the preselection, only a single CMSSW version is needed. The version can be 
 
 then, the different preselection tasks for all runs in a single era can be setup using
 ```bash
-./create_UL_campaign.py --mode preselection --era 2018 --task setup_jobs --run all
+./create_UL_campaign.py --mode preselection --era 2018 --task setup_jobs --workdir /path/to/workdir --run all
 ```
-or a single run can be specified by using the name of the run instead of `all`.
+or a single run can be specified by using the name of the run instead of `all`. The workdir is the folder, that grid-control will use to keep track of the different jobs and store the respective job logfiles. 
+
 ### Production
 The Production of the preselection can be started using
 ```bash
@@ -63,10 +85,11 @@ After successful completion of the preselection task, the output filelist can be
 ```bash
 ./create_UL_campaign.py --mode preselection --era 2018 --task create_filelist --run all
 ```
+---
 
-### Full Campaign
+## Full Campaign
 
-#### Setup
+### Setup
 For the full campaign, two CMSSW versions are needed. They are setup using
 ```bash
 ./create_UL_campaign.py --mode full --era 2018 --task setup_cmssw --final-state $FINALSTATENAME
@@ -81,7 +104,7 @@ After this setup, the two tarballs containing the CMSSW code are generated and u
 ```
 Job setup is done using
 ```bash
-./create_UL_campaign.py --mode full --era 2018 --task setup_jobs --final-state $FINALSTATENAME --run all
+./create_UL_campaign.py --mode full --era 2018 --task setup_jobs --final-state $FINALSTATENAME --run all --workdir /path/to/workdir
 ```
 for all runs of an era or by specified the name of the run instead of using `all`.
 
@@ -93,14 +116,14 @@ The Production of a full campaign can be started using
 This will automatically start the fitting grid control tasks.
 
 ### Output Collection
-After successful completion of the preselection task, the output filelist can be generated using
-```bash
-./create_UL_campaign.py --mode preselection --era 2018 --task create_filelist --run all
-```
+
+TODO
+
 ### Publish Dataset
 
 TODO
 
+---
 
 ## older campaigns
 
