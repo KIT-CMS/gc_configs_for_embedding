@@ -8,13 +8,14 @@ console = Console()
 
 def fix_prefix(prefix):
     if "srm://cmssrm-kit.gridka.de:8443/srm/managerv2?SFN" in prefix:
+        se_list = "cmssrm-kit.gridka.de"
         prefix = prefix.replace(
             "srm://cmssrm-kit.gridka.de:8443/srm/managerv2?SFN=/pnfs/gridka.de/cms/disk-only",
             "root://cmsxrootd-kit.gridka.de/",
         )
     else:
         raise Exception("Unknown prefix")
-    return prefix
+    return prefix, se_list
 
 
 class Filelist(object):
@@ -121,7 +122,7 @@ class FullFilelist(Filelist):
                 output=self.run, finalstate=self.finalstate
             ),
         )
-        cmd = "{gc_path}/scripts/dataset_list_from_gc.py {config} -o {output}verbose".format(
+        cmd = "{gc_path}/scripts/dataset_list_from_gc.py {config} -o {output}".format(
             gc_path=self.grid_control_path,
             config=gc_config_path,
             output=temp_output_file,
@@ -135,39 +136,54 @@ class FullFilelist(Filelist):
                 output=self.run, finalstate=self.finalstate
             ),
         )
-        with open(output_file, "w") as output:
-            with open(temp_output_file, "r") as f:
-                lines = f.readlines()
-                num_lines = len(lines)-4
-                print("Checking {} files".format(num_lines))
-                with Progress() as progress:
-                    task = progress.add_task("[red]Reading number of events from files...", total=num_lines)
-                    prefix = ""
-                    for i, line in enumerate(lines):
-                        if i < 4:
-                            if line.startswith("prefix"):
-                                prefix = fix_prefix(line.strip("prefix = ").strip("\n"))
-                            output.write(line)
-                        else:
-                            filename = line.split(("="))[0].strip()
-                            filepath = prefix + "/" + filename
-                            if not filepath.endswith(".root"):
-                                continue
-                            output.write(
-                                "{file} = {events} \n".format(
-                                    file=filename,
-                                    events=self.get_number_of_events(filepath),
-                                )
+        data = {}
+        data["files"] = {}
+        with open(temp_output_file, "r") as f:
+            lines = f.readlines()
+            num_lines = len(lines) - 4
+            print("Checking {} files".format(num_lines))
+            with Progress() as progress:
+                task = progress.add_task(
+                    "[red]Reading number of events from files...", total=num_lines
+                )
+                prefix = ""
+                for i, line in enumerate(lines):
+                    if i < 4:
+                        if line.startswith("["):
+                            data["header"] = line.strip("\n")
+                        if line.startswith("prefix"):
+                            prefix, se_list = fix_prefix(
+                                line.replace("prefix = ", "").strip("\n")
                             )
-                            progress.advance(task)
+                            data["prefix"] = prefix
+                            data["se_list"] = se_list
+                        if line.startswith("nickname"):
+                            data["nickname"] = line.replace("nickname = ", "").strip(
+                                "\n"
+                            )
+                        if line.startswith("events"):
+                            data["events"] = 0
+                    else:
+                        filename = line.split(("="))[0].strip()
+                        filepath = prefix + "/" + filename
+                        if not filepath.endswith(".root"):
+                            continue
+                        nevents = self.get_number_of_events(filepath)
+                        data["files"][filename] = nevents
+                        data["events"] += nevents
+                        progress.advance(task)
+        with open(output_file, "w") as output:
+            output.write(data["header"] + "\n")
+            output.write("nickname = {}\n".format(data["nickname"]))
+            output.write("events = {}\n".format(data["events"]))
+            output.write("se list = {}\n".format(data["se_list"]))
+            prefix = data["prefix"][data["prefix"].find("/store") :]
+            output.write("prefix = {}\n".format(prefix))
+            for filename, nevents in data["files"].items():
+                output.write("{} = {}\n".format(filename, nevents))
+        console.rule("{} generated ".format(output_file))
         os.remove(temp_output_file)
 
     def get_number_of_events(self, filepath):
         # console.log("Checking {}".format(filepath))
-        file = ROOT.TFile.Open(filepath, "READ")
-        tree = file.Get("Events")
-        return tree.GetEntries()
-
-    def publish_dataset(self):
-        # TODO
-        pass
+        f
