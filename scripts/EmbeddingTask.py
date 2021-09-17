@@ -5,6 +5,7 @@ from rich.console import Console
 
 console = Console()
 
+
 class GeneralTask:
     def __init__(self, era, workdir, identifier, runs, inputfolder, config, isMC):
         self.config = config
@@ -107,9 +108,7 @@ class Preselection(GeneralTask):
     def build_gc_configs(self):
         console.log("Setting up gc configs")
         for run in self.runs:
-            self.write_gc_config(
-                "grid_control_preselection.conf", run
-            )
+            self.write_gc_config("grid_control_preselection.conf", run)
 
         rp_base_cfg = {}
         rp_base_cfg["__CMSRUN_ORDER__"] = "config file = preselection.py"
@@ -222,18 +221,14 @@ class Nano(GeneralTask):
         console.log("Setting up gc configs")
         for run in self.runs:
             self.write_gc_config(
-                "grid_control_nanoaod.conf".format(
-                    datatype=self.datatype
-                ),
+                "grid_control_nanoaod.conf".format(datatype=self.datatype),
                 run,
             )
 
         rp_base_cfg = {}
         rp_base_cfg["__CMSRUN_ORDER__"] = "config file = embedding_nanoaod.py"
         se_path_str = ("se path = {path}").format(
-            path=self.config["output_paths"]["nanoaod"].replace(
-                "{USER}", self.username
-            )
+            path=self.config["output_paths"]["nanoaod"].replace("{USER}", self.username)
         )
         se_output_pattern_str = (
             "se output pattern = "

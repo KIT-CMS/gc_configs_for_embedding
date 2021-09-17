@@ -7,6 +7,7 @@ from rich.console import Console
 
 console = Console()
 
+
 def parse_arguments():
     parser = argparse.ArgumentParser(
         description="Setup Grid Control for Embedding Production"
@@ -35,15 +36,19 @@ def parse_arguments():
     )
     parser.add_argument(
         "--run-all", action="store_true", help="if set, all tasks will be run"
-        )
+    )
     parser.add_argument(
         "--run-preselection", action="store_true", help="if set, all tasks will be run"
-        )
+    )
     parser.add_argument(
-        "--threads", type=int, default=8, help="set the number of threads to be used by cmsRun"
-        )
+        "--threads",
+        type=int,
+        default=8,
+        help="set the number of threads to be used by cmsRun",
+    )
 
     return parser.parse_args()
+
 
 embedding_order = [
     "selection.py",
@@ -51,7 +56,7 @@ embedding_order = [
     "generator_preHLT.py",
     "generator_HLT.py",
     "generator_postHLT.py",
-    "merging.py"
+    "merging.py",
 ]
 
 if __name__ == "__main__":
@@ -72,7 +77,7 @@ if __name__ == "__main__":
             raise FileNotFoundError
     else:
         if not args.run_all:
-            starttask = enquiries.choose('Pick tasks to start with', embedding_order)
+            starttask = enquiries.choose("Pick tasks to start with", embedding_order)
             start_index = embedding_order.index(starttask)
             tasks = embedding_order[start_index:]
     console.rule("Starting to run embedding")
@@ -88,8 +93,15 @@ if __name__ == "__main__":
                 lines = f.readlines()
             with open(os.path.join(workdir, filename), "w") as f:
                 for line in lines:
-                    if "fileNames = cms.untracked.vstring(" in line and modified_input is False:
-                        f.write("    fileNames = cms.untracked.vstring('file:{}'),\n".format(inputfile))
+                    if (
+                        "fileNames = cms.untracked.vstring(" in line
+                        and modified_input is False
+                    ):
+                        f.write(
+                            "    fileNames = cms.untracked.vstring('file:{}'),\n".format(
+                                inputfile
+                            )
+                        )
                         modified_input = True
                     elif "input = cms.untracked.int32(-1)" in line:
                         console.log("Reducing output to {} events".format(args.events))
@@ -116,7 +128,15 @@ if __name__ == "__main__":
     console.log("Using inputfile {}".format(inputfile))
     console.log("Using workdir {}".format(workdir))
     console.rule("Setup finished")
-    commands = ["bash", "minimal_embedding.sh", main_cmssw, hlt_cmssw, inputfile, str(start_index), str(args.threads)]
+    commands = [
+        "bash",
+        "minimal_embedding.sh",
+        main_cmssw,
+        hlt_cmssw,
+        inputfile,
+        str(start_index),
+        str(args.threads),
+    ]
     p = subprocess.Popen(commands, cwd=workdir)
 
     (output, err) = p.communicate()
