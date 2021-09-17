@@ -1,7 +1,9 @@
 import os, stat, yaml, getpass
 from scripts.read_filelist_from_das import read_filelist_from_das
 from shutil import copyfile
-from create_UL_campaign import console
+from rich.console import Console
+
+console = Console()
 
 class GeneralTask:
     def __init__(self, era, workdir, identifier, runs, inputfolder, config, isMC):
@@ -60,10 +62,8 @@ class GeneralTask:
             return True
         for fragment in add_fragment_to_end:
             file_str += "\n" + fragment
-
         for replace in replace_dict:
             file_str = file_str.replace(replace, replace_dict[replace])
-
         out_file = open(self.name + "/" + filename, "w")
         out_file.write(file_str)
         out_file.close()
@@ -108,7 +108,7 @@ class Preselection(GeneralTask):
         console.log("Setting up gc configs")
         for run in self.runs:
             self.write_gc_config(
-                "grid_control_fullembedding_data_base_preselection.conf", run
+                "grid_control_preselection.conf", run
             )
 
         rp_base_cfg = {}
@@ -136,7 +136,7 @@ class Preselection(GeneralTask):
         ] = "partition lfn modifier = <xrootd:nrg>"
         rp_base_cfg["__SE_OUTPUT_FILE__"] = "se output files = PreRAWskimmed.root"
         self.copy_file(
-            "scripts/base_configs/grid_control_fullembedding_data_base_preselection.conf",
+            "scripts/base_configs/grid_control_preselection.conf",
             copy_from_folder="./",
             replace_dict=rp_base_cfg,
         )
@@ -194,15 +194,17 @@ class Nano(GeneralTask):
         GeneralTask.__init__(
             self, era, workdir, identifier, runs, inputfolder, config, isMC
         )
-        self.nanoAOD = True
+        self.nanoaod = True
         self.finalstate = finalstate
-        self.particle_to_embed = "preselection"
-        self.cmsRun_order = ["embedding_nanoAOD.py"]
-        self.name = identifier + "_nanoAOD"
+        self.particle_to_embed = config["finalstate_map"][finalstate][
+            "embeddedParticle"
+        ]
+        self.cmsRun_order = ["embedding_nanoaod.py"]
+        self.name = identifier + "_nanoaod"
         self.cmssw_version = self.config["cmssw_version"][era]["main"]
 
     def build_generator_fragment(self):
-        console.log("No generator fragment needed for preselection")
+        console.log("No generator fragment needed for nanoaod task")
 
     def build_python_configs(self):
         console.log("Setting up python configs")
@@ -220,22 +222,22 @@ class Nano(GeneralTask):
         console.log("Setting up gc configs")
         for run in self.runs:
             self.write_gc_config(
-                "grid_control_fullembedding_{datatype}_base_preselection.conf".format(
+                "grid_control_nanoaod.conf".format(
                     datatype=self.datatype
                 ),
                 run,
             )
 
         rp_base_cfg = {}
-        rp_base_cfg["__CMSRUN_ORDER__"] = "config file = preselection.py"
+        rp_base_cfg["__CMSRUN_ORDER__"] = "config file = embedding_nanoaod.py"
         se_path_str = ("se path = {path}").format(
-            path=self.config["output_paths"]["preselection"].replace(
+            path=self.config["output_paths"]["nanoaod"].replace(
                 "{USER}", self.username
             )
         )
         se_output_pattern_str = (
             "se output pattern = "
-            + "preselection"
+            + "nanoaod"
             + "_"
             + self.identifier
             + "/@NICK@/@FOLDER@/@XBASE@_@GC_JOB_ID@.@XEXT@"
@@ -249,11 +251,9 @@ class Nano(GeneralTask):
         rp_base_cfg[
             "__partition_lfn_modifier__"
         ] = "partition lfn modifier = <xrootd:nrg>"
-        rp_base_cfg["__SE_OUTPUT_FILE__"] = "se output files = PreRAWskimmed.root"
+        rp_base_cfg["__SE_OUTPUT_FILE__"] = "se output files = merged_nano.root"
         self.copy_file(
-            "scripts/base_configs/grid_control_fullembedding_{datatype}_base_preselection.conf".format(
-                datatype=self.datatype
-            ),
+            "scripts/base_configs/grid_control_nanoaod.conf",
             copy_from_folder="./",
             replace_dict=rp_base_cfg,
         )
@@ -280,14 +280,16 @@ class Nano(GeneralTask):
             )
         )
         out_file.write("[CMSSW]\n")
-        dbs_folder = "dbs/ul_embeddded"
-        inputfile = dbs_folder + "/" + self.particle_to_embed + run + ".dbs"
+        dbs_folder = "dbs/ul_embedding"
+        inputfile = os.path.join(dbs_folder, "{}_{}.dbs".format(run, self.finalstate))
+        filelist_location = os.path.join(self.name, os.path.basename(inputfile))
+        copyfile(inputfile, filelist_location)
         out_file.write(
             ("dataset = {particle}_{name}_{run} : list:{filelistname} \n").format(
                 particle=self.particle_to_embed,
                 name=self.name,
                 run=run,
-                filelistname=inputfile,
+                filelistname=os.path.basename(filelist_location),
             )
         )
         out_file.close()

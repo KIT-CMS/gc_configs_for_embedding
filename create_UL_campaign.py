@@ -36,8 +36,8 @@ def parse_arguments():
         "--mode",
         type=str,
         required=True,
-        choices=["preselection", "full", "nanoAOD"],
-        help="Select preselection mode / full embedding mode or nanoAOD mode",
+        choices=["preselection", "full", "nanoaod"],
+        help="Select preselection mode / full embedding mode or nanoaod mode",
     )
     parser.add_argument(
         "--task",
@@ -313,8 +313,8 @@ if __name__ == "__main__":
         task = PreselectionTask(
             args.era, args.workdir, configdir, config, args.backend, args.run, args.mc
         )
-    elif args.mode == "nanoAOD":
-        task = Nano(
+    elif args.mode == "nanoaod":
+        task = NanoTask(
             args.era,
             args.workdir,
             configdir,
@@ -345,9 +345,9 @@ if __name__ == "__main__":
         task.build_filelist()
     elif args.task == "setup_jobs":
         if args.workdir == "":
-	    print("No workdir is set, please specify the workdir using --workdir /path/to/workdir")
-	    raise Exception
-	task.setup_cmsRun()
+            console.log("No workdir is set, please specify the workdir using --workdir /path/to/workdir")
+            raise Exception
+        task.setup_cmsRun()
     elif args.task == "publish_dataset":
         task.publish_dataset()
     else:

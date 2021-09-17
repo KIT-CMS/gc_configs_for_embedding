@@ -1,11 +1,13 @@
 import os
 import ROOT
-from create_UL_campaign import console
+from rich.console import Console
+from rich.progress import Progress
+
+console = Console()
 
 
 def fix_prefix(prefix):
     if "srm://cmssrm-kit.gridka.de:8443/srm/managerv2?SFN" in prefix:
-        console.log("replaceing srm path with xrootd path ...")
         prefix = prefix.replace(
             "srm://cmssrm-kit.gridka.de:8443/srm/managerv2?SFN=/pnfs/gridka.de/cms/disk-only",
             "root://cmsxrootd-kit.gridka.de/",
@@ -97,6 +99,7 @@ class NanoFilelist(Filelist):
 
 class FullFilelist(Filelist):
     def build_filelist(self):
+        ROOT.gErrorIgnoreLevel = 6001
         console.rule("Generating filelist")
         folder = "dbs/ul_embedding/"
         if not os.path.exists(folder):
@@ -118,7 +121,7 @@ class FullFilelist(Filelist):
                 output=self.run, finalstate=self.finalstate
             ),
         )
-        cmd = "{gc_path}/scripts/dataset_list_from_gc.py {config} -o {output}".format(
+        cmd = "{gc_path}/scripts/dataset_list_from_gc.py {config} -o {output}verbose".format(
             gc_path=self.grid_control_path,
             config=gc_config_path,
             output=temp_output_file,
@@ -134,23 +137,30 @@ class FullFilelist(Filelist):
         )
         with open(output_file, "w") as output:
             with open(temp_output_file, "r") as f:
-                prefix = ""
-                for i, line in enumerate(f):
-                    if i < 4:
-                        if line.startswith("prefix"):
-                            prefix = fix_prefix(line.strip("prefix = ").strip("\n"))
-                        output.write(line)
-                    else:
-                        filename = line.split(("="))[0].strip()
-                        filepath = prefix + "/" + filename
-                        if not filepath.endswith(".root"):
-                            continue
-                        output.write(
-                            "{file} = {events}".format(
-                                file=filename,
-                                events=self.get_number_of_events(filepath),
+                lines = f.readlines()
+                num_lines = len(lines)-4
+                print("Checking {} files".format(num_lines))
+                with Progress() as progress:
+                    task = progress.add_task("[red]Reading number of events from files...", total=num_lines)
+                    prefix = ""
+                    for i, line in enumerate(lines):
+                        if i < 4:
+                            if line.startswith("prefix"):
+                                prefix = fix_prefix(line.strip("prefix = ").strip("\n"))
+                            output.write(line)
+                        else:
+                            filename = line.split(("="))[0].strip()
+                            filepath = prefix + "/" + filename
+                            if not filepath.endswith(".root"):
+                                continue
+                            output.write(
+                                "{file} = {events} \n".format(
+                                    file=filename,
+                                    events=self.get_number_of_events(filepath),
+                                )
                             )
-                        )
+                            progress.advance(task)
+        os.remove(temp_output_file)
 
     def get_number_of_events(self, filepath):
         # console.log("Checking {}".format(filepath))
