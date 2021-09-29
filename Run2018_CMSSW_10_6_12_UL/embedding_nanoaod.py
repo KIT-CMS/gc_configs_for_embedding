@@ -78,6 +78,9 @@ from PhysicsTools.NanoAOD.nano_cff import nanoAOD_customizeData
 #call to customisation function nanoAOD_customizeData imported from PhysicsTools.NanoAOD.nano_cff
 process = nanoAOD_customizeData(process)
 
+from TauAnalysis.MCEmbeddingTools.customisers import customiseNanoAOD
+process = customiseNanoAOD(process)
+
 process.unpackedPatTrigger.triggerResults = cms.InputTag('TriggerResults::SIMembeddingHLT')
 
 process.NANOAODoutput.outputCommands.append("keep edmTriggerResults_*_*_SIMembeddingHLT")  # Trigger information
