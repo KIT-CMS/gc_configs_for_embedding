@@ -415,7 +415,7 @@ class FullTask(GeneralTask):
             inputdata = {}
             inputdata["nfiles"] = 0
             if os.path.exists(inputfile):
-                console.log("Using filelist from {}").format(inputfile)
+                console.log("Using filelist from {}".format(inputfile))
                 with open(inputfile, "r") as (file):
                     for line in file.readlines():
                         if "se list" in line:
