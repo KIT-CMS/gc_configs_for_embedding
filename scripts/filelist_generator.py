@@ -42,7 +42,7 @@ class Filelist(object):
 
 class PreselectionFilelist(Filelist):
     def build_filelist(self):
-        console.rule("Generating filelist")
+        console.rule("Generating Preselection filelist")
         if not os.path.exists("dbs/ul/"):
             os.mkdir("dbs/ul/")
         gc_config_folder = os.path.join(
@@ -68,12 +68,12 @@ class PreselectionFilelist(Filelist):
 
 class NanoFilelist(Filelist):
     def build_filelist(self):
-        console.rule("Generating filelist")
+        console.rule("Generating NanoAOD filelist")
         folder = "dbs/ul_embedding_nano/"
         if not os.path.exists(folder):
             os.mkdir(folder)
         gc_config_folder = os.path.join(
-            "{configdir}/{datatype}_{era}".format(
+            "{configdir}/{datatype}_{era}_nanoaod".format(
                 datatype=self.datatype, configdir=self.configdir, era=self.era
             )
         )
@@ -91,6 +91,7 @@ class NanoFilelist(Filelist):
             config=gc_config_path,
             output=output_file,
         )
+        console.log("Running {}".format(cmd))
         os.system(cmd)
         return os.path.abspath(output_file)
 
@@ -101,7 +102,7 @@ class NanoFilelist(Filelist):
 class FullFilelist(Filelist):
     def build_filelist(self):
         ROOT.gErrorIgnoreLevel = 6001
-        console.rule("Generating filelist")
+        console.rule("Generating Full filelist")
         folder = "dbs/ul_embedding/"
         if not os.path.exists(folder):
             os.mkdir(folder)
@@ -186,4 +187,10 @@ class FullFilelist(Filelist):
 
     def get_number_of_events(self, filepath):
         # console.log("Checking {}".format(filepath))
-        f
+        file = ROOT.TFile.Open(filepath, "READ")
+        tree = file.Get("Events")
+        return tree.GetEntries()
+
+    def publish_dataset(self):
+        # TODO
+        pass

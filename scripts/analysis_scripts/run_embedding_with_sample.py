@@ -143,3 +143,6 @@ if __name__ == "__main__":
 
     # This makes the wait possible
     p_status = p.wait()
+
+    console.log("Results can be found in {}".format(workdir))
+    console.rule("Done")

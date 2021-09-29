@@ -287,6 +287,7 @@ class EmbeddingTask(Task):
                 FILE=outputfile,
                 CMSSW_FOLDER=version,
             )
+            console.log(cmd)
             os.system(cmd)
             console.log("finished building tarball...")
             console.log("upload tarball...")
@@ -298,6 +299,7 @@ class EmbeddingTask(Task):
                 TARBALLNAME=outputfile,
             )
             os.system(cmd)
+            console.log(cmd)
             console.rule("finished uploading tarball...")
 
 
