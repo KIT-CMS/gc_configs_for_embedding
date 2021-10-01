@@ -380,7 +380,7 @@ class FullTask(GeneralTask):
                 )
                 add_fragment_to_end.append("randSvc.populate()")
                 add_fragment_to_end.append(
-                    'console.log("Generator random seed: %s" % process.RandomNumberGeneratorService.generator.initialSeed)'
+                    'print("Generator random seed: %s" % process.RandomNumberGeneratorService.generator.initialSeed)'
                 )
                 if file_to_copy == "generator_preHLT.py":
                     add_fragment_to_end.append(self.generator_frag)
