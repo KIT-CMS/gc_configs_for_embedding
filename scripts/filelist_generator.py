@@ -99,15 +99,8 @@ class NanoFilelist(Filelist):
 
 
 class FullFilelist(Filelist):
-    
     def build_filelist(self):
-        console.log("Trying to import ROOT")
-        try:
-            import ROOT
-        except ImportError:
-            console.log("ROOT cannot be found, please source some lcg stack including ROOT and python3, e.g.")
-            console.log("source /cvmfs/sft.cern.ch/lcg/views/LCG_97python3/x86_64-centos7-gcc9-opt/setup.sh")
-            return
+        self.import_root()
         ROOT.gErrorIgnoreLevel = 6001
         console.rule("Generating Full filelist")
         folder = "dbs/ul_embedding/"
@@ -194,9 +187,23 @@ class FullFilelist(Filelist):
 
     def get_number_of_events(self, filepath):
         # console.log("Checking {}".format(filepath))
+        self.import_root()
         file = ROOT.TFile.Open(filepath, "READ")
         tree = file.Get("Events")
         return tree.GetEntries()
+
+    def import_root():
+        console.log("Trying to import ROOT")
+        try:
+            import ROOT
+        except ImportError:
+            console.log(
+                "ROOT cannot be found, please source some lcg stack including ROOT and python3, e.g."
+            )
+            console.log(
+                "source /cvmfs/sft.cern.ch/lcg/views/LCG_97python3/x86_64-centos7-gcc9-opt/setup.sh"
+            )
+            exit()
 
     def publish_dataset(self):
         # TODO

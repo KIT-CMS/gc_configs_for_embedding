@@ -432,8 +432,10 @@ class FullTask(GeneralTask):
 
             else:
                 console.log(
-                    "{} could not be found in folder {}. Please run preselection"
-                ).format(inputfile, dbs_folder)
+                    "{} could not be found in folder {}. Please run preselection".format(
+                        inputfile, dbs_folder
+                    )
+                )
                 exit()
             if os.path.exists(self.name + "/" + run + ".conf"):
                 console.log("Moving existing config to grid_control_ul_main.conf.bak")
