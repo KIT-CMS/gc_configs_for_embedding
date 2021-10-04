@@ -6,15 +6,15 @@ CMSSW_HLT=$2
 INPUTFILE=$3
 STARTTASK=$4
 NTHREADS=$5
-eval $(scram unsetenv -sh)
-echo "Starting with task number $STARTTASK"
 export VO_CMS_SW_DIR=/cvmfs/cms.cern.ch
 source $VO_CMS_SW_DIR/cmsset_default.sh
-echo "setting up main cmssw"
+eval $(scram unsetenv -sh)
+echo "Starting with task number $STARTTASK"
 (
-
+    echo "setting up main cmssw: "
     cd ${CMSSW_MAIN}/src
     eval $(scram runtime -sh)
+    echo "$CMSSW_BASE"
     cd -
     if [ "$STARTTASK" -le 0 ]; then
         echo "Running task No. 0"
@@ -35,6 +35,7 @@ echo "now switchting CMSSW for HLT step"
     eval $(scram unsetenv -sh)
     cd ${CMSSW_HLT}/src
     eval $(scram runtime -sh)
+    echo "$CMSSW_BASE"
     cd -
     if [ "$STARTTASK" -le 3 ]; then
         echo "Running task No. 3"
@@ -46,6 +47,7 @@ echo "now switchting back to main CMSSW for merging"
     eval $(scram unsetenv -sh)
     cd ${CMSSW_MAIN}/src
     eval $(scram runtime -sh)
+    echo "$CMSSW_BASE"
     cd -
     if [ "$STARTTASK" -le 4 ]; then
         echo "Running task No. 4"

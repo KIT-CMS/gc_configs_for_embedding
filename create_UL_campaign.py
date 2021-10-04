@@ -7,6 +7,8 @@ from scripts.EmbeddingTask import Preselection, FullTask, Nano
 from scripts.filelist_generator import PreselectionFilelist, FullFilelist, NanoFilelist
 import getpass
 from rich.console import Console
+import sys
+
 
 console = Console()
 
@@ -304,6 +306,9 @@ class EmbeddingTask(Task):
 
 
 if __name__ == "__main__":
+    if sys.version_info[0] == 2:
+        print('You need to run this with Python 3')
+        raise SystemExit
     args = parse_arguments()
     config = yaml.safe_load(open("scripts/ul_config.yaml", "r"))
     if args.custom_configdir:

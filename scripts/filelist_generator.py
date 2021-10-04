@@ -1,5 +1,4 @@
 import os
-import ROOT
 from rich.console import Console
 from rich.progress import Progress
 
@@ -100,7 +99,15 @@ class NanoFilelist(Filelist):
 
 
 class FullFilelist(Filelist):
+    
     def build_filelist(self):
+        console.log("Trying to import ROOT")
+        try:
+            import ROOT
+        except ImportError:
+            console.log("ROOT cannot be found, please source some lcg stack including ROOT and python3, e.g.")
+            console.log("source /cvmfs/sft.cern.ch/lcg/views/LCG_97python3/x86_64-centos7-gcc9-opt/setup.sh")
+            return
         ROOT.gErrorIgnoreLevel = 6001
         console.rule("Generating Full filelist")
         folder = "dbs/ul_embedding/"
