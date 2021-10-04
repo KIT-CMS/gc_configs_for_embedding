@@ -64,7 +64,7 @@ if __name__ == "__main__":
     workdir = os.path.join(os.path.abspath(args.workdir), args.workdirtag)
     inputfile = os.path.abspath(args.inputfile)
     emb_folder = os.path.abspath(args.embedding_scripts_folder)
-    main_cmssw = os.path.abspath("CMSSW_10_6_12")
+    main_cmssw = os.path.abspath("CMSSW_10_6_28")
     hlt_cmssw = os.path.abspath("CMSSW_10_2_16_UL")
     start_index = 0
     tasks = embedding_order

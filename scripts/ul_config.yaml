@@ -192,16 +192,16 @@ finalstate_map:
     "lep2_name": "El2"
 cmssw_version:
   "2016_preVFP":
-    "main": "CMSSW_10_6_12"
+    "main": "CMSSW_10_6_28"
     "hlt":
   "2016_postVFP":
-    "main": "CMSSW_10_6_12"
+    "main": "CMSSW_10_6_28"
     "hlt":
   "2017":
-    "main": "CMSSW_10_6_12"
+    "main": "CMSSW_10_6_28"
     "hlt":
   "2018":
-    "main": "CMSSW_10_6_12"
+    "main": "CMSSW_10_6_28"
     "hlt": "CMSSW_10_2_16_UL"
 output_paths:
   "tarballs": "srm://cmssrm-kit.gridka.de:8443/srm/managerv2?SFN=/pnfs/gridka.de/cms/disk-only/store/user/{USER}/gc_storage/ul_embedding/tarballs"
