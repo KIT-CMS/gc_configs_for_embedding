@@ -189,7 +189,7 @@ class PreselectionTask(Task):
             workdir=self.workdir,
             identifier=self.identifier,
             runs=self.runlist,
-            inputfolder="Run2018_CMSSW_10_6_12_UL",
+            inputfolder="Run2018_CMSSW_10_6_28_UL",
             config=self.config,
             isMC=self.isMC,
         )
@@ -226,7 +226,7 @@ class NanoTask(Task):
             workdir=self.workdir,
             identifier=self.identifier,
             runs=self.runlist,
-            inputfolder="Run2018_CMSSW_10_6_12_UL",
+            inputfolder="Run2018_CMSSW_10_6_28_UL",
             config=self.config,
             isMC=self.isMC,
         )
@@ -263,7 +263,7 @@ class EmbeddingTask(Task):
             workdir=self.workdir,
             identifier=self.identifier,
             runs=self.runlist,
-            inputfolder="Run2018_CMSSW_10_6_12_UL",
+            inputfolder="Run2018_CMSSW_10_6_28_UL",
             config=self.config,
             isMC=self.isMC,
         )
