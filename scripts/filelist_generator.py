@@ -45,7 +45,7 @@ class PreselectionFilelist(Filelist):
         if not os.path.exists("dbs/ul/"):
             os.mkdir("dbs/ul/")
         gc_config_folder = os.path.join(
-            "{configdir}/{datatype}_{era}".format(
+            "{configdir}/{datatype}_{era}_preselection".format(
                 datatype=self.datatype, configdir=self.configdir, era=self.era
             )
         )
@@ -58,6 +58,7 @@ class PreselectionFilelist(Filelist):
             config=gc_config_path,
             output=output_file,
         )
+        console.log("Running {}".format(cmd))
         os.system(cmd)
         return os.path.abspath(output_file)
 
