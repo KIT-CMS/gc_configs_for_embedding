@@ -7,6 +7,11 @@ import FWCore.ParameterSet.Config as cms
 
 from Configuration.Eras.Era_Run2_2018_cff import Run2_2018
 
+# In order to reduce diskusage of job, remove output of selection.py --> RAWskimmed.root
+import os
+if os.path.exists("RAWskimmed.root"):
+  os.remove("RAWskimmed.root")
+
 process = cms.Process('DIGI2RAW',Run2_2018)
 
 # import of standard configurations

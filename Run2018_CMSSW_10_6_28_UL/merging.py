@@ -7,6 +7,11 @@ import FWCore.ParameterSet.Config as cms
 
 from Configuration.Eras.Era_Run2_2018_cff import Run2_2018
 
+# In order to reduce diskusage of job, remove output of generator_HLT.py --> simulated_and_cleaned_posthlt
+import os
+if os.path.exists("simulated_and_cleaned_posthlt.root"):
+  os.remove("simulated_and_cleaned_posthlt.root")
+
 process = cms.Process('PAT',Run2_2018)
 
 # import of standard configurations

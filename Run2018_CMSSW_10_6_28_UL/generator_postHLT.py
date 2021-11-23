@@ -7,6 +7,11 @@ import FWCore.ParameterSet.Config as cms
 
 from Configuration.Eras.Era_Run2_2018_cff import Run2_2018
 
+# In order to reduce diskusage of job, remove output of generator_preHLT.py --> simulated_and_cleaned_preHLT.root
+import os
+if os.path.exists("simulated_and_cleaned_preHLT.root"):
+  os.remove("simulated_and_cleaned_preHLT.root")
+
 process = cms.Process('RECO',Run2_2018)
 
 # import of standard configurations
