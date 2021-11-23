@@ -1,5 +1,9 @@
+.lock
+CMSSW_*/
 *.root
 *.pyc
 *.tar.gz
 *_data_*/
+data_*/
 *_mc_*/
+mc_*/
