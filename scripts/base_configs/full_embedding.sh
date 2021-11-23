@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+start=`date +%s`
 export XRD_LOGLEVEL="Info"
 echo " --------------"
 echo "Job Parameter Set: "

@@ -406,6 +406,7 @@ class FullTask(GeneralTask):
                 add_fragment_to_end=add_fragment_to_end,
                 skip_if_not_there=True,
             )
+            self.copy_file("../scripts/base_configs/full_embedding.sh")
 
     def build_gc_configs(self):
         dbs_folder = "dbs/ul"
@@ -472,7 +473,7 @@ class FullTask(GeneralTask):
         ].replace("{USER}", self.username)
         rp_base_cfg["__EXE__"] = os.path.join(
             os.path.dirname(os.path.abspath("scripts")),
-            "scripts/base_configs/full_embedding.sh",
+            "scripts/base_configs/embedding_wrapper.sh",
         )
         self.copy_file(
             "scripts/base_configs/grid_control_ul_main.conf",
