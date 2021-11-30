@@ -1,6 +1,7 @@
 import os
 from rich.console import Console
 from rich.progress import Progress
+import argparse
 
 console = Console()
 
@@ -40,7 +41,7 @@ class Filelist(object):
 
 
 class PreselectionFilelist(Filelist):
-    def build_filelist(self):
+    def build_filelist(self, config_path=None):
         console.rule("Generating Preselection filelist")
         if not os.path.exists("dbs/ul/"):
             os.mkdir("dbs/ul/")
@@ -53,6 +54,8 @@ class PreselectionFilelist(Filelist):
             gc_config_folder, "{run}.conf".format(run=self.run)
         )
         output_file = "dbs/ul/{output}.dbs".format(output=self.run)
+        if config_path is not None:
+            gc_config_path = config_path
         cmd = "{gc_path}/scripts/dataset_list_from_gc.py {config} -o {output}".format(
             gc_path=self.grid_control_path,
             config=gc_config_path,
@@ -67,7 +70,7 @@ class PreselectionFilelist(Filelist):
 
 
 class NanoFilelist(Filelist):
-    def build_filelist(self):
+    def build_filelist(self, config_path=None):
         console.rule("Generating NanoAOD filelist")
         folder = "dbs/ul_embedding_nano/"
         if not os.path.exists(folder):
@@ -86,6 +89,8 @@ class NanoFilelist(Filelist):
                 output=self.run, finalstate=self.finalstate
             ),
         )
+        if config_path is not None:
+            gc_config_path = config_path
         cmd = "{gc_path}/scripts/dataset_list_from_gc.py {config} -o {output}".format(
             gc_path=self.grid_control_path,
             config=gc_config_path,
@@ -100,9 +105,8 @@ class NanoFilelist(Filelist):
 
 
 class FullFilelist(Filelist):
-    def build_filelist(self):
+    def build_filelist(self, config_path=None):
         self.import_root()
-        ROOT.gErrorIgnoreLevel = 6001
         console.rule("Generating Full filelist")
         folder = "dbs/ul_embedding/"
         if not os.path.exists(folder):
@@ -124,6 +128,8 @@ class FullFilelist(Filelist):
                 output=self.run, finalstate=self.finalstate
             ),
         )
+        if config_path is not None:
+            gc_config_path = config_path
         cmd = "{gc_path}/scripts/dataset_list_from_gc.py {config} -o {output}".format(
             gc_path=self.grid_control_path,
             config=gc_config_path,
@@ -187,13 +193,14 @@ class FullFilelist(Filelist):
         os.remove(temp_output_file)
 
     def get_number_of_events(self, filepath):
-        # console.log("Checking {}".format(filepath))
-        self.import_root()
+        import ROOT
+
+        ROOT.gErrorIgnoreLevel = 6001
         file = ROOT.TFile.Open(filepath, "READ")
         tree = file.Get("Events")
         return tree.GetEntries()
 
-    def import_root():
+    def import_root(self):
         console.log("Trying to import ROOT")
         try:
             import ROOT
@@ -205,7 +212,32 @@ class FullFilelist(Filelist):
                 "source /cvmfs/sft.cern.ch/lcg/views/LCG_97python3/x86_64-centos7-gcc9-opt/setup.sh"
             )
             exit()
+        console.log("ROOT imported ..")
 
     def publish_dataset(self):
         # TODO
         pass
+
+
+if __name__ == "__main__":
+    print("Hello")
+    console.log("Running in script mode")
+    parser = argparse.ArgumentParser(description="Generate filelist for embedding")
+    parser.add_argument(
+        "--config", type=str, help="path to the config", required=True
+    )
+    parser.add_argument("--era", type=str, help="era", required=True)
+    parser.add_argument("--run", type=str, help="run", required=True)
+    parser.add_argument("--finalstate", type=str, help="finalstate", required=True)
+    parser.add_argument("--isMc", action="store_true", help="is is mc, set this")
+    args = parser.parse_args()
+    grid_control_path = os.path.join("grid-control")
+    filelist = FullFilelist(
+        args.config,
+        args.era,
+        grid_control_path,
+        args.run,
+        args.finalstate,
+        args.isMc,
+    )
+    filelist.build_filelist(config_path=args.config)
