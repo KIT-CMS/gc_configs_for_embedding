@@ -407,6 +407,7 @@ class FullTask(GeneralTask):
                 skip_if_not_there=True,
             )
             self.copy_file("../scripts/base_configs/full_embedding.sh")
+            os.chmod("{path}/full_embedding.sh".format(path=self.name), stat.S_IRWXU)
 
     def build_gc_configs(self):
         dbs_folder = "dbs/ul"

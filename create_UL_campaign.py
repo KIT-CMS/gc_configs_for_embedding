@@ -6,7 +6,7 @@ import yaml
 import sys
 
 if sys.version_info[0] == 2:
-    print('You need to run this with Python 3')
+    print("You need to run this with Python 3")
     raise SystemExit
 
 from scripts.EmbeddingTask import Preselection, FullTask, Nano
@@ -125,7 +125,7 @@ class Task(object):
         out_file.write("do\n")
         for config in configlist:
             out_file.write(
-                "{gc_path}/go.py {configpath} -G \n".format(
+                "python2 {gc_path}/go.py {configpath} -G \n".format(
                     gc_path=self.gc_path, configpath=config
                 )
             )
