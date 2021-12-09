@@ -63,8 +63,9 @@ def parse_arguments():
     parser.add_argument(
         "--backend",
         type=str,
-        choices=["etp", "naf", "cern"],
-        help="Select the condor backend that is used -- TODO --",
+        choices=["etp", "naf", "lxplus"],
+        default="etp",
+        help="Select the condor backend that is used, currently implemented: etp and lxplus",
     )
     parser.add_argument(
         "--custom-configdir",
@@ -266,6 +267,7 @@ class EmbeddingTask(Task):
             inputfolder="Run2018_CMSSW_10_6_28_UL",
             config=self.config,
             isMC=self.isMC,
+            backend=self.backend,
         )
 
     def build_filelist(self):

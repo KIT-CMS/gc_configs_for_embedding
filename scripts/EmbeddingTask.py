@@ -292,7 +292,7 @@ class Nano(GeneralTask):
 
 class FullTask(GeneralTask):
     def __init__(
-        self, era, workdir, finalstate, identifier, runs, inputfolder, config, isMC
+        self, era, workdir, finalstate, identifier, runs, inputfolder, config, isMC, backend
     ):
         GeneralTask.__init__(
             self, era, workdir, identifier, runs, inputfolder, config, isMC
@@ -313,6 +313,15 @@ class FullTask(GeneralTask):
         self.name = self.finalstate + "_" + identifier
         self.generator_frag = self.build_generator_fragment()
         self.cmssw_version = self.config["cmssw_version"][era]["main"]
+        self.backend=backend
+        if self.backend == "etp":
+            self.configname = "grid_control_ul_main.conf"
+        elif self.backend == "lxplus":
+            self.configname = "grid_control_ul_main_lxplus.conf"
+        elif self.backend == "naf":
+            self.configname = "grid_control_ul_main_naf.conf"
+        else:
+            raise ValueError("Backend {} not supported".format(self.backend))
 
     def build_generator_fragment(self):
         generator_frag = ""
@@ -440,12 +449,12 @@ class FullTask(GeneralTask):
                 )
                 exit()
             if os.path.exists(self.name + "/" + run + ".conf"):
-                console.log("Moving existing config to grid_control_ul_main.conf.bak")
+                console.log("Moving existing config to {}.bak".format(self.configname))
                 copyfile(
-                    os.path.join(self.name, "grid_control_ul_main.conf"),
-                    os.path.join(self.name, "grid_control_ul_main.conf.bak"),
+                    os.path.join(self.name, self.configname),
+                    os.path.join(self.name, "{}.bak".format(self.configname)),
                 )
-            self.write_gc_config("grid_control_ul_main.conf", run, inputdata)
+            self.write_gc_config(self.configname, run, inputdata)
         rp_base_cfg = {}
         se_path_str = ("se path = {path}").format(
             path=self.config["output_paths"]["main"].replace("{USER}", self.username)
@@ -477,7 +486,7 @@ class FullTask(GeneralTask):
             "scripts/base_configs/embedding_wrapper.sh",
         )
         self.copy_file(
-            "scripts/base_configs/grid_control_ul_main.conf",
+            "scripts/base_configs/{}".format(self.configname),
             copy_from_folder="./",
             replace_dict=rp_base_cfg,
         )
