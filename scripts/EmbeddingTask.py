@@ -292,7 +292,16 @@ class Nano(GeneralTask):
 
 class FullTask(GeneralTask):
     def __init__(
-        self, era, workdir, finalstate, identifier, runs, inputfolder, config, isMC, backend
+        self,
+        era,
+        workdir,
+        finalstate,
+        identifier,
+        runs,
+        inputfolder,
+        config,
+        isMC,
+        backend,
     ):
         GeneralTask.__init__(
             self, era, workdir, identifier, runs, inputfolder, config, isMC
@@ -313,7 +322,7 @@ class FullTask(GeneralTask):
         self.name = self.finalstate + "_" + identifier
         self.generator_frag = self.build_generator_fragment()
         self.cmssw_version = self.config["cmssw_version"][era]["main"]
-        self.backend=backend
+        self.backend = backend
         if self.backend == "etp":
             self.configname = "grid_control_ul_main.conf"
         elif self.backend == "lxplus":
@@ -448,7 +457,7 @@ class FullTask(GeneralTask):
                     )
                 )
                 exit()
-            if os.path.exists(self.name + "/" + run + ".conf"):
+            if os.path.exists(os.path.join(self.name, run, self.configname)):
                 console.log("Moving existing config to {}.bak".format(self.configname))
                 copyfile(
                     os.path.join(self.name, self.configname),
