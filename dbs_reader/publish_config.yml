@@ -1,0 +1,12 @@
+"2018":
+  global_tag: "106X_dataRun2_v35"
+  campaign_name: "UL2018"
+  tier: "USER"
+  group: "NoGroup"
+  application: "cmsRun"
+  app_version: "CMSSW_10_6_28"
+  processed_ds: "{final_state}FinalState-inputDoubleMu_106X_ULegacy_miniAOD-v1"
+  primary_ds: "ULEmbeddingRun2018"
+  description: "TauEmbedding"
+  primary_ds_type: "Data"
+  output_module_label: "Merged"
