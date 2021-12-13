@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 import pprint
 import argparse
+
+from yaml import events
 from dbs.apis.dbsClient import DbsApi
 import uuid
 import os
@@ -80,7 +82,7 @@ def parse_arguments():
         "--task",
         type=str,
         required=True,
-        choices=["prepare", "publish"],
+        choices=["prepare", "publish", "test_publish"],
         help="Name the task to be performed",
     )
     parser.add_argument(
@@ -156,7 +158,7 @@ def addFilesToBlock(blockDict, files):
     return blockDict
 
 
-def generate_filelist(temp_output_file, gc_config_path):
+def generate_filelist(temp_output_file, gc_config_path, grid_control_path):
     cmd = "{gc_path}/scripts/dataset_list_from_gc.py {config} -o {output}".format(
         gc_path=grid_control_path,
         config=gc_config_path,
@@ -207,7 +209,7 @@ def readout_file_information(
     files = []
     with open(gc_filelist, "r") as f:
         lines = f.readlines()
-        total = task_end_index - task_begin_index + 1
+        total = task_end_index - task_begin_index
         with tqdm(
             total=total,
             position=worker_id,
@@ -262,7 +264,7 @@ def generate_file_json(file_info_file, outputfolder, gc_filelist, nthreads, bloc
         (
             gc_filelist,
             min(jobtasks[i]),
-            max(jobtasks[i]),
+            max(jobtasks[i] + 1),
             outputfolder,
             offset,
             prefix,
@@ -308,40 +310,55 @@ def generate_file_json(file_info_file, outputfolder, gc_filelist, nthreads, bloc
     open(os.path.join(outputfolder, "scanned"), "a").close()
 
 
-def upload_to_dbs(dataset_info_file, file_info_file, origin_site_name):
-    dataset_info = json.load(open(dataset_info_file, "r"))
-    file_info = json.load(open(file_info_file, "r"))
+def upload_to_dbs(dataset_info_file, file_info_file, origin_site_name, dry=False):
+    print("Uploading to DBS3...")
+    with open(dataset_info_file, "r") as f:
+        dataset_info = json.loads(f.read())
+    with open(file_info_file, "r") as f:
+        file_info = json.loads(f.read())
     phy3WriteUrl = "https://cmsweb.cern.ch/dbs/prod/phys03/DBSWriter"
     writeApi = DbsApi(url=phy3WriteUrl, debug=1)
+    total_files = 0
+    total_events = 0
+    print("insert block in DBS3: %s" % writeApi.url)
+    print("Preparing upload for {}".format(dataset_info["processed_ds"]))
+    print("Blocks to be processed: {}".format(len(file_info["blocks"])))
     for block in file_info["blocks"]:
         blockid = block["blockid"]
-        files = block["files"]
+        filedata = block["files"]
+        filelist = []
+        print(
+            "Processing block {} - Number of files: {}".format(blockid, len(filedata))
+        )
+        total_files += len(filedata)
         blockDict = createEmptyBlock(dataset_info, origin_site_name, blockid)
-        for file in files:
+        for file in filedata:
             fileDic = {}
             lfn = file["name"]
             fileDic["file_type"] = "EDM"
             fileDic["logical_file_name"] = lfn
             for key in ["check_sum", "adler32", "file_size", "event_count"]:
                 fileDic[key] = file[key]
+            total_events += file["event_count"]
             fileDic["file_lumi_list"] = file["lumis"]
             fileDic["auto_cross_section"] = 0.0
             fileDic["last_modified_by"] = "sbrommer"
-
-            files.append(fileDic)
+            filelist.append(fileDic)
         # now upload the block
-        blockDict = addFilesToBlock(blockDict, files)
-        print("insert block in DBS3: %s" % writeApi.url)
-        writeApi.insertBulkBlock(blockDict)
+        blockDict = addFilesToBlock(blockDict, filelist)
+        if not dry:
+            writeApi.insertBulkBlock(blockDict)
+        # else:
+        #     print("Dry run, not inserting block into DBS3")
+        #     pprint.pprint(blockDict)
+    print("Total files: {} // Total Events: {}".format(total_files, total_events))
 
 
 if __name__ == "__main__":
     blocksize = 500
     origin_site_name = "T1_DE_KIT"
     args = parse_arguments()
-    grid_control_path = os.path.join(
-        os.path.dirname(os.path.realpath(__file__)), "..", "grid-control"
-    )
+
     # first create the folders
     sample = "{}_Embedding_{}_{}".format(args.era, args.final_state, args.run)
     sample_publish_folder = os.path.join(
@@ -356,7 +373,11 @@ if __name__ == "__main__":
     if not os.path.exists(os.path.join(sample_publish_folder, "temp")):
         os.makedirs(os.path.join(sample_publish_folder, "temp"))
     if not os.path.exists(gc_filelist):
-        generate_filelist(gc_filelist, args.gc_config)
+        print("Creating gc filelist for {}".format(sample))
+        grid_control_path = os.path.join(
+            os.path.dirname(os.path.realpath(__file__)), "..", "grid-control"
+        )
+        generate_filelist(gc_filelist, args.gc_config, grid_control_path)
     # create the dataset_info.json file if not existent
     dataset_info_file = os.path.join(sample_publish_folder, "dataset_info.json")
     file_info_file = os.path.join(sample_publish_folder, "file_info.json")
@@ -377,9 +398,19 @@ if __name__ == "__main__":
             )
         else:
             print("Dataset already prepared")
-    elif args.task == "upload":
+    elif args.task == "publish":
         # now we have to upload the dataset to DBS3
         if not os.path.exists(os.path.join(sample_publish_folder, "scanned")):
             print("Dataset not prepared yet")
             exit()
-        upload_to_dbs(dataset_info_file, file_info_file, origin_site_name)
+        else:
+            print("Uploading dataset to DBS3")
+            upload_to_dbs(dataset_info_file, file_info_file, origin_site_name)
+    elif args.task == "test_publish":
+        # now we have to upload the dataset to DBS3
+        if not os.path.exists(os.path.join(sample_publish_folder, "scanned")):
+            print("Dataset not prepared yet")
+            exit()
+        else:
+            print("Uploading dataset to DBS3")
+            upload_to_dbs(dataset_info_file, file_info_file, origin_site_name, dry=True)
