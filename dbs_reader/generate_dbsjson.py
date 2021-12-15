@@ -13,7 +13,6 @@ import numpy as np
 from multiprocessing import Pool, current_process, RLock
 from tqdm import tqdm
 
-
 import ROOT
 
 
@@ -30,7 +29,8 @@ def fix_prefix(prefix):
 
 
 def getlumi(file):
-    output = subprocess.check_output("edmLumisInFiles.py {}".format(file), shell=True)
+    output = subprocess.check_output("edmLumisInFiles.py {}".format(file),
+                                     shell=True)
     lumidict = json.loads(output)
     outputdata = []
     for run in lumidict:
@@ -38,7 +38,10 @@ def getlumi(file):
             lumilow = lumirange[0]
             lumihigh = lumirange[1]
             for lumi in xrange(lumilow, lumihigh + 1):
-                outputdata.append({"lumi_section_num": lumi, "run_num": int(run)})
+                outputdata.append({
+                    "lumi_section_num": lumi,
+                    "run_num": int(run)
+                })
     return outputdata
 
 
@@ -57,11 +60,11 @@ def get_file_information(filepath):
 
 def parse_arguments():
     parser = argparse.ArgumentParser(
-        description="Script to generate json for DBS3 upload"
-    )
-    parser.add_argument(
-        "--gc-config", type=str, help="path to the grid-control config", required=True
-    )
+        description="Script to generate json for DBS3 upload")
+    parser.add_argument("--gc-config",
+                        type=str,
+                        help="path to the grid-control config",
+                        required=True)
     parser.add_argument("--era", type=str, help="era", required=True)
     parser.add_argument("--run", type=str, help="run", required=True)
     parser.add_argument(
@@ -127,15 +130,13 @@ def createEmptyBlock(ds_info, origin_site_name, blockid):
         "open_for_writing": 0,
     }
 
-    dataset_conf_list = [
-        {
-            "app_name": ds_info["application"],
-            "global_tag": ds_info["global_tag"],
-            "output_module_label": ds_info["output_module_label"],
-            "pset_hash": "dummyhash",
-            "release_version": ds_info["app_version"],
-        }
-    ]
+    dataset_conf_list = [{
+        "app_name": ds_info["application"],
+        "global_tag": ds_info["global_tag"],
+        "output_module_label": ds_info["output_module_label"],
+        "pset_hash": "dummyhash",
+        "release_version": ds_info["app_version"],
+    }]
 
     blockDict = {
         "files": [],
@@ -154,7 +155,8 @@ def createEmptyBlock(ds_info, origin_site_name, blockid):
 def addFilesToBlock(blockDict, files):
     blockDict["files"] = files
     blockDict["block"]["file_count"] = len(files)
-    blockDict["block"]["block_size"] = sum([int(file["file_size"]) for file in files])
+    blockDict["block"]["block_size"] = sum(
+        [int(file["file_size"]) for file in files])
     return blockDict
 
 
@@ -168,12 +170,13 @@ def generate_filelist(temp_output_file, gc_config_path, grid_control_path):
     os.system(cmd)
 
 
-def generate_dataset_info(publish_configpath, era, final_state, outputfile):
+def generate_dataset_info(publish_configpath, era, run, final_state,
+                          outputfile):
     # INFORMATION TO BE PUT IN DBS3
     config = yaml.load(open(publish_configpath, "r"))[era]
     # almost free text here, but beware WMCore/Lexicon.py
     dataset_info = {
-        "primary_ds": config["primary_ds"],
+        "primary_ds": config["primary_ds"].format(run=run),
         "processed_ds": config["processed_ds"].format(final_state=final_state),
         "tier": config["tier"],
         "group": config["group"],
@@ -199,9 +202,8 @@ def readout_file_information(
 ):
     # worker id
     worker_id = current_process()._identity[0]
-    outputfile = os.path.join(
-        outputfolder, "temp", "file_details_{}.json".format(tasknumber)
-    )
+    outputfile = os.path.join(outputfolder, "temp",
+                              "file_details_{}.json".format(tasknumber))
     if os.path.exists(outputfile):
         print("File {} already exists".format(outputfile))
         return
@@ -211,13 +213,14 @@ def readout_file_information(
         lines = f.readlines()
         total = task_end_index - task_begin_index
         with tqdm(
-            total=total,
-            position=worker_id,
-            desc="Task {}".format(tasknumber),
-            dynamic_ncols=True,
-            leave=False,
+                total=total,
+                position=worker_id,
+                desc="Task {}".format(tasknumber),
+                dynamic_ncols=True,
+                leave=False,
         ) as bar:
-            for lineindex in xrange(task_begin_index + offset, task_end_index + offset):
+            for lineindex in xrange(task_begin_index + offset,
+                                    task_end_index + offset):
                 line = lines[lineindex]
                 filename = line.split(("="))[0].strip()
                 filepath = prefix + "/" + filename
@@ -225,7 +228,8 @@ def readout_file_information(
                     continue
                 fileinfo = get_file_information(filepath)
                 aFile = {
-                    "name": filepath.replace("root://cmsxrootd-kit.gridka.de/", ""),
+                    "name": filepath.replace("root://cmsxrootd-kit.gridka.de/",
+                                             ""),
                     "event_count": fileinfo["nentries"],
                     "file_size": fileinfo["file_size"],
                     "check_sum": fileinfo["check_sum"],
@@ -242,7 +246,8 @@ def job_wrapper(args):
     return readout_file_information(*args)
 
 
-def generate_file_json(file_info_file, outputfolder, gc_filelist, nthreads, blocksize):
+def generate_file_json(file_info_file, outputfolder, gc_filelist, nthreads,
+                       blocksize):
     offset = 4
     num_files = 0
     prefix = ""
@@ -254,35 +259,33 @@ def generate_file_json(file_info_file, outputfolder, gc_filelist, nthreads, bloc
         for i, line in enumerate(lines):
             if i < 4:
                 if line.startswith("prefix"):
-                    prefix, _ = fix_prefix(line.replace("prefix = ", "").strip("\n"))
+                    prefix, _ = fix_prefix(
+                        line.replace("prefix = ", "").strip("\n"))
             else:
                 break
     ntasks = int(num_files / float(blocksize)) + 1
     files = range(num_files)
     jobtasks = np.array_split(files, ntasks)
-    arguments = [
-        (
-            gc_filelist,
-            min(jobtasks[i]),
-            max(jobtasks[i] + 1),
-            outputfolder,
-            offset,
-            prefix,
-            i,
-        )
-        for i in range(ntasks)
-    ]
+    arguments = [(
+        gc_filelist,
+        min(jobtasks[i]),
+        max(jobtasks[i] + 1),
+        outputfolder,
+        offset,
+        prefix,
+        i,
+    ) for i in range(ntasks)]
     if nthreads > len(arguments):
         nthreads = len(arguments)
     print("Running {} tasks with {} threads".format(len(arguments), nthreads))
-    pool = Pool(nthreads, initargs=(RLock(),), initializer=tqdm.set_lock)
+    pool = Pool(nthreads, initargs=(RLock(), ), initializer=tqdm.set_lock)
     for _ in tqdm(
-        pool.imap_unordered(job_wrapper, arguments),
-        total=len(arguments),
-        desc="Total progess",
-        position=nthreads + 1,
-        dynamic_ncols=True,
-        leave=True,
+            pool.imap_unordered(job_wrapper, arguments),
+            total=len(arguments),
+            desc="Total progess",
+            position=nthreads + 1,
+            dynamic_ncols=True,
+            leave=True,
     ):
         pass
     # result = pool.map(job_wrapper, arguments)
@@ -295,22 +298,26 @@ def generate_file_json(file_info_file, outputfolder, gc_filelist, nthreads, bloc
     for i in range(ntasks):
         result = json.loads(
             open(
-                os.path.join(outputfolder, "temp", "file_details_{}.json".format(i)),
+                os.path.join(outputfolder, "temp",
+                             "file_details_{}.json".format(i)),
                 "r",
-            ).read()
-        )
+            ).read())
         block = {
             "blockid": str(uuid.uuid4()),
             "files": result[str(i)],
         }
         combined["blocks"].append(block)
     json.dump(combined, open(file_info_file, "w"), indent=4)
-    print("Finished preparing dbs for {} blocks...".format(len(combined["blocks"])))
+    print("Finished preparing dbs for {} blocks...".format(
+        len(combined["blocks"])))
     # generate file indicating that the filelist is complete
     open(os.path.join(outputfolder, "scanned"), "a").close()
 
 
-def upload_to_dbs(dataset_info_file, file_info_file, origin_site_name, dry=False):
+def upload_to_dbs(dataset_info_file,
+                  file_info_file,
+                  origin_site_name,
+                  dry=False):
     print("Uploading to DBS3...")
     with open(dataset_info_file, "r") as f:
         dataset_info = json.loads(f.read())
@@ -323,13 +330,15 @@ def upload_to_dbs(dataset_info_file, file_info_file, origin_site_name, dry=False
     print("insert block in DBS3: %s" % writeApi.url)
     print("Preparing upload for {}".format(dataset_info["processed_ds"]))
     print("Blocks to be processed: {}".format(len(file_info["blocks"])))
+    print("DatasetName: {}".format(
+        createEmptyBlock(dataset_info, origin_site_name,
+                         "asdf")["dataset"]["dataset"]))
     for block in file_info["blocks"]:
         blockid = block["blockid"]
         filedata = block["files"]
         filelist = []
-        print(
-            "Processing block {} - Number of files: {}".format(blockid, len(filedata))
-        )
+        print("Processing block {} - Number of files: {}".format(
+            blockid, len(filedata)))
         total_files += len(filedata)
         blockDict = createEmptyBlock(dataset_info, origin_site_name, blockid)
         for file in filedata:
@@ -348,10 +357,12 @@ def upload_to_dbs(dataset_info_file, file_info_file, origin_site_name, dry=False
         blockDict = addFilesToBlock(blockDict, filelist)
         if not dry:
             writeApi.insertBulkBlock(blockDict)
-        # else:
-        #     print("Dry run, not inserting block into DBS3")
-        #     pprint.pprint(blockDict)
-    print("Total files: {} // Total Events: {}".format(total_files, total_events))
+        else:
+            print("Dry run, not inserting block into DBS3")
+            pprint.pprint(blockDict)
+            exit()
+    print("Total files: {} // Total Events: {}".format(total_files,
+                                                       total_events))
 
 
 if __name__ == "__main__":
@@ -362,12 +373,10 @@ if __name__ == "__main__":
     # first create the folders
     sample = "{}_Embedding_{}_{}".format(args.era, args.final_state, args.run)
     sample_publish_folder = os.path.join(
-        os.path.dirname(os.path.realpath(__file__)), "publishdb", sample
-    )
+        os.path.dirname(os.path.realpath(__file__)), "publishdb", sample)
     # if not existent, create the gc_filelist which contains all the output filepaths
-    gc_filelist = os.path.join(
-        sample_publish_folder, "gc_{}_filelist.txt".format(sample)
-    )
+    gc_filelist = os.path.join(sample_publish_folder,
+                               "gc_{}_filelist.txt".format(sample))
     if not os.path.exists(sample_publish_folder):
         os.makedirs(sample_publish_folder)
     if not os.path.exists(os.path.join(sample_publish_folder, "temp")):
@@ -375,16 +384,15 @@ if __name__ == "__main__":
     if not os.path.exists(gc_filelist):
         print("Creating gc filelist for {}".format(sample))
         grid_control_path = os.path.join(
-            os.path.dirname(os.path.realpath(__file__)), "..", "grid-control"
-        )
+            os.path.dirname(os.path.realpath(__file__)), "..", "grid-control")
         generate_filelist(gc_filelist, args.gc_config, grid_control_path)
     # create the dataset_info.json file if not existent
-    dataset_info_file = os.path.join(sample_publish_folder, "dataset_info.json")
+    dataset_info_file = os.path.join(sample_publish_folder,
+                                     "dataset_info.json")
     file_info_file = os.path.join(sample_publish_folder, "file_info.json")
     if not os.path.exists(dataset_info_file):
-        generate_dataset_info(
-            args.publish_config, args.era, args.final_state, dataset_info_file
-        )
+        generate_dataset_info(args.publish_config, args.era, args.run,
+                              args.final_state, dataset_info_file)
     if args.task == "prepare":
         print("Preparing dataset")
         if not os.path.exists(os.path.join(sample_publish_folder, "scanned")):
@@ -413,4 +421,7 @@ if __name__ == "__main__":
             exit()
         else:
             print("Uploading dataset to DBS3")
-            upload_to_dbs(dataset_info_file, file_info_file, origin_site_name, dry=True)
+            upload_to_dbs(dataset_info_file,
+                          file_info_file,
+                          origin_site_name,
+                          dry=True)
