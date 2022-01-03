@@ -27,7 +27,7 @@ def parse_arguments():
         "--era",
         type=str,
         # choices=['2016_preVFP', '2016_postVFP', '2017', '2018'],
-        choices=["2018"],
+        choices=["2017", "2018"],
         required=True,
         help="Era used for the production",
     )
@@ -85,6 +85,19 @@ def possible_runs(era):
     config = yaml.load(open("scripts/ul_config.yaml", "r"))
     runlist = config["runlist"][era]
     return runlist
+
+
+def get_inputfolder(era):
+    if era == "2018":
+        return "Run2018_CMSSW_10_6_28_UL"
+    elif era == "2017":
+        return "Run2017_CMSSW_10_6_28_UL"
+    elif era == "2016_postVFP":
+        return "Run2016_CMSSW_10_6_28_UL_postVFP"
+    elif era == "2016_preVFP":
+        return "Run2016_CMSSW_10_6_28_UL_preVFP"
+    else:
+        raise ValueError("Era not supported")
 
 
 class Task(object):
@@ -190,7 +203,7 @@ class PreselectionTask(Task):
             workdir=self.workdir,
             identifier=self.identifier,
             runs=self.runlist,
-            inputfolder="Run2018_CMSSW_10_6_28_UL",
+            inputfolder=get_inputfolder(era),
             config=self.config,
             isMC=self.isMC,
         )
@@ -227,7 +240,7 @@ class NanoTask(Task):
             workdir=self.workdir,
             identifier=self.identifier,
             runs=self.runlist,
-            inputfolder="Run2018_CMSSW_10_6_28_UL",
+            inputfolder=get_inputfolder(era),
             config=self.config,
             isMC=self.isMC,
         )
@@ -264,7 +277,7 @@ class EmbeddingTask(Task):
             workdir=self.workdir,
             identifier=self.identifier,
             runs=self.runlist,
-            inputfolder="Run2018_CMSSW_10_6_28_UL",
+            inputfolder=get_inputfolder(era),
             config=self.config,
             isMC=self.isMC,
             backend=self.backend,
