@@ -87,40 +87,40 @@ generator_cuts:
       "attempts": 1
   "2017":
     "MuTau":
-      "lep1_pt":
-      "lep1_eta":
-      "lep2_pt":
-      "lep2_eta":
+      "lep1_pt": 18
+      "lep1_eta": 2.2
+      "lep2_pt": 18
+      "lep2_eta": 2.4
       "attempts": 1000
     "ElTau":
-      "lep1_pt":
-      "lep1_eta":
-      "lep2_pt":
-      "lep2_eta":
+      "lep1_pt": 18
+      "lep1_eta": 2.2
+      "lep2_pt": 18
+      "lep2_eta": 2.4
       "attempts": 1000
     "ElMu":
-      "lep1_pt":
-      "lep1_eta":
-      "lep2_pt":
-      "lep2_eta":
+      "lep1_pt": 9
+      "lep1_eta": 2.5
+      "lep2_pt": 19
+      "lep2_eta": 2.5
       "attempts": 1000
     "TauTau":
-      "lep1_pt":
-      "lep1_eta":
-      "lep2_pt":
-      "lep2_eta":
+      "lep1_pt": 20
+      "lep1_eta": 2.2
+      "lep2_pt": 20
+      "lep2_eta": 2.2
       "attempts": 1000
     "MuEmb":
-      "lep1_pt":
-      "lep1_eta":
-      "lep2_pt":
-      "lep2_eta":
+      "lep1_pt": 17
+      "lep1_eta": 2.5
+      "lep2_pt": 8
+      "lep2_eta": 2.5
       "attempts": 1
     "ElEmb":
-      "lep1_pt":
-      "lep1_eta":
-      "lep2_pt":
-      "lep2_eta":
+      "lep1_pt": 22
+      "lep1_eta": 2.5
+      "lep2_pt": 10
+      "lep2_eta": 2.5
       "attempts": 1
   "2018":
     "MuTau":
@@ -199,7 +199,7 @@ cmssw_version:
     "hlt":
   "2017":
     "main": "CMSSW_10_6_28"
-    "hlt":
+    "hlt": "CMSSW_9_4_14_UL_patch1"
   "2018":
     "main": "CMSSW_10_6_28"
     "hlt": "CMSSW_10_2_16_UL"
