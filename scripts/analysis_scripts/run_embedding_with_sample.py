@@ -4,6 +4,7 @@ import subprocess
 import enquiries
 from shutil import copyfile
 from rich.console import Console
+import yaml
 
 console = Console()
 
@@ -64,8 +65,18 @@ if __name__ == "__main__":
     workdir = os.path.join(os.path.abspath(args.workdir), args.workdirtag)
     inputfile = os.path.abspath(args.inputfile)
     emb_folder = os.path.abspath(args.embedding_scripts_folder)
-    main_cmssw = os.path.abspath("CMSSW_10_6_28")
-    hlt_cmssw = os.path.abspath("CMSSW_10_2_16_UL")
+    era = [
+        s
+        for s in emb_folder.split("_")
+        if s in ["2016_preVFP", "2016_postVFP", "2017", "2018"]
+    ][0]
+    config = yaml.safe_load(open("scripts/ul_config.yaml", "r"))
+    main_cmssw = os.path.abspath(config["cmssw_version"][era]["main"])
+    hlt_cmssw = os.path.abspath(config["cmssw_version"][era]["hlt"])
+    # main_cmssw = os.path.abspath("CMSSW_10_6_28")
+    # hlt_cmssw = os.path.abspath("CMSSW_10_2_16_UL")
+    console.log(f"Using main CMSSW version: {main_cmssw}")
+    console.log(f"Using HLT CMSSW version: {hlt_cmssw}")
     start_index = 0
     tasks = embedding_order
     if args.run_preselection:

@@ -10,6 +10,7 @@ if sys.version_info[0] == 2:
     raise SystemExit
 
 from scripts.EmbeddingTask import Preselection, FullTask, Nano
+from scripts.create_tmux_while import create_tmux_while
 from scripts.filelist_generator import PreselectionFilelist, FullFilelist, NanoFilelist
 import getpass
 from rich.console import Console
@@ -77,6 +78,11 @@ def parse_arguments():
         action="store_true",
         help="If this is set, mc embedding is run instead of data embedding",
     )
+    parser.add_argument(
+        "--no_tmux",
+        action="store_true",
+        help="If this is set, no tmux is used to run the jobs",
+    )
 
     return parser.parse_args()
 
@@ -101,7 +107,9 @@ def get_inputfolder(era):
 
 
 class Task(object):
-    def __init__(self, era, workdir, configdir, config, backend, run, isMC=False):
+    def __init__(
+        self, era, workdir, configdir, config, backend, run, no_tmux=False, isMC=False
+    ):
         self.era = era
         self.workdir = workdir
         self.config = config
@@ -110,6 +118,7 @@ class Task(object):
         self.runlist = self.validate_run(run)
         self.gc_path = os.path.abspath("grid-control")
         self.backend = backend
+        self.no_tmux = no_tmux
         self.cmssw_versions = {
             "main": self.config["cmssw_version"][self.era]["main"],
             "hlt": self.config["cmssw_version"][self.era]["hlt"],
@@ -130,25 +139,36 @@ class Task(object):
             configlist.append(
                 "{name}/{run}.conf".format(name=self.task.get_name(), run=run)
             )
-        out_file = open("{name}/while.sh".format(name=self.task.get_name()), "w")
-        out_file.write("#!/bin/bash\n")
-        out_file.write("\n")
-        out_file.write("touch .lock\n")
-        out_file.write("\n")
-        out_file.write('while [ -f ".lock" ]\n')
-        out_file.write("do\n")
-        for config in configlist:
-            out_file.write(
-                "python2 {gc_path}/go.py {configpath} -G \n".format(
-                    gc_path=self.gc_path, configpath=config
+        if self.no_tmux:
+            console.rule("Using old script")
+            out_file = open("{name}/while.sh".format(name=self.task.get_name()), "w")
+            out_file.write("#!/bin/bash\n")
+            out_file.write("\n")
+            out_file.write("touch .lock\n")
+            out_file.write("\n")
+            out_file.write('while [ -f ".lock" ]\n')
+            out_file.write("do\n")
+            for config in configlist:
+                out_file.write(
+                    "python2 {gc_path}/go.py {configpath} -G \n".format(
+                        gc_path=self.gc_path, configpath=config
+                    )
                 )
+            out_file.write('echo "rm .lock"\n')
+            out_file.write("sleep 2\n")
+            out_file.write("done\n")
+            out_file.close()
+            os.chmod("{name}/while.sh".format(name=self.task.get_name()), stat.S_IRWXU)
+            os.system("./{name}/while.sh".format(name=self.task.get_name()))
+        else:
+            console.rule("Using tmux version")
+            script = create_tmux_while(
+                taskname=self.task.get_name(),
+                configlist=configlist,
+                gc_path=self.gc_path,
+                tmux_path=self.config["tmux_path"],
             )
-        out_file.write('echo "rm .lock"\n')
-        out_file.write("sleep 2\n")
-        out_file.write("done\n")
-        out_file.close()
-        os.chmod("{name}/while.sh".format(name=self.task.get_name()), stat.S_IRWXU)
-        os.system("./{name}/while.sh".format(name=self.task.get_name()))
+            os.system("./{}".format(script))
 
     def setup_env(self):
         console.rule("Setting up main CMSSW")
@@ -196,8 +216,10 @@ class Task(object):
 
 
 class PreselectionTask(Task):
-    def __init__(self, era, workdir, configdir, config, backend, run, isMC):
-        Task.__init__(self, era, workdir, configdir, config, backend, run, isMC)
+    def __init__(self, era, workdir, configdir, config, backend, run, no_tmux, isMC):
+        Task.__init__(
+            self, era, workdir, configdir, config, backend, run, no_tmux, isMC
+        )
         self.task = Preselection(
             era=self.era,
             workdir=self.workdir,
@@ -231,8 +253,12 @@ class PreselectionTask(Task):
 
 
 class NanoTask(Task):
-    def __init__(self, era, workdir, configdir, config, backend, run, finalstate, isMC):
-        Task.__init__(self, era, workdir, configdir, config, backend, run, isMC)
+    def __init__(
+        self, era, workdir, configdir, config, backend, run, finalstate, no_tmux, isMC
+    ):
+        Task.__init__(
+            self, era, workdir, configdir, config, backend, run, no_tmux, isMC
+        )
         self.finalstate = finalstate
         self.task = Nano(
             era=self.era,
@@ -268,8 +294,12 @@ class NanoTask(Task):
 
 
 class EmbeddingTask(Task):
-    def __init__(self, era, workdir, configdir, config, backend, run, finalstate, isMC):
-        Task.__init__(self, era, workdir, configdir, config, backend, run, isMC)
+    def __init__(
+        self, era, workdir, configdir, config, backend, run, finalstate, no_tmux, isMC
+    ):
+        Task.__init__(
+            self, era, workdir, configdir, config, backend, run, no_tmux, isMC
+        )
         self.finalstate = finalstate
         self.task = FullTask(
             finalstate=self.finalstate,
@@ -335,7 +365,14 @@ if __name__ == "__main__":
     # first setup CMSSW environments
     if args.mode == "preselection":
         task = PreselectionTask(
-            args.era, args.workdir, configdir, config, args.backend, args.run, args.mc
+            args.era,
+            args.workdir,
+            configdir,
+            config,
+            args.backend,
+            args.run,
+            args.no_tmux,
+            args.mc,
         )
     elif args.mode == "nanoaod":
         task = NanoTask(
@@ -346,6 +383,7 @@ if __name__ == "__main__":
             args.backend,
             args.run,
             args.final_state,
+            args.no_tmux,
             args.mc,
         )
     else:
@@ -357,6 +395,7 @@ if __name__ == "__main__":
             args.backend,
             args.run,
             args.final_state,
+            args.no_tmux,
             args.mc,
         )
     if args.task == "setup_cmssw":
