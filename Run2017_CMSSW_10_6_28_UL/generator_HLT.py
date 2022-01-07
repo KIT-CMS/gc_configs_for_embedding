@@ -31,9 +31,37 @@ process.maxEvents = cms.untracked.PSet(
 )
 
 # Input source
-process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring('file:simulated_and_cleaned_preHLT.root'),
-    secondaryFileNames = cms.untracked.vstring()
+process.source = cms.Source(
+    "PoolSource",
+    dropDescendantsOfDroppedBranches=cms.untracked.bool(False),
+    fileNames=cms.untracked.vstring("file:simulated_and_cleaned_preHLT.root"),
+    secondaryFileNames=cms.untracked.vstring(),
+    inputCommands=cms.untracked.vstring(
+        "keep *",
+        "drop TotemTimingRecHitedmDetSetVector_totemTimingRecHits_*_*",
+        "drop recoGsfElectrons_lowPtGsfElectrons_*_*",
+        "drop floatedmValueMap_rekeyLowPtGsfElectronSeedValueMaps_*_*",
+        "drop *_hpsPFTauDiscriminationByVVLooseIsolationMVArun2v1DBnewDMwLT_*_*",
+        "drop TotemTimingDigiedmDetSetVector_totemTimingRawToDigi_*_*",
+        "drop recoBeamSpot_onlineMetaDataDigis_*_*",
+        "drop DCSRecord_onlineMetaDataDigis_*_*",
+        "drop *_hpsPFTauDiscriminationByVVLooseIsolationMVArun2v1DBoldDMwLT_*_*",
+        "drop *_lowPtGsfToTrackLinks_*_*",
+        "drop *_hpsPFTauDiscriminationByVVLooseIsolationMVArun2v1DBdR03oldDMwLT_*_*",
+        "drop recoGsfElectronCores_lowPtGsfElectronCores_*_*",
+        "drop CTPPSRecord_onlineMetaDataDigis_*_*",
+        "drop recoSuperClusters_lowPtGsfElectronSuperClusters_*_*",
+        "drop CTPPSPixelDataErroredmDetSetVector_ctppsPixelDigis_*_*",
+        "drop *_gsfTracksOpenConversions_*_*",
+        "drop floatedmValueMap_lowPtGsfElectronSeedValueMaps_*_*",
+        "drop recoGsfTracks_lowPtGsfEleGsfTracks_*_*",
+        "drop OnlineLuminosityRecord_onlineMetaDataDigis_*_*",
+        "drop recoCaloClusters_lowPtGsfElectronSuperClusters_*_*",
+        "drop floatedmValueMap_lowPtGsfElectronID_*_*",
+        "drop CTPPSDiamondRecHitedmDetSetVector_ctppsDiamondRecHits_*_*",
+        "drop *_inclusiveCandidateSecondaryVertices_*_*",
+        "drop *_inclusiveCandidateSecondaryVerticesCvsL_*_*",
+    ),
 )
 
 process.options = cms.untracked.PSet(
@@ -50,13 +78,10 @@ process.configurationMetadata = cms.untracked.PSet(
 # Output definition
 
 process.RAWSIMoutput = cms.OutputModule("PoolOutputModule",
-    compressionAlgorithm = cms.untracked.string('LZMA'),
-    compressionLevel = cms.untracked.int32(9),
     dataset = cms.untracked.PSet(
         dataTier = cms.untracked.string('RAWSIM'),
         filterName = cms.untracked.string('')
     ),
-    eventAutoFlushCompressedSize = cms.untracked.int32(20971520),
     fileName = cms.untracked.string('simulated_and_cleaned_posthlt.root'),
     outputCommands = process.RAWSIMEventContent.outputCommands,
     splitLevel = cms.untracked.int32(0)
