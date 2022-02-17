@@ -35,17 +35,22 @@ def parse_arguments():
     parser.add_argument(
         "--final-state",
         type=str,
-        required=True,
+        required=False,
         choices=["MuTau", "ElTau", "ElMu", "TauTau", "MuEmb", "ElEmb"],
         help="Name the final state you want to process",
     )
-    parser.add_argument("--run", type=str, help="Name of the Run you want to process")
+    parser.add_argument(
+        "--run",
+        type=str,
+        nargs="+",
+        help="Name or list of the runs you want to process, use all to process all runs of an era",
+    )
     parser.add_argument(
         "--mode",
         type=str,
         required=True,
         choices=["preselection", "full", "nanoaod"],
-        help="Select preselection mode / full embedding mode or nanoaod mode",
+        help="Select preselection mode, full embedding mode or nanoaod mode",
     )
     parser.add_argument(
         "--task",
@@ -66,7 +71,7 @@ def parse_arguments():
         type=str,
         choices=["etp", "naf", "lxplus"],
         default="etp",
-        help="Select the condor backend that is used, currently implemented: etp and lxplus",
+        help="Select the condor backend that is used.",
     )
     parser.add_argument(
         "--custom-configdir",
@@ -186,17 +191,23 @@ class Task(object):
         )
 
     def validate_run(self, run):
-        if run == "all":
-            return self.config["runlist"][self.era]
-        elif run in self.config["runlist"][self.era]:
-            return [run]
+        runlist = []
+        if type(run) is not list:
+            run = [run]
+        if run == ["all"]:
+            runlist = self.config["runlist"][self.era]
         else:
-            console.log(
-                "Run name unknown: Known runs are: {}".format(
-                    self.config["runlist"][self.era]
-                )
-            )
-            exit()
+            for single_run in run:
+                if single_run in self.config["runlist"][self.era]:
+                    runlist.append(single_run)
+                else:
+                    console.log(
+                        "Run name unknown: Known runs are: {}".format(
+                            self.config["runlist"][self.era]
+                        )
+                    )
+                    exit()
+        return runlist
 
     @classmethod
     def build_filelist(self):
@@ -358,6 +369,10 @@ class EmbeddingTask(Task):
 if __name__ == "__main__":
     args = parse_arguments()
     config = yaml.safe_load(open("scripts/ul_config.yaml", "r"))
+    if args.final_state is None:
+        finalstate = "NotSet"
+    else:
+        finalstate = args.final_state
     if args.custom_configdir:
         configdir = args.custom_configdir
     else:
@@ -382,7 +397,7 @@ if __name__ == "__main__":
             config,
             args.backend,
             args.run,
-            args.final_state,
+            finalstate,
             args.no_tmux,
             args.mc,
         )
@@ -394,7 +409,7 @@ if __name__ == "__main__":
             config,
             args.backend,
             args.run,
-            args.final_state,
+            finalstate,
             args.no_tmux,
             args.mc,
         )
@@ -403,10 +418,22 @@ if __name__ == "__main__":
     elif args.task == "upload_tarballs":
         task.upload_tarballs()
     elif args.task == "run_production":
+        if args.final_state is None:
+            raise ValueError("Final state not specified")
+        if args.run is None:
+            raise ValueError("run not specified")
         task.run_production()
     elif args.task == "create_filelist":
+        if args.final_state is None:
+            raise ValueError("Final state not specified")
+        if args.run is None:
+            raise ValueError("run not specified")
         task.build_filelist()
     elif args.task == "setup_jobs":
+        if args.final_state is None:
+            raise ValueError("Final state not specified")
+        if args.run is None:
+            raise ValueError("run not specified")
         if args.workdir == "":
             console.log(
                 "No workdir is set, please specify the workdir using --workdir /path/to/workdir"
@@ -414,6 +441,8 @@ if __name__ == "__main__":
             raise Exception
         task.setup_cmsRun()
     elif args.task == "publish_dataset":
+        if args.final_state is None:
+            raise ValueError("Final state not specified")
         task.publish_dataset()
     else:
         exit()
