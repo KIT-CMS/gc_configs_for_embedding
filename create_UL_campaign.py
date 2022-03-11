@@ -88,7 +88,13 @@ def parse_arguments():
         action="store_true",
         help="If this is set, no tmux is used to run the jobs",
     )
+    parser.add_argument(
+        "--user",
+        type=str,
+        default="",
+        help="if you have a different username on NAF and ETP you have to choose your ETP username here",
 
+    )
     return parser.parse_args()
 
 
@@ -113,7 +119,7 @@ def get_inputfolder(era):
 
 class Task(object):
     def __init__(
-        self, era, workdir, configdir, config, backend, run, no_tmux=False, isMC=False
+        self, era, workdir, configdir, config, backend, run, user, no_tmux=False, isMC=False
     ):
         self.era = era
         self.workdir = workdir
@@ -128,11 +134,13 @@ class Task(object):
             "main": self.config["cmssw_version"][self.era]["main"],
             "hlt": self.config["cmssw_version"][self.era]["hlt"],
         }
-        self.username = getpass.getuser()
         self.identifier = "data_{}".format(self.era)
         if isMC:
             self.identifier = "mc_{}".format(self.era)
-
+        if args.user:
+            self.username = args.user
+        else:      
+            self.username = getpass.getuser()
     def run_production(self):
         console.rule(
             "Running production for - {era} - {run}".format(
@@ -227,15 +235,16 @@ class Task(object):
 
 
 class PreselectionTask(Task):
-    def __init__(self, era, workdir, configdir, config, backend, run, no_tmux, isMC):
+    def __init__(self, era, workdir, configdir, config, backend, run, user, no_tmux, isMC):
         Task.__init__(
-            self, era, workdir, configdir, config, backend, run, no_tmux, isMC
+            self, era, workdir, configdir, config, backend, run, user, no_tmux, isMC
         )
         self.task = Preselection(
             era=self.era,
             workdir=self.workdir,
             identifier=self.identifier,
             runs=self.runlist,
+            user=self.username,
             inputfolder=get_inputfolder(era),
             config=self.config,
             isMC=self.isMC,
@@ -265,10 +274,10 @@ class PreselectionTask(Task):
 
 class NanoTask(Task):
     def __init__(
-        self, era, workdir, configdir, config, backend, run, finalstate, no_tmux, isMC
+        self, era, workdir, configdir, config, backend, run, user, finalstate, no_tmux, isMC
     ):
         Task.__init__(
-            self, era, workdir, configdir, config, backend, run, no_tmux, isMC
+            self, era, workdir, configdir, config, backend, run, user, no_tmux, isMC
         )
         self.finalstate = finalstate
         self.task = Nano(
@@ -277,6 +286,7 @@ class NanoTask(Task):
             workdir=self.workdir,
             identifier=self.identifier,
             runs=self.runlist,
+            user=self.username,
             inputfolder=get_inputfolder(era),
             config=self.config,
             isMC=self.isMC,
@@ -306,10 +316,10 @@ class NanoTask(Task):
 
 class EmbeddingTask(Task):
     def __init__(
-        self, era, workdir, configdir, config, backend, run, finalstate, no_tmux, isMC
+        self, era, workdir, configdir, config, backend, run, user, finalstate, no_tmux, isMC
     ):
         Task.__init__(
-            self, era, workdir, configdir, config, backend, run, no_tmux, isMC
+            self, era, workdir, configdir, config, backend, run, user, no_tmux, isMC
         )
         self.finalstate = finalstate
         self.task = FullTask(
@@ -318,6 +328,7 @@ class EmbeddingTask(Task):
             workdir=self.workdir,
             identifier=self.identifier,
             runs=self.runlist,
+            user=self.username,
             inputfolder=get_inputfolder(era),
             config=self.config,
             isMC=self.isMC,
@@ -386,6 +397,7 @@ if __name__ == "__main__":
             config,
             args.backend,
             args.run,
+            args.user,
             args.no_tmux,
             args.mc,
         )
@@ -397,6 +409,7 @@ if __name__ == "__main__":
             config,
             args.backend,
             args.run,
+            args.user,
             finalstate,
             args.no_tmux,
             args.mc,
@@ -409,6 +422,7 @@ if __name__ == "__main__":
             config,
             args.backend,
             args.run,
+            args.user,
             finalstate,
             args.no_tmux,
             args.mc,

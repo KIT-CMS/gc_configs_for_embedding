@@ -7,7 +7,7 @@ console = Console()
 
 
 class GeneralTask:
-    def __init__(self, era, workdir, identifier, runs, inputfolder, config, isMC):
+    def __init__(self, era, workdir, identifier, runs, user, inputfolder, config, isMC):
         self.config = config
         self.inputfolder = inputfolder
         self.runs = runs
@@ -15,12 +15,14 @@ class GeneralTask:
         self.identifier = identifier
         self.era = era
         self.name = ""
-        self.username = getpass.getuser()
         if isMC:
             self.datatype = "mc"
         else:
             self.datatype = "data"
-
+        if user:
+            self.username = user
+        else:      
+            self.username = getpass.getuser()
     @classmethod
     def build_generator_fragment():
         pass
@@ -79,9 +81,9 @@ class GeneralTask:
 
 
 class Preselection(GeneralTask):
-    def __init__(self, era, workdir, identifier, runs, inputfolder, config, isMC):
+    def __init__(self, era, workdir, identifier, runs, user, inputfolder, config, isMC):
         GeneralTask.__init__(
-            self, era, workdir, identifier, runs, inputfolder, config, isMC
+            self, era, workdir, identifier, runs, user, inputfolder, config, isMC
         )
         self.preselection = True
         self.finalstate = "preselection"
@@ -188,10 +190,10 @@ class Preselection(GeneralTask):
 
 class Nano(GeneralTask):
     def __init__(
-        self, era, workdir, finalstate, identifier, runs, inputfolder, config, isMC
+        self, era, workdir, finalstate, identifier, runs, user, inputfolder, config, isMC
     ):
         GeneralTask.__init__(
-            self, era, workdir, identifier, runs, inputfolder, config, isMC
+            self, era, workdir, identifier, runs, user, inputfolder, config, isMC
         )
         self.nanoaod = True
         self.finalstate = finalstate
@@ -298,13 +300,14 @@ class FullTask(GeneralTask):
         finalstate,
         identifier,
         runs,
+        user, 
         inputfolder,
         config,
         isMC,
         backend,
     ):
         GeneralTask.__init__(
-            self, era, workdir, identifier, runs, inputfolder, config, isMC
+            self, era, workdir, identifier, runs, user, inputfolder, config, isMC
         )
         self.preselection = False
         self.finalstate = finalstate
