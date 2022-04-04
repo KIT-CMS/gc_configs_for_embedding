@@ -445,7 +445,7 @@ class FullTask(GeneralTask):
                             if "gridka" in line:
                                 inputdata[
                                     "selist"
-                                ] = "root://cmsxrootd-kit.gridka.de:1094"
+                                ] = "root://cmsxrootd-redirectors.gridka.de"
                             else:
                                 inputdata["selist"] = line.split(" = ")[1].strip("\n")
                         if "prefix" in line:
