@@ -10,6 +10,11 @@ runlist:
   "2016_postVFP": ["2016_postVFP_F", "2016_postVFP_G", "2016_postVFP_H"]
   "2017": ["Run2017B", "Run2017C", "Run2017D", "Run2017E", "Run2017F"]
   "2018": ["Run2018A", "Run2018B", "Run2018C", "Run2018D"]
+globaltag_names:
+  "2016_preVFP": ""
+  "2016_postVFP": ""
+  "2017": ""
+  "2018": "inputDoubleMu_106X_ULegacy_miniAOD-v1"
 generator_cuts:
   "2016_preVFP":
     "MuTau":
@@ -165,31 +170,37 @@ finalstate_map:
     "embeddedParticle": "TauEmbedding"
     "lep1_name": "Mu"
     "lep2_name": "Had"
+    "FullName": "MuTauFinalState"
   "ElTau":
     "name": "ElHad"
     "embeddedParticle": "TauEmbedding"
     "lep1_name": "El"
     "lep2_name": "Had"
+    "FullName": "ElTauFinalState"
   "ElMu":
     "name": "ElMu"
     "embeddedParticle": "TauEmbedding"
     "lep1_name": "El"
     "lep2_name": "Mu"
+    "FullName": "ElMuFinalState"
   "TauTau":
     "name": "HadHad"
     "embeddedParticle": "TauEmbedding"
     "lep1_name": "Had1"
     "lep2_name": "Had2"
+    "FullName": "TauTauFinalState"
   "MuEmb":
     "name": "MuMu"
     "embeddedParticle": "MuEmbedding"
     "lep1_name": "Mu1"
     "lep2_name": "Mu2"
+    "FullName": "MuonEmbedding"
   "ElEmb":
     "name": "ElEl"
     "embeddedParticle": "ElEmbedding"
     "lep1_name": "El1"
     "lep2_name": "El2"
+    "FullName": "ElectronEmbedding"
 cmssw_version:
   "2016_preVFP":
     "main": "CMSSW_10_6_28"
@@ -207,5 +218,7 @@ output_paths:
   "tarballs": "srm://cmssrm-kit.gridka.de:8443/srm/managerv2?SFN=/pnfs/gridka.de/cms/disk-only/store/user/{USER}/ul_embedding/tarballs_dez20"
   "preselection": "srm://cmssrm-kit.gridka.de:8443/srm/managerv2?SFN=/pnfs/gridka.de/cms/disk-only/store/user/{USER}/ul_embedding/preselection"
   "main": "srm://cmssrm-kit.gridka.de:8443/srm/managerv2?SFN=/pnfs/gridka.de/cms/disk-only/store/user/{USER}/ul_embedding/miniaod"
+  "large_miniAOD": "srm://cmssrm-kit.gridka.de:8443/srm/managerv2?SFN=/pnfs/gridka.de/cms/disk-only/store/user/{USER}/ul_embedding/large_miniAOD"
   "nanoaod": "srm://cmssrm-kit.gridka.de:8443/srm/managerv2?SFN=/pnfs/gridka.de/cms/disk-only/store/user/{USER}/ul_embedding/nanoaod"
+
 tmux_path: "/home/sbrommer/local/bms1/bin/tmux"
