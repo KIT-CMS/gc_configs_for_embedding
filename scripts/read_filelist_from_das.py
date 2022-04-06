@@ -17,7 +17,7 @@ parser.add_argument(
 parser.add_argument(
     "--gridka-red",
     action="store_true",
-    help="If set, the gridka redicator root://cmsxrootd-kit.gridka.de:1094/ is used directly. Default: {}".format(
+    help="If set, the gridka redicator root://cmsxrootd-redirectors.gridka.de/ is used directly. Default: {}".format(
         xootd_prefix
     ),
 )
@@ -59,7 +59,7 @@ def read_filelist_from_das(nick, query, outputfile, phys03, xootd_prefix):
 if __name__ == "__main__":
     args = parser.parse_args()
     if args.gridka_red:
-        xootd_prefix = "root://cmsxrootd-kit.gridka.de:1094/"
+        xootd_prefix = "root://cmsxrootd-redirectors.gridka.de/"
     read_filelist_from_das(
         args.nick, args.query, args.outputfile, args.phys03, xootd_prefix
     )

@@ -9,9 +9,14 @@ if sys.version_info[0] == 2:
     print("You need to run this with Python 3")
     raise SystemExit
 
-from scripts.EmbeddingTask import Preselection, FullTask, Nano
+from scripts.EmbeddingTask import Preselection, FullTask, Nano, aggregateMiniAOD
 from scripts.create_tmux_while import create_tmux_while
-from scripts.filelist_generator import PreselectionFilelist, FullFilelist, NanoFilelist
+from scripts.filelist_generator import (
+    PreselectionFilelist,
+    FullFilelist,
+    NanoFilelist,
+    AggregatedMiniAODFilelist,
+)
 import getpass
 from rich.console import Console
 
@@ -49,8 +54,8 @@ def parse_arguments():
         "--mode",
         type=str,
         required=True,
-        choices=["preselection", "full", "nanoaod"],
-        help="Select preselection mode, full embedding mode or nanoaod mode",
+        choices=["preselection", "full", "aggregate", "nanoaod"],
+        help="Select preselection mode, full embedding mode, aggregate mode, or nanoaod mode",
     )
     parser.add_argument(
         "--task",
@@ -93,7 +98,6 @@ def parse_arguments():
         type=str,
         default="",
         help="if you have a different username on NAF and ETP you have to choose your ETP username here",
-
     )
     return parser.parse_args()
 
@@ -119,7 +123,16 @@ def get_inputfolder(era):
 
 class Task(object):
     def __init__(
-        self, era, workdir, configdir, config, backend, run, user, no_tmux=False, isMC=False
+        self,
+        era,
+        workdir,
+        configdir,
+        config,
+        backend,
+        run,
+        user,
+        no_tmux=False,
+        isMC=False,
     ):
         self.era = era
         self.workdir = workdir
@@ -139,8 +152,9 @@ class Task(object):
             self.identifier = "mc_{}".format(self.era)
         if args.user:
             self.username = args.user
-        else:      
+        else:
             self.username = getpass.getuser()
+
     def run_production(self):
         console.rule(
             "Running production for - {era} - {run}".format(
@@ -235,7 +249,9 @@ class Task(object):
 
 
 class PreselectionTask(Task):
-    def __init__(self, era, workdir, configdir, config, backend, run, user, no_tmux, isMC):
+    def __init__(
+        self, era, workdir, configdir, config, backend, run, user, no_tmux, isMC
+    ):
         Task.__init__(
             self, era, workdir, configdir, config, backend, run, user, no_tmux, isMC
         )
@@ -272,9 +288,71 @@ class PreselectionTask(Task):
         console.log("Ne need to publish preselection datasets --> Exiting")
 
 
+class AggregateMiniAODTask(Task):
+    def __init__(
+        self,
+        era,
+        workdir,
+        configdir,
+        config,
+        backend,
+        run,
+        user,
+        finalstate,
+        no_tmux,
+        isMC,
+    ):
+        Task.__init__(
+            self, era, workdir, configdir, config, backend, run, user, no_tmux, isMC
+        )
+        self.finalstate = finalstate
+        self.task = aggregateMiniAOD(
+            era=self.era,
+            finalstate=self.finalstate,
+            workdir=self.workdir,
+            identifier=self.identifier,
+            runs=self.runlist,
+            user=self.username,
+            inputfolder=get_inputfolder(era),
+            config=self.config,
+            isMC=self.isMC,
+        )
+
+    def build_filelist(self):
+        for run in self.runlist:
+            filelist = AggregatedMiniAODFilelist(
+                configdir=self.configdir,
+                era=self.era,
+                grid_control_path=self.gc_path,
+                run=run,
+                finalstate=self.finalstate,
+                isMC=self.isMC,
+            )
+            filelist.build_filelist()
+
+    def setup_cmsRun(self):
+        self.task.setup_all()
+
+    def upload_tarballs(self):
+        console.log("Not needed for preselection --> Exiting ")
+
+    def publish_dataset(self):
+        console.log("To be implemented ...")
+
+
 class NanoTask(Task):
     def __init__(
-        self, era, workdir, configdir, config, backend, run, user, finalstate, no_tmux, isMC
+        self,
+        era,
+        workdir,
+        configdir,
+        config,
+        backend,
+        run,
+        user,
+        finalstate,
+        no_tmux,
+        isMC,
     ):
         Task.__init__(
             self, era, workdir, configdir, config, backend, run, user, no_tmux, isMC
@@ -316,7 +394,17 @@ class NanoTask(Task):
 
 class EmbeddingTask(Task):
     def __init__(
-        self, era, workdir, configdir, config, backend, run, user, finalstate, no_tmux, isMC
+        self,
+        era,
+        workdir,
+        configdir,
+        config,
+        backend,
+        run,
+        user,
+        finalstate,
+        no_tmux,
+        isMC,
     ):
         Task.__init__(
             self, era, workdir, configdir, config, backend, run, user, no_tmux, isMC
@@ -403,6 +491,19 @@ if __name__ == "__main__":
         )
     elif args.mode == "nanoaod":
         task = NanoTask(
+            args.era,
+            args.workdir,
+            configdir,
+            config,
+            args.backend,
+            args.run,
+            args.user,
+            finalstate,
+            args.no_tmux,
+            args.mc,
+        )
+    elif args.mode == "aggregate":
+        task = AggregateMiniAODTask(
             args.era,
             args.workdir,
             configdir,
