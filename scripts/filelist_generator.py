@@ -76,8 +76,11 @@ class NanoFilelist(Filelist):
         if not os.path.exists(folder):
             os.mkdir(folder)
         gc_config_folder = os.path.join(
-            "{configdir}/{datatype}_{era}_nanoaod".format(
-                datatype=self.datatype, configdir=self.configdir, era=self.era
+            "{configdir}/{datatype}_{era}_{finalstate}_nanoaod".format(
+                datatype=self.datatype,
+                finalstate=self.finalstate,
+                configdir=self.configdir,
+                era=self.era,
             )
         )
         gc_config_path = os.path.join(
@@ -112,7 +115,10 @@ class AggregatedMiniAODFilelist(Filelist):
             os.mkdir(folder)
         gc_config_folder = os.path.join(
             "{configdir}/{datatype}_{era}_{finalstate}_aggregate_miniAOD".format(
-                datatype=self.datatype, configdir=self.configdir, era=self.era, finalstate=self.finalstate
+                datatype=self.datatype,
+                configdir=self.configdir,
+                era=self.era,
+                finalstate=self.finalstate,
             )
         )
         gc_config_path = os.path.join(
