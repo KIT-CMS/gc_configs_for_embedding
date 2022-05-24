@@ -43,11 +43,11 @@ def create_tmux_while(taskname, tmux_path, configlist, gc_path):
             title_0=taskname + "_0", tmux_path=tmux_path
         )
     )
-    out_file.write(
-        "   {tmux_path} select-window -t {sessionname}:0 \n".format(
-            sessionname=taskname, tmux_path=tmux_path
-        )
-    )
+    # out_file.write(
+    #     "   {tmux_path} select-window -t {sessionname}:0 \n".format(
+    #         sessionname=taskname, tmux_path=tmux_path
+    #     )
+    # )
     counter = 0
     splitable = True
     for config in configlist[1:]:
@@ -64,9 +64,8 @@ def create_tmux_while(taskname, tmux_path, configlist, gc_path):
             counter += 1
         else:
             out_file.write(
-                "   {tmux_path} new-window -t {sessionname} -n {title} 'python2 {gc_path}/go.py {configpath} -Gc' \n".format(
+                "   {tmux_path} new-window -n {title} 'python2 {gc_path}/go.py {configpath} -Gc' \n".format(
                     tmux_path=tmux_path,
-                    sessionname=taskname + ":" + str(counter),
                     title=taskname + "_" + str(counter),
                     gc_path=gc_path,
                     configpath=config,
