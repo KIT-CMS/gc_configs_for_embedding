@@ -1,94 +1,95 @@
 runlist:
-  "2016_preVFP":
+  "2016-HIPM": # pre VFP version
     [
-      "Run2016_preVFB_B",
-      "Run2016_preVFB_C",
-      "Run2016_preVFB_D",
-      "Run2016_preVFB_E",
-      "Run2016_preVFB_F",
+      "Run2016-HIPM_B_ver1",
+      "Run2016-HIPM_B_ver2",
+      "Run2016-HIPM_C",
+      "Run2016-HIPM_D",
+      "Run2016-HIPM_E",
+      "Run2016-HIPM_F",
     ]
-  "2016_postVFP": ["2016_postVFP_F", "2016_postVFP_G", "2016_postVFP_H"]
+  "2016": ["Run2016_F", "Run2016_G", "Run2016_H"]
   "2017": ["Run2017B", "Run2017C", "Run2017D", "Run2017E", "Run2017F"]
   "2018": ["Run2018A", "Run2018B", "Run2018C", "Run2018D"]
 globaltag_names:
-  "2016_preVFP": ""
-  "2016_postVFP": ""
+  "2016-HIPM": ""
+  "2016": ""
   "2017": ""
   "2018": "inputDoubleMu_106X_ULegacy_miniAOD-v1"
 generator_cuts:
-  "2016_preVFP":
+  "2016-HIPM":
     "MuTau":
-      "lep1_pt":
-      "lep1_eta":
-      "lep2_pt":
-      "lep2_eta":
+      "lep1_pt": 18
+      "lep1_eta": 2.2
+      "lep2_pt": 18
+      "lep2_eta": 2.4
       "attempts": 1000
     "ElTau":
-      "lep1_pt":
-      "lep1_eta":
-      "lep2_pt":
-      "lep2_eta":
+      "lep1_pt": 18
+      "lep1_eta": 2.2
+      "lep2_pt": 18
+      "lep2_eta": 2.4
       "attempts": 1000
     "ElMu":
-      "lep1_pt":
-      "lep1_eta":
-      "lep2_pt":
-      "lep2_eta":
+      "lep1_pt": 9
+      "lep1_eta": 2.5
+      "lep2_pt": 19
+      "lep2_eta": 2.5
       "attempts": 1000
     "TauTau":
-      "lep1_pt":
-      "lep1_eta":
-      "lep2_pt":
-      "lep2_eta":
+      "lep1_pt": 20
+      "lep1_eta": 2.2
+      "lep2_pt": 20
+      "lep2_eta": 2.2
       "attempts": 1000
     "MuEmb":
-      "lep1_pt":
-      "lep1_eta":
-      "lep2_pt":
-      "lep2_eta":
+      "lep1_pt": 17
+      "lep1_eta": 2.5
+      "lep2_pt": 8
+      "lep2_eta": 2.5
       "attempts": 1
     "ElEmb":
-      "lep1_pt":
-      "lep1_eta":
-      "lep2_pt":
-      "lep2_eta":
+      "lep1_pt": 22
+      "lep1_eta": 2.5
+      "lep2_pt": 10
+      "lep2_eta": 2.5
       "attempts": 1
-  "2016_postVFP":
+  "2016":
     "MuTau":
-      "lep1_pt":
-      "lep1_eta":
-      "lep2_pt":
-      "lep2_eta":
+      "lep1_pt": 18
+      "lep1_eta": 2.2
+      "lep2_pt": 18
+      "lep2_eta": 2.4
       "attempts": 1000
     "ElTau":
-      "lep1_pt":
-      "lep1_eta":
-      "lep2_pt":
-      "lep2_eta":
+      "lep1_pt": 18
+      "lep1_eta": 2.2
+      "lep2_pt": 18
+      "lep2_eta": 2.4
       "attempts": 1000
     "ElMu":
-      "lep1_pt":
-      "lep1_eta":
-      "lep2_pt":
-      "lep2_eta":
+      "lep1_pt": 9
+      "lep1_eta": 2.5
+      "lep2_pt": 19
+      "lep2_eta": 2.5
       "attempts": 1000
     "TauTau":
-      "lep1_pt":
-      "lep1_eta":
-      "lep2_pt":
-      "lep2_eta":
+      "lep1_pt": 20
+      "lep1_eta": 2.2
+      "lep2_pt": 20
+      "lep2_eta": 2.2
       "attempts": 1000
     "MuEmb":
-      "lep1_pt":
-      "lep1_eta":
-      "lep2_pt":
-      "lep2_eta":
+      "lep1_pt": 17
+      "lep1_eta": 2.5
+      "lep2_pt": 8
+      "lep2_eta": 2.5
       "attempts": 1
     "ElEmb":
-      "lep1_pt":
-      "lep1_eta":
-      "lep2_pt":
-      "lep2_eta":
+      "lep1_pt": 22
+      "lep1_eta": 2.5
+      "lep2_pt": 10
+      "lep2_eta": 2.5
       "attempts": 1
   "2017":
     "MuTau":
@@ -202,12 +203,12 @@ finalstate_map:
     "lep2_name": "El2"
     "FullName": "ElectronEmbedding"
 cmssw_version:
-  "2016_preVFP":
+  "2016-HIPM":
     "main": "CMSSW_10_6_28"
-    "hlt":
-  "2016_postVFP":
+    "hlt": "CMSSW_8_0_33_UL"
+  "2016":
     "main": "CMSSW_10_6_28"
-    "hlt":
+    "hlt": "CMSSW_8_0_33_UL"
   "2017":
     "main": "CMSSW_10_6_28"
     "hlt": "CMSSW_9_4_14_UL_patch1"

@@ -113,10 +113,10 @@ def get_inputfolder(era):
         return "Run2018_CMSSW_10_6_28_UL"
     elif era == "2017":
         return "Run2017_CMSSW_10_6_28_UL"
-    elif era == "2016_postVFP":
-        return "Run2016_CMSSW_10_6_28_UL_postVFP"
-    elif era == "2016_preVFP":
-        return "Run2016_CMSSW_10_6_28_UL_preVFP"
+    elif era == "2016":
+        return "Run2016_CMSSW_10_6_28_UL"
+    elif era == "2016-HIPM":
+        return "Run2016-HIPM_CMSSW_10_6_28_UL"
     else:
         raise ValueError("Era not supported")
 
