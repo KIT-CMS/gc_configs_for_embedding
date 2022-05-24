@@ -4,6 +4,7 @@ import getpass
 from scripts.read_filelist_from_das import read_filelist_from_das
 from shutil import copyfile
 from rich.console import Console
+import yaml
 
 console = Console()
 
@@ -84,7 +85,18 @@ class GeneralTask:
 
 
 class Preselection(GeneralTask):
-    def __init__(self, era, workdir, identifier, runs, user, inputfolder, config, isMC):
+    def __init__(
+        self,
+        era,
+        workdir,
+        identifier,
+        runs,
+        user,
+        inputfolder,
+        config,
+        isMC,
+        input_samples=None,
+    ):
         GeneralTask.__init__(
             self, era, workdir, identifier, runs, user, inputfolder, config, isMC
         )
@@ -94,6 +106,7 @@ class Preselection(GeneralTask):
         self.cmsRun_order = ["preselection.py"]
         self.name = identifier + "_preselection"
         self.cmssw_version = self.config["cmssw_version"][era]["main"]
+        self.input_samples = input_samples
 
     def build_generator_fragment(self):
         console.log("No generator fragment needed for preselection")
@@ -167,7 +180,10 @@ class Preselection(GeneralTask):
             )
         )
         out_file.write("[CMSSW]\n")
-        dbs_name = ("/DoubleMuon/{RUN}-v1/RAW").format(RUN=run)
+        if self.input_samples:
+            dbs_name = self.input_samples[run]
+        else:
+            dbs_name = ("/DoubleMuon/{RUN}-v1/RAW").format(RUN=run)
         filelistname = "DoubleMuon_{run}_RAW.dbs".format(run=run)
         read_filelist_from_das(
             "{particle}_{name}_DoubleMuon_{run}".format(

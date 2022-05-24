@@ -11,6 +11,29 @@ runlist:
   "2016": ["Run2016_F", "Run2016_G", "Run2016_H"]
   "2017": ["Run2017B", "Run2017C", "Run2017D", "Run2017E", "Run2017F"]
   "2018": ["Run2018A", "Run2018B", "Run2018C", "Run2018D"]
+input_samples:
+  "2016-HIPM": # pre VFP version
+    "Run2016-HIPM_B_ver1": "/DoubleMuon/Run2016B-v1/RAW"
+    "Run2016-HIPM_B_ver2": "/DoubleMuon/Run2016B-v2/RAW"
+    "Run2016-HIPM_C": "/DoubleMuon/Run2016C-v2/RAW"
+    "Run2016-HIPM_D": "/DoubleMuon/Run2016D-v2/RAW"
+    "Run2016-HIPM_E": "/DoubleMuon/Run2016E-v2/RAW"
+    "Run2016-HIPM_F": "/DoubleMuon/Run2016F-v1/RAW"
+  "2016":
+    "Run2016_F": "/DoubleMuon/Run2016F-v1/RAW"
+    "Run2016_G": "/DoubleMuon/Run2016G-v1/RAW"
+    "Run2016_H": "/DoubleMuon/Run2016H-v1/RAW"
+  "2017":
+    "Run2017B": "/DoubleMuon/Run2017B-v1/RAW"
+    "Run2017C": "/DoubleMuon/Run2017C-v1/RAW"
+    "Run2017D": "/DoubleMuon/Run2017D-v1/RAW"
+    "Run2017E": "/DoubleMuon/Run2017E-v1/RAW"
+    "Run2017F": "/DoubleMuon/Run2017F-v1/RAW"
+  "2018":
+    "Run2018A": "/DoubleMuon/Run2018A-v1/RAW"
+    "Run2018B": "/DoubleMuon/Run2018B-v1/RAW"
+    "Run2018C": "/DoubleMuon/Run2018C-v1/RAW"
+    "Run2018D": "/DoubleMuon/Run2018D-v1/RAW"
 globaltag_names:
   "2016-HIPM": ""
   "2016": ""

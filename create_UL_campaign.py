@@ -33,7 +33,7 @@ def parse_arguments():
         "--era",
         type=str,
         # choices=['2016_preVFP', '2016_postVFP', '2017', '2018'],
-        choices=["2017", "2018"],
+        choices=["2016-HIPM", "2016", "2017", "2018"],
         required=True,
         help="Era used for the production",
     )
@@ -264,6 +264,7 @@ class PreselectionTask(Task):
             inputfolder=get_inputfolder(era),
             config=self.config,
             isMC=self.isMC,
+            input_samples=self.config["input_samples"][self.era],
         )
 
     def build_filelist(self):
