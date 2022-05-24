@@ -2,12 +2,12 @@
 # using: 
 # Revision: 1.19 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: LHEprodandCLEAN --filein file:RAWskimmed.root --fileout file:lhe_and_cleaned.root --runUnscheduled --data --era Run2_2017 --scenario pp --conditions 106X_dataRun2_v35 --eventcontent RAWRECO --datatier RAWRECO --step RAW2DIGI,RECO,PAT --customise Configuration/DataProcessing/RecoTLR.customisePostEra_Run2_2017,TauAnalysis/MCEmbeddingTools/customisers.customiseLHEandCleaning_Reselect --no_exec -n -1 --python_filename lheprodandcleaning.py
+# with command line options: LHEprodandCLEAN --filein file:RAWskimmed.root --fileout file:lhe_and_cleaned.root --runUnscheduled --data --era Run2_2016_HIPM --scenario pp --conditions 106X_dataRun2_v35 --eventcontent RAWRECO --datatier RAWRECO --step RAW2DIGI,RECO,PAT --customise Configuration/DataProcessing/RecoTLR.customisePostEra_Run2_2016,TauAnalysis/MCEmbeddingTools/customisers.customiseLHEandCleaning_Reselect --no_exec -n -1 --python_filename lheprodandcleaning.py
 import FWCore.ParameterSet.Config as cms
 
-from Configuration.Eras.Era_Run2_2017_cff import Run2_2017
+from Configuration.Eras.Era_Run2_2016_HIPM_cff import Run2_2016_HIPM
 
-process = cms.Process('RECO',Run2_2017)
+process = cms.Process('RECO',Run2_2016_HIPM)
 
 # import of standard configurations
 process.load('Configuration.StandardSequences.Services_cff')
@@ -106,10 +106,10 @@ associatePatAlgosToolsTask(process)
 # customisation of the process.
 
 # Automatic addition of the customisation function from Configuration.DataProcessing.RecoTLR
-from Configuration.DataProcessing.RecoTLR import customisePostEra_Run2_2017 
+from Configuration.DataProcessing.RecoTLR import customisePostEra_Run2_2016 
 
-#call to customisation function customisePostEra_Run2_2017 imported from Configuration.DataProcessing.RecoTLR
-process = customisePostEra_Run2_2017(process)
+#call to customisation function customisePostEra_Run2_2016 imported from Configuration.DataProcessing.RecoTLR
+process = customisePostEra_Run2_2016(process)
 
 # Automatic addition of the customisation function from TauAnalysis.MCEmbeddingTools.customisers
 from TauAnalysis.MCEmbeddingTools.customisers import customiseLHEandCleaning_Reselect 

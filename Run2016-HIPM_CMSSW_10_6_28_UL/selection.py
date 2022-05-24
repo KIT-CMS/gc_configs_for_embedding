@@ -2,10 +2,10 @@
 # using: 
 # Revision: 1.19 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: RECO -s RAW2DIGI,L1Reco,RECO,PAT --runUnscheduled --data --scenario pp --conditions 106X_dataRun2_v35 --era Run2_2017 --eventcontent RAWRECO --datatier RAWRECO --customise Configuration/DataProcessing/RecoTLR.customisePostEra_Run2_2017,TauAnalysis/MCEmbeddingTools/customisers.customiseSelecting_Reselect --filein file:PreRAWskimmed.root --fileout RAWskimmed.root -n -1 --no_exec --python_filename=selection.py
+# with command line options: RECO -s RAW2DIGI,L1Reco,RECO,PAT --runUnscheduled --data --scenario pp --conditions 106X_dataRun2_v35 --era Run2_2016_HIPM --eventcontent RAWRECO --datatier RAWRECO --customise Configuration/DataProcessing/RecoTLR.customisePostEra_Run2_2016,TauAnalysis/MCEmbeddingTools/customisers.customiseSelecting_Reselect --filein file:PreRAWskimmed.root --fileout RAWskimmed.root -n -1 --no_exec --python_filename=selection.py
 import FWCore.ParameterSet.Config as cms
 import sys
-from Configuration.Eras.Era_Run2_2017_cff import Run2_2017
+from Configuration.Eras.Era_Run2_2016_HIPM_cff import Run2_2016_HIPM
 
 if len(sys.argv) == 3:
     inputfile = sys.argv[2]
@@ -13,7 +13,7 @@ else:
     inputfile = "PreRAWskimmed.root"
 print("Using inputfile: {}".format(inputfile))
 
-process = cms.Process('RECO',Run2_2017)
+process = cms.Process('RECO',Run2_2016_HIPM)
 
 # import of standard configurations
 process.load('Configuration.StandardSequences.Services_cff')
@@ -114,10 +114,10 @@ associatePatAlgosToolsTask(process)
 # customisation of the process.
 
 # Automatic addition of the customisation function from Configuration.DataProcessing.RecoTLR
-from Configuration.DataProcessing.RecoTLR import customisePostEra_Run2_2017 
+from Configuration.DataProcessing.RecoTLR import customisePostEra_Run2_2016 
 
-#call to customisation function customisePostEra_Run2_2017 imported from Configuration.DataProcessing.RecoTLR
-process = customisePostEra_Run2_2017(process)
+#call to customisation function customisePostEra_Run2_2016 imported from Configuration.DataProcessing.RecoTLR
+process = customisePostEra_Run2_2016(process)
 
 # Automatic addition of the customisation function from TauAnalysis.MCEmbeddingTools.customisers
 from TauAnalysis.MCEmbeddingTools.customisers import customiseSelecting_Reselect 

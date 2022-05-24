@@ -2,10 +2,10 @@
 # using: 
 # Revision: 1.19 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: PAT -s PAT --filein file:simulated_and_cleaned.root --fileout file:merged.root --era Run2_2017 --runUnscheduled --data --scenario pp --conditions 106X_dataRun2_v35 --eventcontent MINIAODSIM --datatier USER --customise TauAnalysis/MCEmbeddingTools/customisers.customiseMerging_Reselect --customise_commands process.patTrigger.processName = cms.string("SIMembeddingHLT") \nprocess.slimmedPatTrigger.triggerResults =  cms.InputTag("TriggerResults::SIMembeddingHLT") \nprocess.patMuons.triggerResults =  cms.InputTag("TriggerResults::SIMembeddingHLT") -n -1 --no_exec --python_filename=merging.py
+# with command line options: PAT -s PAT --filein file:simulated_and_cleaned.root --fileout file:merged.root --era Run2_2016_HIPM --runUnscheduled --data --scenario pp --conditions 106X_dataRun2_v35 --eventcontent MINIAODSIM --datatier USER --customise TauAnalysis/MCEmbeddingTools/customisers.customiseMerging_Reselect --customise_commands process.patTrigger.processName = cms.string("SIMembeddingHLT") \nprocess.slimmedPatTrigger.triggerResults =  cms.InputTag("TriggerResults::SIMembeddingHLT") \nprocess.patMuons.triggerResults =  cms.InputTag("TriggerResults::SIMembeddingHLT") -n -1 --no_exec --python_filename=merging_v2.py
 import FWCore.ParameterSet.Config as cms
 
-from Configuration.Eras.Era_Run2_2017_cff import Run2_2017
+from Configuration.Eras.Era_Run2_2016_HIPM_cff import Run2_2016_HIPM
 
 # In order to reduce diskusage of job, remove output of generator_HLT.py --> simulated_and_cleaned_posthlt
 import os
@@ -13,7 +13,7 @@ if os.path.exists("simulated_and_cleaned_posthlt.root"):
   os.remove("simulated_and_cleaned_posthlt.root")
 
 
-process = cms.Process('PAT',Run2_2017)
+process = cms.Process('PAT',Run2_2016_HIPM)
 
 # import of standard configurations
 process.load('Configuration.StandardSequences.Services_cff')

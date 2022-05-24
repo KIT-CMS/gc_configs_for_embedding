@@ -2,12 +2,12 @@
 # using: 
 # Revision: 1.19 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: -s NANO --data --eventcontent NANOAOD --datatier NANOAOD --no_exec --conditions 106X_dataRun2_v35 --era Run2_2017 --filein file:test_17.root --fileout file:test_nano_17.root --python_filename=embedding_nanoaod.py --customise TauAnalysis/MCEmbeddingTools/customisers.customiseNanoAOD --customise_commands process.unpackedPatTrigger.triggerResults = cms.InputTag("TriggerResults::SIMembeddingHLT") \nprocess.NANOAODoutput.outputCommands.append("keep edmTriggerResults_*_*_SIMembeddingHLT")  # Trigger information \nprocess.NANOAODoutput.outputCommands.append("keep edmTriggerResults_*_*_MERGE")  # MET filter flags
+# with command line options: -s NANO --data --eventcontent NANOAOD --datatier NANOAOD --no_exec --conditions 106X_dataRun2_v35 --era Run2_2016_HIPM --filein file:test_16.root --fileout file:merged_nano.root --python_filename=embedding_nanoaod.py --customise TauAnalysis/MCEmbeddingTools/customisers.customiseNanoAOD --customise_commands process.unpackedPatTrigger.triggerResults = cms.InputTag("TriggerResults::SIMembeddingHLT") \nprocess.NANOAODoutput.outputCommands.append("keep edmTriggerResults_*_*_SIMembeddingHLT")  # Trigger information \nprocess.NANOAODoutput.outputCommands.append("keep edmTriggerResults_*_*_MERGE")  # MET filter flags \nprocess.NANOAODoutput.outputCommands.remove("keep edmTriggerResults_*_*_*") \nprocess.genParticles2HepMC.genEventInfo = cms.InputTag("generator", "", "SIMembeddingpreHLT")
 import FWCore.ParameterSet.Config as cms
 
-from Configuration.Eras.Era_Run2_2017_cff import Run2_2017
+from Configuration.Eras.Era_Run2_2016_HIPM_cff import Run2_2016_HIPM
 
-process = cms.Process('NANO',Run2_2017)
+process = cms.Process('NANO',Run2_2016_HIPM)
 
 # import of standard configurations
 process.load('Configuration.StandardSequences.Services_cff')
@@ -26,7 +26,7 @@ process.maxEvents = cms.untracked.PSet(
 
 # Input source
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring('file:test_17.root'),
+    fileNames = cms.untracked.vstring('file:test_16.root'),
     secondaryFileNames = cms.untracked.vstring()
 )
 
@@ -90,8 +90,8 @@ process = customiseNanoAOD(process)
 
 process.unpackedPatTrigger.triggerResults = cms.InputTag("TriggerResults::SIMembeddingHLT") 
 process.NANOAODoutput.outputCommands.append("keep edmTriggerResults_*_*_SIMembeddingHLT")  # Trigger information 
-process.NANOAODoutput.outputCommands.append("keep edmTriggerResults_*_*_MERGE")  # MET filter flags
-process.NANOAODoutput.outputCommands.remove("keep edmTriggerResults_*_*_*")
+process.NANOAODoutput.outputCommands.append("keep edmTriggerResults_*_*_MERGE")  # MET filter flags 
+process.NANOAODoutput.outputCommands.remove("keep edmTriggerResults_*_*_*") 
 process.genParticles2HepMC.genEventInfo = cms.InputTag("generator", "", "SIMembeddingpreHLT")
 # Add early deletion of temporary data products to reduce peak memory need
 from Configuration.StandardSequences.earlyDeleteSettings_cff import customiseEarlyDelete

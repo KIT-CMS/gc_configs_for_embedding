@@ -2,17 +2,17 @@
 # using: 
 # Revision: 1.19 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: TauAnalysis/MCEmbeddingTools/python/EmbeddingPythia8Hadronizer_cfi.py --filein file:lhe_and_cleaned.root --fileout simulated_and_cleaned_preHLT.root --conditions 106X_mc2017_realistic_v6 --era Run2_2017 --eventcontent RAWSIM --step GEN,SIM,DIGI,L1,DIGI2RAW --datatier RAWSIM --customise TauAnalysis/MCEmbeddingTools/customisers.customiseGenerator_preHLT_Reselect --beamspot Realistic25ns13TeVEarly2017Collision --no_exec -n -1 --python_filename generator_preHLT.py --geometry DB:Extended --mc
+# with command line options: TauAnalysis/MCEmbeddingTools/python/EmbeddingPythia8Hadronizer_cfi.py --filein file:lhe_and_cleaned.root --fileout simulated_and_cleaned_preHLT.root --conditions 106X_mcRun2_asymptotic_preVFP_v11 --era Run2_2016_HIPM --eventcontent RAWSIM --step GEN,SIM,DIGI,L1,DIGI2RAW --datatier RAWSIM --customise TauAnalysis/MCEmbeddingTools/customisers.customiseGenerator_preHLT_Reselect --beamspot Realistic25ns13TeV2016Collision --no_exec -n -1 --python_filename generator_preHLT.py --geometry DB:Extended --mc
 import FWCore.ParameterSet.Config as cms
 
-from Configuration.Eras.Era_Run2_2017_cff import Run2_2017
+from Configuration.Eras.Era_Run2_2016_HIPM_cff import Run2_2016_HIPM
 
 # In order to reduce diskusage of job, remove output of selection.py --> RAWskimmed.root
 import os
 if os.path.exists("RAWskimmed.root"):
   os.remove("RAWskimmed.root")
 
-process = cms.Process('DIGI2RAW',Run2_2017)
+process = cms.Process('DIGI2RAW',Run2_2016_HIPM)
 
 # import of standard configurations
 process.load('Configuration.StandardSequences.Services_cff')
@@ -24,7 +24,7 @@ process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
 process.load('Configuration.StandardSequences.GeometrySimDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_cff')
 process.load('Configuration.StandardSequences.Generator_cff')
-process.load('IOMC.EventVertexGenerators.VtxSmearedRealistic25ns13TeVEarly2017Collision_cfi')
+process.load('IOMC.EventVertexGenerators.VtxSmearedRealistic25ns13TeV2016Collision_cfi')
 process.load('GeneratorInterface.Core.genFilterSummary_cff')
 process.load('Configuration.StandardSequences.SimIdeal_cff')
 process.load('Configuration.StandardSequences.Digi_cff')
@@ -82,10 +82,13 @@ process.RAWSIMoutput = cms.OutputModule("PoolOutputModule",
     SelectEvents = cms.untracked.PSet(
         SelectEvents = cms.vstring('generation_step')
     ),
+    compressionAlgorithm = cms.untracked.string('LZMA'),
+    compressionLevel = cms.untracked.int32(1),
     dataset = cms.untracked.PSet(
         dataTier = cms.untracked.string('RAWSIM'),
         filterName = cms.untracked.string('')
     ),
+    eventAutoFlushCompressedSize = cms.untracked.int32(20971520),
     fileName = cms.untracked.string('simulated_and_cleaned_preHLT.root'),
     outputCommands = process.RAWSIMEventContent.outputCommands,
     splitLevel = cms.untracked.int32(0)
@@ -97,7 +100,7 @@ process.RAWSIMoutput = cms.OutputModule("PoolOutputModule",
 process.XMLFromDBSource.label = cms.string("Extended")
 process.genstepfilter.triggerConditions=cms.vstring("generation_step")
 from Configuration.AlCa.GlobalTag import GlobalTag
-process.GlobalTag = GlobalTag(process.GlobalTag, '106X_mc2017_realistic_v6', '')
+process.GlobalTag = GlobalTag(process.GlobalTag, '106X_mcRun2_asymptotic_preVFP_v11', '')
 
 process.generator = cms.EDFilter("Pythia8HadronizerFilter",
     HepMCFilter = cms.PSet(

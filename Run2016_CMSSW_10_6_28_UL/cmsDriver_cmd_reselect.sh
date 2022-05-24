@@ -50,7 +50,7 @@ cmsDriver.py TauAnalysis/MCEmbeddingTools/python/EmbeddingPythia8Hadronizer_cfi.
 --customise_commands 'process.source.bypassVersionCheck = cms.untracked.bool(True)' \
 --customise \
 TauAnalysis/MCEmbeddingTools/customisers.customiseGenerator_HLT_Reselect \
---beamspot Realistic25ns13TeV2016Collision --no_exec -n -1 --python_filename generator_HLT_v2.py \
+--beamspot Realistic25ns13TeV2016Collision --no_exec -n -1 --python_filename generator_HLT.py \
 --geometry DB:Extended --mc
 
 cmsDriver.py TauAnalysis/MCEmbeddingTools/python/EmbeddingPythia8Hadronizer_cfi.py \
@@ -59,7 +59,7 @@ cmsDriver.py TauAnalysis/MCEmbeddingTools/python/EmbeddingPythia8Hadronizer_cfi.
 --eventcontent RAWRECO --step RAW2DIGI,RECO \
 --datatier RAWRECO --customise \
 TauAnalysis/MCEmbeddingTools/customisers.customiseGenerator_postHLT_Reselect \
---beamspot Realistic25ns13TeV2016Collision --no_exec -n -1 --python_filename generator_postHLT_v2.py \
+--beamspot Realistic25ns13TeV2016Collision --no_exec -n -1 --python_filename generator_postHLT.py \
 --geometry DB:Extended --mc
 
 ### Step 4: Merging of simulated hard process and cleaned data:
@@ -71,7 +71,7 @@ cmsDriver.py PAT -s PAT \
 --customise \
 TauAnalysis/MCEmbeddingTools/customisers.customiseMerging_Reselect \
 --customise_commands 'process.patTrigger.processName = cms.string("SIMembeddingHLT") \nprocess.slimmedPatTrigger.triggerResults =  cms.InputTag("TriggerResults::SIMembeddingHLT") \nprocess.patMuons.triggerResults =  cms.InputTag("TriggerResults::SIMembeddingHLT")' \
--n -1 --no_exec --python_filename=merging_v2.py
+-n -1 --no_exec --python_filename=merging.py
 
 ### NanoAOD Setp
 
@@ -81,7 +81,7 @@ cmsDriver.py  -s NANO \
 --era Run2_2016 \
 --filein file:test_16.root \
 --fileout file:merged_nano.root \
---python_filename=embedding_nanoaod_v2.py \
+--python_filename=embedding_nanoaod.py \
 --customise TauAnalysis/MCEmbeddingTools/customisers.customiseNanoAOD \
 --customise_commands 'process.unpackedPatTrigger.triggerResults = cms.InputTag("TriggerResults::SIMembeddingHLT") \nprocess.NANOAODoutput.outputCommands.append("keep edmTriggerResults_*_*_SIMembeddingHLT")  # Trigger information \nprocess.NANOAODoutput.outputCommands.append("keep edmTriggerResults_*_*_MERGE")  # MET filter flags \nprocess.NANOAODoutput.outputCommands.remove("keep edmTriggerResults_*_*_*") \nprocess.genParticles2HepMC.genEventInfo = cms.InputTag("generator", "", "SIMembeddingpreHLT")'
 # after set nanoaod path manually to:

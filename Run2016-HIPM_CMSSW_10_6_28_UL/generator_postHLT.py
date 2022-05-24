@@ -2,17 +2,17 @@
 # using: 
 # Revision: 1.19 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: TauAnalysis/MCEmbeddingTools/python/EmbeddingPythia8Hadronizer_cfi.py --filein file:simulated_and_cleaned_posthlt.root --fileout simulated_and_cleaned.root --conditions 106X_mc2017_realistic_v6 --era Run2_2017 --eventcontent RAWRECO --step RAW2DIGI,RECO --datatier RAWRECO --customise TauAnalysis/MCEmbeddingTools/customisers.customiseGenerator_postHLT_Reselect --beamspot Realistic25ns13TeVEarly2017Collision --no_exec -n -1 --python_filename generator_postHLT.py --geometry DB:Extended --mc
+# with command line options: TauAnalysis/MCEmbeddingTools/python/EmbeddingPythia8Hadronizer_cfi.py --filein file:simulated_and_cleaned_posthlt.root --fileout simulated_and_cleaned.root --conditions 106X_mcRun2_asymptotic_preVFP_v11 --era Run2_2016_HIPM --eventcontent RAWRECO --step RAW2DIGI,RECO --datatier RAWRECO --customise TauAnalysis/MCEmbeddingTools/customisers.customiseGenerator_postHLT_Reselect --beamspot Realistic25ns13TeV2016Collision --no_exec -n -1 --python_filename generator_postHLT.py --geometry DB:Extended --mc
 import FWCore.ParameterSet.Config as cms
 
-from Configuration.Eras.Era_Run2_2017_cff import Run2_2017
+from Configuration.Eras.Era_Run2_2016_HIPM_cff import Run2_2016_HIPM
 
 # In order to reduce diskusage of job, remove output of generator_preHLT.py --> simulated_and_cleaned_preHLT.root
 import os
 if os.path.exists("simulated_and_cleaned_preHLT.root"):
   os.remove("simulated_and_cleaned_preHLT.root")
 
-process = cms.Process('RECO',Run2_2017)
+process = cms.Process('RECO',Run2_2016_HIPM)
 
 # import of standard configurations
 process.load('Configuration.StandardSequences.Services_cff')
@@ -64,7 +64,7 @@ process.RAWRECOoutput = cms.OutputModule("PoolOutputModule",
 
 # Other statements
 from Configuration.AlCa.GlobalTag import GlobalTag
-process.GlobalTag = GlobalTag(process.GlobalTag, '106X_mc2017_realistic_v6', '')
+process.GlobalTag = GlobalTag(process.GlobalTag, '106X_mcRun2_asymptotic_preVFP_v11', '')
 
 # Path and EndPath definitions
 process.raw2digi_step = cms.Path(process.RawToDigi)

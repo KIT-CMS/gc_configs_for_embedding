@@ -2,12 +2,12 @@
 # using: 
 # Revision: 1.19 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: RECO -s RAW2DIGI,L1Reco,RECO,PAT --runUnscheduled --data --scenario pp --conditions 106X_dataRun2_v35 --era Run2_2017 --eventcontent RAW --datatier RAW --customise Configuration/DataProcessing/RecoTLR.customisePostEra_Run2_2017,TauAnalysis/MCEmbeddingTools/customisers.customiseSelecting --filein file:D671E4CB-B468-E811-B0BA-FA163EFF1C10.root --fileout PreRAWskimmed.root -n -1 --no_exec --python_filename=preselection.py
+# with command line options: RECO -s RAW2DIGI,L1Reco,RECO,PAT --runUnscheduled --data --scenario pp --conditions 106X_dataRun2_v35 --era Run2_2016_HIPM --eventcontent RAW --datatier RAW --customise Configuration/DataProcessing/RecoTLR.customisePostEra_Run2_2017,TauAnalysis/MCEmbeddingTools/customisers.customiseSelecting --filein file:D671E4CB-B468-E811-B0BA-FA163EFF1C10.root --fileout PreRAWskimmed.root -n -1 --no_exec --python_filename=preselection_v2.py
 import FWCore.ParameterSet.Config as cms
 
-from Configuration.Eras.Era_Run2_2017_cff import Run2_2017
+from Configuration.Eras.Era_Run2_2016_HIPM_cff import Run2_2016_HIPM
 
-process = cms.Process('RECO',Run2_2017)
+process = cms.Process('RECO',Run2_2016_HIPM)
 
 # import of standard configurations
 process.load('Configuration.StandardSequences.Services_cff')
