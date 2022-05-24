@@ -5,9 +5,9 @@
 # with command line options: SKIM -s NONE --filein file:merged.root --fileout file:merged_large.root --era Run2_2018 --data --scenario pp --conditions 123X_dataRun2_v2 --eventcontent MINIAODSIM --datatier USER --customise_commands process.MINIAODSIMoutput.outputCommands = cms.untracked.vstring("keep *") -n -1 --no_exec --python_filename=aggregation.py
 import FWCore.ParameterSet.Config as cms
 
-from Configuration.Eras.Era_Run2_2017_cff import Run2_2017
+from Configuration.Eras.Era_Run2_2016_cff import Run2_2016
 
-process = cms.Process("NONE", Run2_2017)
+process = cms.Process("NONE", Run2_2016)
 
 # import of standard configurations
 process.load("FWCore.MessageService.MessageLogger_cfi")
