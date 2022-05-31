@@ -5,7 +5,7 @@ runtime_start=`date +%s`
 ioinput_start=$(</sys/class/net/eth0/statistics/rx_bytes)
 iooutput_start=$(</sys/class/net/eth0/statistics/tx_bytes)
 
-/usr/bin/time -f "monitoring_metrics_start\nmetric_runtime: %e \nmetric_cputime: %U \nmetric_syscputime: %S\nmetric_cpuefficiency %P\nmetric_memory: %M\nmetric_filesysteminputs: %I\nmetric_filesystemoutputs: %O" ./full_embedding.sh
+/usr/bin/time -f "monitoring_metrics_start\nmetric_runtime: %e \nmetric_cputime: %U \nmetric_syscputime: %S\nmetric_cpuefficiency: %P\nmetric_memory: %M\nmetric_filesysteminputs: %I\nmetric_filesystemoutputs: %O" ./full_embedding.sh
 ## for the job runtime
 runtime_end=`date +%s`
 ioinput_end=$(</sys/class/net/eth0/statistics/rx_bytes)
