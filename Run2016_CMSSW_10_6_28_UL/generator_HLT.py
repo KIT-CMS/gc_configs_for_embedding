@@ -33,7 +33,7 @@ process.maxEvents = cms.untracked.PSet(input=cms.untracked.int32(-1))
 process.source = cms.Source(
     "PoolSource",
     dropDescendantsOfDroppedBranches=cms.untracked.bool(False),
-    fileNames=cms.untracked.vstring("file:simulated_and_cleaned_preHLT.root"),
+    fileNames = cms.untracked.vstring("file:/ceph/sbrommer/embedding/UL/studies/2016_F_v2/simulated_and_cleaned_preHLT.root"),
     secondaryFileNames=cms.untracked.vstring(),
     inputCommands=cms.untracked.vstring(
         "keep *",
@@ -60,6 +60,17 @@ process.source = cms.Source(
         "drop CTPPSDiamondRecHitedmDetSetVector_ctppsDiamondRecHits_*_*",
         "drop *_inclusiveCandidateSecondaryVertices_*_*",
         "drop *_inclusiveCandidateSecondaryVerticesCvsL_*_*",
+        "drop *_ctppsDiamondRawToDigi_*_*",
+        "drop *_ctppsDiamondRecHits_*_*",
+        "drop *_ctppsPixelClusters_*_*",
+        "drop *_ctppsPixelDigis_*_*",
+        "drop *_ctppsPixelDigis_*_*",
+        "drop *_ctppsPixelLocalTracks_*_*",
+        "drop *_ctppsPixelRecHits_*_*",
+        "drop *_ctppsDiamondRawToDigi_*_*",
+        "drop *_siPixelDigis_*_*",
+        "drop *_tcdsDigis_*_*",
+        "drop *_ak4PFJetsCHS_rho_LHEembeddingCLEAN",
     ),
 )
 
@@ -121,12 +132,5 @@ process = customizeHLTforFullSim(process)
 
 # End of customisation functions
 
-# Customisation from command line
-process.source.bypassVersionCheck = cms.untracked.bool(True)
-# Add early deletion of temporary data products to reduce peak memory need
-from Configuration.StandardSequences.earlyDeleteSettings_cff import customiseEarlyDelete
-
-process = customiseEarlyDelete(process)
-# End adding early deletion
 # Customisation from command line
 process.source.bypassVersionCheck = cms.untracked.bool(True)
