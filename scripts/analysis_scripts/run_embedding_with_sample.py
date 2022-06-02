@@ -66,9 +66,7 @@ if __name__ == "__main__":
     inputfile = os.path.abspath(args.inputfile)
     emb_folder = os.path.abspath(args.embedding_scripts_folder)
     era = [
-        s
-        for s in emb_folder.split("_")
-        if s in ["2016_preVFP", "2016_postVFP", "2017", "2018"]
+        s for s in emb_folder.split("_") if s in ["2016-HIPM", "2016", "2017", "2018"]
     ][0]
     config = yaml.safe_load(open("scripts/ul_config.yaml", "r"))
     main_cmssw = os.path.abspath(config["cmssw_version"][era]["main"])
