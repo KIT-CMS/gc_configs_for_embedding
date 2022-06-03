@@ -33,7 +33,7 @@ process.maxEvents = cms.untracked.PSet(input=cms.untracked.int32(-1))
 process.source = cms.Source(
     "PoolSource",
     dropDescendantsOfDroppedBranches=cms.untracked.bool(False),
-    fileNames = cms.untracked.vstring("file:/ceph/sbrommer/embedding/UL/studies/2016_F_v2/simulated_and_cleaned_preHLT.root"),
+    fileNames = cms.untracked.vstring("file:simulated_and_cleaned_preHLT.root"),
     secondaryFileNames=cms.untracked.vstring(),
     inputCommands=cms.untracked.vstring(
         "keep *",
