@@ -71,7 +71,6 @@ process.source = cms.Source(
         "drop *_ctppsDiamondRawToDigi_*_*",
         "drop *_siPixelDigis_*_*",
         "drop *_tcdsDigis_*_*",
-        "drop *_ak4PFJetsCHS_rho_LHEembeddingCLEAN",
     ),
 )
 
