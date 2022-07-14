@@ -2,7 +2,7 @@
 nickname = merged_large
 events = 16595675
 se list = cmssrm-kit.gridka.de
-prefix = /store/user/sbrommer/ul_embedding/large_miniAOD/MuonEmbedding/EmbeddingRun2017C/MINIAOD//0000
+prefix = /store/user/sbrommer/ul_embedding/large_miniAOD/MuonEmbedding/EmbeddingRun2017C/MINIAOD/inputDoubleMu_106X_ULegacy_miniAOD-v1/0000
 f6bfea3c-97a1-4459-a520-bcc7196c15a0.root = 91302
 cb660ece-b268-492d-90b1-215189a0222e.root = 97037
 3de3183f-477d-4f31-8954-fd600ee7ec4c.root = 103269

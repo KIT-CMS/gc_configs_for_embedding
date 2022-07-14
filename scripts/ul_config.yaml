@@ -35,9 +35,9 @@ input_samples:
     "Run2018C": "/DoubleMuon/Run2018C-v1/RAW"
     "Run2018D": "/DoubleMuon/Run2018D-v1/RAW"
 globaltag_names:
-  "2016-HIPM": ""
-  "2016": ""
-  "2017": ""
+  "2016-HIPM": "inputDoubleMu_106X_ULegacy_miniAOD-v1"
+  "2016": "inputDoubleMu_106X_ULegacy_miniAOD-v1"
+  "2017": "inputDoubleMu_106X_ULegacy_miniAOD-v1"
   "2018": "inputDoubleMu_106X_ULegacy_miniAOD-v1"
 generator_cuts:
   "2016-HIPM":
