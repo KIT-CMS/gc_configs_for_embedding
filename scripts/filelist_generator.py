@@ -144,6 +144,43 @@ class AggregatedMiniAODFilelist(Filelist):
     def publish_dataset(self):
         console.log("To be implemented ")
 
+class PuppiOnMiniFilelist(Filelist):
+    def build_filelist(self, config_path=None):
+        console.rule("Generating Rerun Puppi filelist")
+        folder = "dbs/ul_embedding_rerun_puppi/"
+        if not os.path.exists(folder):
+            os.mkdir(folder)
+        gc_config_folder = os.path.join(
+            "{configdir}/{datatype}_{era}_{finalstate}_rerun-puppi".format(
+                datatype=self.datatype,
+                configdir=self.configdir,
+                era=self.era,
+                finalstate=self.finalstate,
+            )
+        )
+        gc_config_path = os.path.join(
+            gc_config_folder, "{run}.conf".format(run=self.run)
+        )
+        output_file = os.path.join(
+            folder,
+            "{output}_{finalstate}.dbs".format(
+                output=self.run, finalstate=self.finalstate
+            ),
+        )
+        if config_path is not None:
+            gc_config_path = config_path
+        cmd = "{gc_path}/scripts/dataset_list_from_gc.py {config} -o {output}".format(
+            gc_path=self.grid_control_path,
+            config=gc_config_path,
+            output=output_file,
+        )
+        console.log("Running {}".format(cmd))
+        os.system(cmd)
+        return os.path.abspath(output_file)
+
+    def publish_dataset(self):
+        console.log("To be implemented ")
+
 
 class FullFilelist(Filelist):
     def build_filelist(self, config_path=None):

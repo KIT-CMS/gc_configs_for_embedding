@@ -305,7 +305,7 @@ class Nano(GeneralTask):
             )
         )
         out_file.write("[CMSSW]\n")
-        dbs_folder = "dbs/ul_embedding"
+        dbs_folder = "dbs/ul_embedding_rerun_puppi"
         inputfile = os.path.join(dbs_folder, "{}_{}.dbs".format(run, self.finalstate))
         filelist_location = os.path.join(self.name, os.path.basename(inputfile))
         copyfile(inputfile, filelist_location)
@@ -424,6 +424,122 @@ class aggregateMiniAOD(GeneralTask):
         )
         out_file.write("[CMSSW]\n")
         dbs_folder = "dbs/ul_embedding"
+        inputfile = os.path.join(dbs_folder, "{}_{}.dbs".format(run, self.finalstate))
+        filelist_location = os.path.join(self.name, os.path.basename(inputfile))
+        copyfile(inputfile, filelist_location)
+        out_file.write(
+            ("dataset = Embedding{run} : list:{filelistname} \n").format(
+                run=run,
+                filelistname=os.path.basename(filelist_location),
+            )
+        )
+        out_file.close()
+
+
+class PuppiOnMini(GeneralTask):
+    def __init__(
+        self,
+        era,
+        workdir,
+        finalstate,
+        identifier,
+        runs,
+        user,
+        inputfolder,
+        config,
+        isMC,
+    ):
+        GeneralTask.__init__(
+            self, era, workdir, identifier, runs, user, inputfolder, config, isMC
+        )
+        self.nanoaod = False
+        self.finalstate = finalstate
+        self.particle_to_embed = config["finalstate_map"][finalstate][
+            "embeddedParticle"
+        ]
+        self.full_finalstatename = config["finalstate_map"][finalstate]["FullName"]
+        self.globaltagname = config["globaltag_names"][era]
+        self.cmsRun_order = ["recompute_puppi_embedding.py"]
+        self.name = identifier + "_" + finalstate + "_rerun-puppi"
+        self.cmssw_version = self.config["cmssw_version"][era]["main"]
+
+    def build_generator_fragment(self):
+        console.log("No generator fragment needed for rerunning Puppi")
+
+    def build_python_configs(self):
+        console.log("Setting up python configs for rerunning Puppi")
+        add_fragment_to_end = []
+        with open("scripts/customise_for_gc.py", "r") as (function_to_add):
+            add_fragment_to_end.append(function_to_add.read())
+        add_fragment_to_end.append("process = customise_for_gc(process)")
+        self.copy_file(
+            self.cmsRun_order[0],
+            add_fragment_to_end=add_fragment_to_end,
+            skip_if_not_there=True,
+        )
+
+    def build_gc_configs(self):
+        console.log("Setting up gc configs")
+        for run in self.runs:
+            self.write_gc_config(
+                "grid_control_rerun_puppi.conf",
+                run,
+            )
+
+        rp_base_cfg = {}
+        rp_base_cfg["__CMSRUN_ORDER__"] = "config file = recompute_puppi_embedding.py"
+        se_path_str = ("se path = {path}").format(
+            path=self.config["output_paths"]["rerun_puppi"].replace(
+                "{USER}", self.username
+            )
+        )
+        se_output_pattern_str = (
+            "se output pattern = "
+            + self.full_finalstatename
+            + "/@NICK@/"
+            + "MINIAOD/"
+            + self.globaltagname
+            + "/0000/@GC_GUID@.@XEXT@"
+        )
+        rp_base_cfg["__CMSSW_BASE__"] = os.path.join(
+            os.path.dirname(os.path.abspath(self.cmssw_version)),
+            self.cmssw_version + "/",
+        )
+        rp_base_cfg["__SE_PATH__"] = se_path_str
+        rp_base_cfg["__SE_OUTPUT_PATTERN__"] = se_output_pattern_str
+        rp_base_cfg[
+            "__partition_lfn_modifier__"
+        ] = "partition lfn modifier = <xrootd:nrg>"
+        rp_base_cfg["__SE_OUTPUT_FILE__"] = "se output files = updated_merged.root"
+        self.copy_file(
+            "scripts/base_configs/grid_control_rerun_puppi.conf",
+            copy_from_folder="./",
+            replace_dict=rp_base_cfg,
+        )
+
+    def write_gc_config(self, outfile, run):
+        out_file = open(self.name + "/" + run + ".conf", "w")
+        out_file.write("[global]\n")
+        out_file.write(("include={}\n").format(outfile))
+        if "etp.kit.edu" in os.environ["HOSTNAME"] and self.workdir == "":
+            workdir = ("/work/{user}/embedding/UL/gc_workdir").format(
+                user=os.environ["USER"]
+            )
+        elif "naf" in os.environ["HOSTNAME"] and self.workdir == "":
+            workdir = ("/nfs/dust/cms/user/{user}/embedding/gc_workdir").format(
+                user=os.environ["USER"]
+            )
+        else:
+            workdir = self.workdir
+        out_file.write(
+            ("workdir = {WORKDIR}/{particle_to_embed}_{name}\n").format(
+                WORKDIR=workdir,
+                particle_to_embed=self.particle_to_embed,
+                name=out_file.name.split(".")[0],
+            )
+        )
+        out_file.write("[CMSSW]\n")
+        dbs_folder = "dbs/ul_embedding_aggregated_miniaod"
         inputfile = os.path.join(dbs_folder, "{}_{}.dbs".format(run, self.finalstate))
         filelist_location = os.path.join(self.name, os.path.basename(inputfile))
         copyfile(inputfile, filelist_location)

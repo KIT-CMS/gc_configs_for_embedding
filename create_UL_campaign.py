@@ -9,13 +9,20 @@ if sys.version_info[0] == 2:
     print("You need to run this with Python 3")
     raise SystemExit
 
-from scripts.EmbeddingTask import Preselection, FullTask, Nano, aggregateMiniAOD
+from scripts.EmbeddingTask import (
+    Preselection,
+    FullTask,
+    Nano,
+    aggregateMiniAOD,
+    PuppiOnMini,
+)
 from scripts.create_tmux_while import create_tmux_while
 from scripts.filelist_generator import (
     PreselectionFilelist,
     FullFilelist,
     NanoFilelist,
     AggregatedMiniAODFilelist,
+    PuppiOnMiniFilelist,
 )
 import getpass
 from rich.console import Console
@@ -54,8 +61,8 @@ def parse_arguments():
         "--mode",
         type=str,
         required=True,
-        choices=["preselection", "full", "aggregate", "nanoaod"],
-        help="Select preselection mode, full embedding mode, aggregate mode, or nanoaod mode",
+        choices=["preselection", "full", "aggregate", "rerunpuppi", "nanoaod"],
+        help="Select preselection mode, full embedding mode, aggregate mode, rerun puppi mode, or nanoaod mode",
     )
     parser.add_argument(
         "--task",
@@ -341,6 +348,58 @@ class AggregateMiniAODTask(Task):
         console.log("To be implemented ...")
 
 
+class PuppiOnMiniTask(Task):
+    def __init__(
+        self,
+        era,
+        workdir,
+        configdir,
+        config,
+        backend,
+        run,
+        user,
+        finalstate,
+        no_tmux,
+        isMC,
+    ):
+        Task.__init__(
+            self, era, workdir, configdir, config, backend, run, user, no_tmux, isMC
+        )
+        self.finalstate = finalstate
+        self.task = PuppiOnMini(
+            era=self.era,
+            finalstate=self.finalstate,
+            workdir=self.workdir,
+            identifier=self.identifier,
+            runs=self.runlist,
+            user=self.username,
+            inputfolder=get_inputfolder(era),
+            config=self.config,
+            isMC=self.isMC,
+        )
+
+    def build_filelist(self):
+        for run in self.runlist:
+            filelist = PuppiOnMiniFilelist(
+                configdir=self.configdir,
+                era=self.era,
+                grid_control_path=self.gc_path,
+                run=run,
+                finalstate=self.finalstate,
+                isMC=self.isMC,
+            )
+            filelist.build_filelist()
+
+    def setup_cmsRun(self):
+        self.task.setup_all()
+
+    def upload_tarballs(self):
+        console.log("Not needed for preselection --> Exiting ")
+
+    def publish_dataset(self):
+        console.log("To be implemented ...")
+
+
 class NanoTask(Task):
     def __init__(
         self,
@@ -505,6 +564,19 @@ if __name__ == "__main__":
         )
     elif args.mode == "aggregate":
         task = AggregateMiniAODTask(
+            args.era,
+            args.workdir,
+            configdir,
+            config,
+            args.backend,
+            args.run,
+            args.user,
+            finalstate,
+            args.no_tmux,
+            args.mc,
+        )
+    elif args.mode == "rerunpuppi":
+        task = PuppiOnMiniTask(
             args.era,
             args.workdir,
             configdir,
