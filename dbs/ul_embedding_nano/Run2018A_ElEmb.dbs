@@ -1,8 +1,8 @@
-[/PRIVATE/merged_nano#451a197d]
+[/PRIVATE/merged_nano#09429846]
 nickname = merged_nano
 events = 14960365
 se list = cmssrm-kit.gridka.de
-prefix = /store/user/sbrommer/ul_embedding/nanoaod/nanoaod_data_2018/ElEmbedding_data_2018_ElEmb_nanoaod_Run2018A
+prefix = /store/user/sbrommer/ul_embedding_nanoaod/v2/nanoaod_data_2018/ElEmbedding_data_2018_ElEmb_nanoaod_Run2018A
 1/merged_nano_0.root = 100000
 2/merged_nano_1.root = 100000
 3/merged_nano_2.root = 100000
