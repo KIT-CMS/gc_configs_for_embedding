@@ -73,7 +73,7 @@ associatePatAlgosToolsTask(process)
 # customisation of the process.
 
 # Automatic addition of the customisation function from PhysicsTools.NanoAOD.nano_cff
-from PhysicsTools.NanoAOD.nano_cff import nanoAOD_customizeData 
+from PhysicsTools.NanoAOD.nano_cff import nanoAOD_customizeData
 
 #call to customisation function nanoAOD_customizeData imported from PhysicsTools.NanoAOD.nano_cff
 process = nanoAOD_customizeData(process)
@@ -130,9 +130,12 @@ process.triggerObjectTable.selections[2].qualityBits = cms.string(
 process.triggerObjectTable.selections[3] = cms.PSet(
             name = cms.string("Tau"),
             id = cms.int32(15),
-            sel = cms.string("type(84) && pt > 5 && coll('*Tau*') && ( filter('*LooseChargedIso*') || filter('*MediumChargedIso*') || filter('*DeepTau*') || filter('*TightChargedIso*') || filter('*TightOOSCPhotons*') || filter('hltL2TauIsoFilter') || filter('*OverlapFilterIsoMu*') || filter('*OverlapFilterIsoEle*') || filter('*L1HLTMatched*') || filter('*Dz02*') || filter('*DoublePFTau*') || filter('*SinglePFTau*') || filter('hlt*SelectedPFTau') || filter('*DisplPFTau*') )"), #All trigger objects from a Tau collection + passing at least one filter
-            l1seed = cms.string("type(-100)"), l1deltaR = cms.double(0.3),
-            l2seed = cms.string("type(84) && coll('hltL2TauJetsL1IsoTauSeeded')"),  l2deltaR = cms.double(0.3),
+            sel = cms.string("type(84) && pt > 5 && coll('*Tau*') && ( filter('*LooseChargedIso*') || filter('*MediumChargedIso*') || filter('*DeepTau*') || filter('*TightChargedIso*') || filter('*TightOOSCPhotons*') || filter('hltL2TauIsoFilter') || filter('*OverlapFilterIsoMu*') || filter('*OverlapFilterIsoEle*') || filter('*L1HLTMatched*') || filter('*Dz02*') || filter('*DoublePFTau*') || filter('*SinglePFTau*') || filter('hlt*SelectedPFTau') || filter('*DisplPFTau*') || filter('*Tau*') )"), #All trigger objects from a Tau collection + passing at least one filter
+            # sel = cms.string("type(84) && pt > 5 && coll('*Tau*') && filter('*Tau*') "), #All trigger objects from a Tau collection + passing at least one filter
+            l1seed = cms.string("type(-100)"),
+            l1deltaR = cms.double(0.3),
+            l2seed = cms.string("type(84) && coll('hltL2TauJetsL1IsoTauSeeded')"),
+            l2deltaR = cms.double(0.3),
             skipObjectsNotPassingQualityBits = cms.bool(True),
             qualityBits = cms.string(
                             "filter('*LooseChargedIso*') + " \
@@ -154,8 +157,12 @@ process.triggerObjectTable.selections[3] = cms.PSet(
                             "65536*filter('*Monitoring') + " \
                             "131072*filter('*Reg') + " \
                             "262144*filter('*L1Seeded') + " \
-                            "524288*filter('*1Prong')"),
-            qualityBitsDoc = cms.string("1 = LooseChargedIso, 2 = MediumChargedIso, 4 = TightChargedIso, 8 = DeepTau, 16 = TightID OOSC photons, 32 = HPS, 64 = charged iso di-tau, 128 = deeptau di-tau, 256 = e-tau, 512 = mu-tau, 1024 = single-tau/tau+MET, 2048 = run 2 VBF+ditau, 4096 = run 3 VBF+ditau, 8192 = run 3 double PF jets + ditau, 16384 = di-tau + PFJet, 32768 = Displaced Tau, 65536 = Monitoring, 131072 = regional paths, 262144 = L1 seeded paths, 524288 = 1 prong tau paths"),
+                            "524288*filter('*1Prong') + " \
+                            "1048576*filter('*DoubleL2IsoTau26*') + " \
+                            "2097152*filter('*SingleL2IsoTau20*') + " \
+                            "4194304*filter('*TauJet*') "),
+            # qualityBits = cms.string("5000*filter('*DoubleL2IsoTau26*')"),
+            qualityBitsDoc = cms.string("1 = LooseChargedIso, 2 = MediumChargedIso, 4 = TightChargedIso, 8 = DeepTau, 16 = TightID OOSC photons, 32 = HPS, 64 = charged iso di-tau, 128 = deeptau di-tau, 256 = e-tau, 512 = mu-tau, 1024 = single-tau/tau+MET, 2048 = run 2 VBF+ditau, 4096 = run 3 VBF+ditau, 8192 = run 3 double PF jets + ditau, 16384 = di-tau + PFJet, 32768 = Displaced Tau, 65536 = Monitoring, 131072 = regional paths, 262144 = L1 seeded paths, 524288 = 1 prong tau paths, 1048576 = double L2 tau26 (for tau embedding), 2097152 = single L2 tau20 (for tauleg in mu + tau crosstrigger in embedding), 4194304 = tau jet5 (for tauleg in e + tau crosstrigger in embedding)"),
         )
 process.triggerObjectTable.selections[4].qualityBits = cms.string(
                 "1         * filter('*CrossCleaned*LooseChargedIsoPFTau*') + " \
