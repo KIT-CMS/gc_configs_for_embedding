@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import argparse
+from src.arg_parser import parser
 import os
 import stat
 import yaml
@@ -16,7 +16,7 @@ from scripts.EmbeddingTask import (
     aggregateMiniAOD,
     PuppiOnMini,
 )
-from scripts.create_tmux_while import create_tmux_while
+from create_grid_control_script import create_tmux_while
 from scripts.filelist_generator import (
     PreselectionFilelist,
     FullFilelist,
@@ -29,84 +29,6 @@ from rich.console import Console
 
 
 console = Console()
-
-
-def parse_arguments():
-    parser = argparse.ArgumentParser(
-        description="Setup Grid Control for Embedding Production"
-    )
-    parser.add_argument("--workdir", type=str, help="path to the workdir", default="")
-    parser.add_argument(
-        "--era",
-        type=str,
-        # choices=['2016_preVFP', '2016_postVFP', '2017', '2018'],
-        choices=["2016-HIPM", "2016", "2017", "2018"],
-        required=True,
-        help="Era used for the production",
-    )
-    parser.add_argument(
-        "--final-state",
-        type=str,
-        required=False,
-        choices=["MuTau", "ElTau", "ElMu", "TauTau", "MuEmb", "ElEmb"],
-        help="Name the final state you want to process",
-    )
-    parser.add_argument(
-        "--run",
-        type=str,
-        nargs="+",
-        help="Name or list of the runs you want to process, use all to process all runs of an era",
-    )
-    parser.add_argument(
-        "--mode",
-        type=str,
-        required=True,
-        choices=["preselection", "full", "aggregate", "rerunpuppi", "nanoaod"],
-        help="Select preselection mode, full embedding mode, aggregate mode, rerun puppi mode, or nanoaod mode",
-    )
-    parser.add_argument(
-        "--task",
-        type=str,
-        required=True,
-        choices=[
-            "setup_cmssw",
-            "upload_tarballs",
-            "setup_jobs",
-            "run_production",
-            "create_filelist",
-            "publish_dataset",
-        ],
-        help="Different commands that are possible",
-    )
-    parser.add_argument(
-        "--backend",
-        type=str,
-        choices=["etp", "naf", "lxplus"],
-        default="etp",
-        help="Select the condor backend that is used.",
-    )
-    parser.add_argument(
-        "--custom-configdir",
-        type=str,
-        help="If this is set, use the configdir from the given folder",
-    )
-    parser.add_argument(
-        "--mc",
-        action="store_true",
-        help="If this is set, mc embedding is run instead of data embedding",
-    )
-    parser.add_argument(
-        "--no_tmux",
-        action="store_true",
-        help="If this is set, no tmux is used to run the jobs",
-    )
-    parser.add_argument(
-        "--user",
-        type=str,
-        default="",
-        help="if you have a different username on NAF and ETP you have to choose your ETP username here",
-    )
-    return parser.parse_args()
 
 
 def possible_runs(era):
@@ -526,81 +448,56 @@ class EmbeddingTask(Task):
 
 
 if __name__ == "__main__":
-    args = parse_arguments()
-    config = yaml.safe_load(open("scripts/ul_config.yaml", "r"))
-    if args.final_state is None:
-        finalstate = "NotSet"
-    else:
-        finalstate = args.final_state
-    if args.custom_configdir:
-        configdir = args.custom_configdir
-    else:
-        configdir = os.path.dirname(os.path.realpath(__file__))
+    # Get command-line arguments:
+    # workdir
+    # era
+    # final-state
+    # run
+    # mode
+    # task
+    # backend
+    # custom-configdir
+    # mc
+    # no_tmux
+    # user
+    args = parser.parse_args()
+    # load config which contains details about the different LHC runs
+    config = yaml.safe_load(open("src/ul_config.yaml", "r"))
+
     # first setup CMSSW environments
+    params = [
+        args.era,
+        args.workdir,
+        args.custom_configdir,
+        config,
+        args.backend,
+        args.run,
+        args.user,
+        args.no_tmux,
+        args.mc,
+    ]
+    # The following choices are possible: "preselection", "full", "aggregate", "rerunpuppi", "nanoaod"
     if args.mode == "preselection":
-        task = PreselectionTask(
-            args.era,
-            args.workdir,
-            configdir,
-            config,
-            args.backend,
-            args.run,
-            args.user,
-            args.no_tmux,
-            args.mc,
-        )
+        task = PreselectionTask(*params)
     elif args.mode == "nanoaod":
-        task = NanoTask(
-            args.era,
-            args.workdir,
-            configdir,
-            config,
-            args.backend,
-            args.run,
-            args.user,
-            finalstate,
-            args.no_tmux,
-            args.mc,
-        )
+        task = NanoTask(*params)
     elif args.mode == "aggregate":
-        task = AggregateMiniAODTask(
-            args.era,
-            args.workdir,
-            configdir,
-            config,
-            args.backend,
-            args.run,
-            args.user,
-            finalstate,
-            args.no_tmux,
-            args.mc,
-        )
+        task = AggregateMiniAODTask(*params)
     elif args.mode == "rerunpuppi":
-        task = PuppiOnMiniTask(
-            args.era,
-            args.workdir,
-            configdir,
-            config,
-            args.backend,
-            args.run,
-            args.user,
-            finalstate,
-            args.no_tmux,
-            args.mc,
-        )
+        task = PuppiOnMiniTask(*params)
+    elif args.mode == "full":
+        task = EmbeddingTask(*params)
     else:
-        task = EmbeddingTask(
-            args.era,
-            args.workdir,
-            configdir,
-            config,
-            args.backend,
-            args.run,
-            args.user,
-            finalstate,
-            args.no_tmux,
-            args.mc,
-        )
+        parser.error(f"The mode {args.mode} doesn't exist.")
+
+    # Run the specific tasks
+    # The following choices are possible:
+    # "setup_cmssw",
+    # "upload_tarballs",
+    # "setup_jobs",
+    # "run_production",
+    # "create_filelist",
+    # "publish_dataset",
     if args.task == "setup_cmssw":
         task.setup_env()
     elif args.task == "upload_tarballs":

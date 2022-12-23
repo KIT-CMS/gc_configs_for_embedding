@@ -1,7 +1,7 @@
 import os
 import stat
 import getpass
-from scripts.read_filelist_from_das import read_filelist_from_das
+from read_filelist_from_das import read_filelist_from_das
 from shutil import copyfile
 from rich.console import Console
 import yaml
@@ -11,13 +11,13 @@ console = Console()
 
 class GeneralTask:
     def __init__(self, era, workdir, identifier, runs, user, inputfolder, config, isMC):
-        self.config = config
-        self.inputfolder = inputfolder
-        self.runs = runs
+        self.era = era
         self.workdir = workdir
         self.identifier = identifier
-        self.era = era
-        self.name = ""
+        self.runs = runs
+        self.inputfolder = inputfolder
+        self.config = config
+        self.name = identifier + "_generalTask"
         if isMC:
             self.datatype = "mc"
         else:
@@ -132,7 +132,7 @@ class Preselection(GeneralTask):
         rp_base_cfg["__CMSRUN_ORDER__"] = "config file = preselection.py"
         se_path_str = ("se path = {path}").format(
             path=self.config["output_paths"]["preselection"].replace(
-                "{USER}", self.username
+                "{USER}", self.user
             )
         )
         se_output_pattern_str = (
@@ -163,47 +163,28 @@ class Preselection(GeneralTask):
         out_file.write("[global]\n")
         out_file.write(("include={}\n").format(outfile))
         if "etp.kit.edu" in os.environ["HOSTNAME"] and self.workdir == "":
-            workdir = ("/work/{user}/embedding/UL/gc_workdir").format(
-                user=os.environ["USER"]
-            )
+            workdir = f"/work/{self.user}/embedding/UL/gc_workdir"
         elif "naf" in os.environ["HOSTNAME"] and self.workdir == "":
-            workdir = ("/nfs/dust/cms/user/{user}/embedding/gc_workdir").format(
-                user=os.environ["USER"]
-            )
+            workdir = f"/nfs/dust/cms/user/{self.user}/embedding/gc_workdir"
         else:
             workdir = self.workdir
         out_file.write(
-            ("workdir = {WORKDIR}/{particle_to_embed}_{name}\n").format(
-                WORKDIR=workdir,
-                particle_to_embed=self.particle_to_embed,
-                name=out_file.name.split(".")[0],
-            )
+            f"workdir = {workdir}/{self.particle_to_embed}_{out_file.name.split('.')[0]}\n"
         )
         out_file.write("[CMSSW]\n")
         if self.input_samples:
             dbs_name = self.input_samples[run]
         else:
-            dbs_name = ("/DoubleMuon/{RUN}-v1/RAW").format(RUN=run)
-        filelistname = "DoubleMuon_{run}_RAW.dbs".format(run=run)
+            dbs_name = (f"/DoubleMuon/{run}-v1/RAW")
+        filelistname = f"DoubleMuon_{run}_RAW.dbs"
         read_filelist_from_das(
-            "{particle}_{name}_DoubleMuon_{run}".format(
-                particle=self.particle_to_embed, name=self.name, run=run
-            ),
+            f"{self.particle_to_embed}_{self.name}_DoubleMuon_{run}",
             dbs_name,
-            "{name}/{filelistname}".format(name=self.name, filelistname=filelistname),
+            f"{self.name}/{filelistname}",
             False,
             "root://cms-xrd-global.cern.ch/",
         )
-        out_file.write(
-            (
-                "dataset = {particle}_{name}_DoubleMuon_{run} : list:{filelistname} \n"
-            ).format(
-                particle=self.particle_to_embed,
-                name=self.name,
-                run=run,
-                filelistname=filelistname,
-            )
-        )
+        out_file.write(f"dataset = {self.particle_to_embed}_{self.name}_DoubleMuon_{run} : list:{filelistname}\n")
         out_file.close()
 
 
