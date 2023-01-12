@@ -14,7 +14,7 @@ echo "Set input file path .."
 FOLDER=$(($FILENUMBER%100))
 FOLDER=$(($FOLDER+1))
 export INPUTFILE=$INPUTPATH/$FOLDER/PreRAWskimmed_$FILENUMBER.root
-export SCRAM_ARCH="slc7_amd64_gcc820"
+export SCRAM_ARCH="slc7_amd64_gcc700"
 echo $INPUTFILE
 
 echo "frist copy the two tarballs"
