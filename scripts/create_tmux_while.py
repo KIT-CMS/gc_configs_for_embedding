@@ -1,6 +1,7 @@
 import argparse
 import os
 import stat
+import random
 
 parser = argparse.ArgumentParser(
     description="This scipt can be used, to generate a script that spawns multiple grid control tasks automatically"
@@ -29,9 +30,10 @@ def create_tmux_while(taskname, tmux_path, configlist, gc_path):
     out_file.write("if [ $? != 0 ]; then\n")
     # first create the tmux session
     out_file.write(
-        "   {tmux_path} new-session -d -x 300 -s {sessionname} 'python2 {gc_path}/go.py {configpath} -Gc' \n".format(
+        "   {tmux_path} new-session -d -x 300 -s {sessionname} '{random_sleep} && python2 {gc_path}/go.py {configpath} -Gc' \n".format(
             tmux_path=tmux_path,
             sessionname=taskname,
+            random_sleep="sleep " + str(random.randint(0, 30)),
             gc_path=gc_path,
             configpath=configlist[0],
         )
@@ -53,9 +55,9 @@ def create_tmux_while(taskname, tmux_path, configlist, gc_path):
     for config in configlist[1:]:
         if splitable:
             out_file.write(
-                "   {tmux_path} split-window -h 'python2 {gc_path}/go.py {configpath} -Gc' \n".format(
+                "   {tmux_path} split-window -h '{random_sleep} && python2 {gc_path}/go.py {configpath} -Gc' \n".format(
                     tmux_path=tmux_path,
-                    taskname=taskname,
+                    random_sleep="sleep " + str(random.randint(0, 30)),
                     gc_path=gc_path,
                     configpath=config,
                 )
@@ -64,9 +66,10 @@ def create_tmux_while(taskname, tmux_path, configlist, gc_path):
             counter += 1
         else:
             out_file.write(
-                "   {tmux_path} new-window -n {title} 'python2 {gc_path}/go.py {configpath} -Gc' \n".format(
+                "   {tmux_path} new-window -n {title} '{random_sleep} && python2 {gc_path}/go.py {configpath} -Gc' \n".format(
                     tmux_path=tmux_path,
                     title=taskname + "_" + str(counter),
+                    random_sleep="sleep " + str(random.randint(0, 30)),
                     gc_path=gc_path,
                     configpath=config,
                 )
