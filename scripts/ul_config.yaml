@@ -239,11 +239,11 @@ cmssw_version:
     "main": "CMSSW_10_6_28"
     "hlt": "CMSSW_10_2_16_UL"
 output_paths:
-  "tarballs": "srm://cmssrm-kit.gridka.de:8443/srm/managerv2?SFN=/pnfs/gridka.de/cms/disk-only/store/user/{USER}/ul_embedding/tarballs_dez20"
-  "preselection": "srm://cmssrm-kit.gridka.de:8443/srm/managerv2?SFN=/pnfs/gridka.de/cms/disk-only/store/user/{USER}/ul_embedding/preselection"
-  "main": "srm://cmssrm-kit.gridka.de:8443/srm/managerv2?SFN=/pnfs/gridka.de/cms/disk-only/store/user/{USER}/ul_embedding/miniaod"
-  "large_miniAOD": "srm://cmssrm-kit.gridka.de:8443/srm/managerv2?SFN=/pnfs/gridka.de/cms/disk-only/store/user/{USER}/ul_embedding/large_miniAOD"
-  "rerun_puppi": "srm://cmssrm-kit.gridka.de:8443/srm/managerv2?SFN=/pnfs/gridka.de/cms/disk-only/store/user/{USER}/ul_embedding/large_miniAOD_v2"
-  "nanoaod": "srm://cmssrm-kit.gridka.de:8443/srm/managerv2?SFN=/pnfs/gridka.de/cms/disk-only/store/user/{USER}/ul_embedding_nanoaod/v3"
+  "tarballs": "root://cmsxrootd-kit-disk.gridka.de//store/user/{USER}/ul_embedding/tarballs_dez20"
+  "preselection": "root://cmsxrootd-kit-disk.gridka.de//store/user/{USER}/ul_embedding/preselection"
+  "main": " root://cmsxrootd-kit-disk.gridka.de//store/user/{USER}/ul_embedding/miniaod"
+  "large_miniAOD": " root://cmsxrootd-kit-disk.gridka.de//store/user/{USER}/ul_embedding/large_miniAOD"
+  "rerun_puppi": " root://cmsxrootd-kit-disk.gridka.de//store/user/{USER}/ul_embedding/large_miniAOD_v2"
+  "nanoaod": "root://cmsxrootd-kit-disk.gridka.de//store/user/{USER}/ul_embedding_nanoaod/v3"
 
 tmux_path: "/home/sbrommer/local/bms1/bin/tmux"
