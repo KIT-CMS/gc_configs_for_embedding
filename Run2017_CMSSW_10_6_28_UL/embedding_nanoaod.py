@@ -321,7 +321,7 @@ process.triggerObjectTable.selections[4].qualityBitsDoc = cms.string(
 )
 
 # add boosted tau trigger objects
-process.triggerObjectTable.append(
+process.triggerObjectTable.selections.append(
     cms.PSet(
         name=cms.string("BoostedTau"),
         id=cms.int32(1515),
