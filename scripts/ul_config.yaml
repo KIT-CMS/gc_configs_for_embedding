@@ -244,6 +244,6 @@ output_paths:
   "main": " root://cmsxrootd-kit-disk.gridka.de//store/user/{USER}/ul_embedding/miniaod"
   "large_miniAOD": " root://cmsxrootd-kit-disk.gridka.de//store/user/{USER}/ul_embedding/large_miniAOD"
   "rerun_puppi": " root://cmsxrootd-kit-disk.gridka.de//store/user/{USER}/ul_embedding/large_miniAOD_v2"
-  "nanoaod": "root://cmsxrootd-kit-disk.gridka.de//store/user/{USER}/ul_embedding_nanoaod/v3"
+  "nanoaod": "root://cmsxrootd-kit-disk.gridka.de//store/user/{USER}/ul_embedding_nanoaod/v5"
 
-tmux_path: "/home/sbrommer/local/bms1/bin/tmux"
+tmux_path: "/usr/bin/tmux"
