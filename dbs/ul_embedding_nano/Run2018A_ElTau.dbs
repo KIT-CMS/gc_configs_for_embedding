@@ -1,6 +1,6 @@
 [/PRIVATE/merged_nano#dee77171]
 nickname = merged_nano
-events = 11700000
+events = 11729068
 prefix = /store/user/mmolch/ul_embedding_nanoaod/v5/nanoaod_data_2018/TauEmbedding_data_2018_ElTau_nanoaod_Run2018A
 1/merged_nano_0.root = 100000
 2/merged_nano_1.root = 100000
@@ -119,3 +119,4 @@ prefix = /store/user/mmolch/ul_embedding_nanoaod/v5/nanoaod_data_2018/TauEmbeddi
 15/merged_nano_114.root = 100000
 16/merged_nano_115.root = 100000
 17/merged_nano_116.root = 100000
+18/merged_nano_117.root = 29068
