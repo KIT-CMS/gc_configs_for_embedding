@@ -1,7 +1,7 @@
-[/PRIVATE/merged_nano#8ac660de]
+[/PRIVATE/merged_nano#73d2dbb7]
 nickname = merged_nano
-events = 4764998
-prefix = /store/user/mmolch/ul_embedding_nanoaod/v5/nanoaod_data_2017/TauEmbedding_data_2017_ElMu_nanoaod_Run2017B
+events = 4163359
+prefix = /store/user/mmolch/ul_embedding_nanoaod/v5/nanoaod_data_2017/TauEmbedding_data_2017_MuTau_nanoaod_Run2017B
 1/merged_nano_0.root = 100000
 2/merged_nano_1.root = 100000
 3/merged_nano_2.root = 100000
@@ -43,10 +43,4 @@ prefix = /store/user/mmolch/ul_embedding_nanoaod/v5/nanoaod_data_2017/TauEmbeddi
 39/merged_nano_38.root = 100000
 40/merged_nano_39.root = 100000
 41/merged_nano_40.root = 100000
-42/merged_nano_41.root = 100000
-43/merged_nano_42.root = 100000
-44/merged_nano_43.root = 100000
-45/merged_nano_44.root = 100000
-46/merged_nano_45.root = 100000
-47/merged_nano_46.root = 100000
-48/merged_nano_47.root = 64998
+42/merged_nano_41.root = 63359
