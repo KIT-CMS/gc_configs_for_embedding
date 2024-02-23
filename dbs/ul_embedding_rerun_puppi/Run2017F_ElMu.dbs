@@ -1,6 +1,6 @@
 [/PRIVATE/updated_merged#fbd921f2]
 nickname = updated_merged
-events = 13063719
+events = 12967831
 se list = cmssrm-kit.gridka.de
 prefix = /store/user/sbrommer/ul_embedding/large_miniAOD_v2/ElMuFinalState/EmbeddingRun2017F/MINIAOD/inputDoubleMu_106X_ULegacy_miniAOD-v1/0000
 e3d63b24-d31d-4124-98b1-9e055eb85ee7.root = 54792
@@ -124,7 +124,6 @@ a9af5c74-6a66-4719-8474-f7c56ff68ab9.root = 43813
 f52fdac5-44fb-4469-83a1-3f7deb8ca843.root = 45732
 56b2835f-f91c-492e-b7bd-e07d13e971b3.root = 49404
 a5e95f4e-6899-4db5-908d-27bc4c03e1a8.root = 41775
-7443ec3e-d946-420a-8bfa-a962b94ce497.root = 54113
 18014980-5e7a-4b8d-9030-8b94776c9114.root = 48085
 eecc0062-aff3-4180-aa64-1627ff1741b7.root = 56527
 ee6de120-68ef-4a85-a344-185607b68cf1.root = 50697
@@ -166,7 +165,6 @@ d51de4a0-6b60-489c-8fcc-975131d767e5.root = 54627
 b4b5af68-88ff-41f4-afee-2e8f558aa395.root = 55151
 50eabb09-6f8e-400b-9dee-193e4a725666.root = 50354
 5b1fa3dd-8038-41e9-847f-38af535b3416.root = 57358
-5da5763d-b01f-43eb-a49c-d30ff0228d55.root = 41775
 88b13e30-503e-4b56-b518-9653bf5b2123.root = 46293
 423bf2ae-5c9c-4c6a-894b-806d853b5834.root = 50406
 cf5d3491-42b2-4693-924f-e404a7a91ffe.root = 55603

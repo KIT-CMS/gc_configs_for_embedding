@@ -1,6 +1,6 @@
 [/PRIVATE/updated_merged#cd74e8cd]
 nickname = updated_merged
-events = 7027415
+events = 6985935
 se list = cmssrm-kit.gridka.de
 prefix = /store/user/sbrommer/ul_embedding/large_miniAOD_v2/TauTauFinalState/EmbeddingRun2017E/MINIAOD/inputDoubleMu_106X_ULegacy_miniAOD-v1/0000
 383da1c6-eabf-437f-acf3-eaa479a536c7.root = 41798
@@ -137,7 +137,6 @@ df508225-6264-4e1d-b4cc-12bfb6dd4cb6.root = 41082
 3f78ab03-3472-45a0-aeda-c49e34229a0f.root = 40136
 ddd87540-4db7-4a11-8e3f-0f80d892fd3e.root = 39491
 11c15cf1-6c1f-4cc7-b53d-89bd2df4d046.root = 40151
-48849cc2-0886-441a-88a3-a2cd9c861e2a.root = 41480
 d12a69d7-1633-47d1-b595-7b0f0d017b78.root = 38939
 a1f1ee8d-8b4c-43fd-b71b-d21f9cc4d777.root = 40332
 9c56a6ab-e224-4089-b0ed-60887bee2c09.root = 34754
