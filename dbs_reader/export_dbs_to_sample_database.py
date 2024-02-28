@@ -212,7 +212,7 @@ if __name__ == "__main__":
         # dump entry file temporarily and copy output file to sample database
         destination_path = os.path.join(database_path, _era, "embedding", "{}.json".format(entry["nick"]))
         with tempfile.NamedTemporaryFile(mode="w") as tmp_file:
-            json.dump(entry, tmp_file, separators=(", ", ": "), indent=4)
+            json.dump(entry, tmp_file, separators=(",", ": "), indent=4)
             tmp_file.flush()
             shutil.copy(tmp_file.name, destination_path)
         
