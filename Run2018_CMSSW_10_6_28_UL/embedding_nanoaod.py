@@ -224,7 +224,7 @@ process.triggerObjectTable.selections[3].qualityBits = cms.string(
     "256*filter('hltOverlapFilterIsoMu*PFTau*') + " \
     "512*filter('hltDoublePFTau*TrackPt1*ChargedIsolation*') + " \
     "1024*filter('hltL1sBigORLooseIsoEGXXerIsoTauYYerdRMin0p3') + " \
-    "2048*filter('hltL1sMu18erTau24erIorMu20erTau24er') + "
+    "2048*filter('hltL1sMu18erTau24erIorMu20erTau24er') + " \
     "4096*filter('hltL1sBigORMu18erTauXXer2p1') + " \
     "8192*filter('hltDoubleL2IsoTau26eta2p2')"
 )
