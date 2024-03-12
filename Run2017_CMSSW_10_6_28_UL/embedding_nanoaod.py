@@ -115,7 +115,7 @@ process.triggerObjectTable.selections[0].qualityBits = cms.string(
     "8*filter('*OverlapFilter*IsoEle*PFTau*') + " \
     "16*filter('hltEle*Ele*CaloIdLTrackIdLIsoVL*Filter') + " \
     "32*filter('hltMu*TrkIsoVVL*Ele*CaloIdLTrackIdLIsoVL*Filter*')  + " \
-    "64*filter('hlt*OverlapFilterIsoEle*PFTau*') + " \
+    "64*filter('hltOverlapFilterIsoEle*PFTau*') + " \
     "128*filter('hltEle*Ele*Ele*CaloIdLTrackIdLDphiLeg*Filter') + " \
     "256*max(filter('hltL3fL1Mu*DoubleEG*Filtered*'),filter('hltMu*DiEle*CaloIdLTrackIdLElectronleg*Filter')) + " \
     "512*max(filter('hltL3fL1DoubleMu*EG*Filter*'),filter('hltDiMu*Ele*CaloIdLTrackIdLElectronleg*Filter')) + " \
@@ -161,7 +161,7 @@ process.triggerObjectTable.selections[2].qualityBits = cms.string(
     "8*max(filter('hltL3crIsoL1*SingleMu*Filtered0p07'),filter('hltL3crIsoL1sMu*Filtered0p07')) + " \
     "16*filter('hltDiMuon*Filtered*') + " \
     "32*filter('hltMu*TrkIsoVVL*Ele*CaloIdLTrackIdLIsoVL*Filter*') + " \
-    "64*filter('hlt*OverlapFilterIsoMu*PFTau*') + " \
+    "64*filter('hltOverlapFilterIsoMu*PFTau*') + " \
     "128*filter('hltL3fL1TripleMu*') + " \
     "256*max(filter('hltL3fL1DoubleMu*EG*Filtered*'),filter('hltDiMu*Ele*CaloIdLTrackIdLElectronleg*Filter')) + " \
     "512*max(filter('hltL3fL1Mu*DoubleEG*Filtered*'),filter('hltMu*DiEle*CaloIdLTrackIdLElectronleg*Filter')) + " \
@@ -200,7 +200,6 @@ process.triggerObjectTable.selections[3].sel = cms.string(
     "coll('*Tau*') &&" \
     "( filter('*LooseChargedIso*') || " \
     "filter('*MediumChargedIso*') || " \
-    "filter('*DeepTau*') || " \
     "filter('*TightChargedIso*') || " \
     "filter('*TightOOSCPhotons*') || " \
     "filter('hltL2TauIsoFilter') || " \
@@ -211,7 +210,8 @@ process.triggerObjectTable.selections[3].sel = cms.string(
     "filter('*DoublePFTau*') || " \
     "filter('*SinglePFTau*') || " \
     "filter('hlt*SelectedPFTau') || " \
-    "filter('*DisplPFTau*') )"
+    "filter('*DisplPFTau*') || " \
+    "filter('*Tau*') )"
 )
 
 # modify the tau entry
@@ -227,7 +227,7 @@ process.triggerObjectTable.selections[3].qualityBits = cms.string(
     "256*filter('hltOverlapFilterIsoMu*PFTau*') + " \
     "512*filter('hltDoublePFTau*TrackPt1*ChargedIsolation*') + " \
     "1024*filter('hltL1sBigORLooseIsoEGXXerIsoTauYYerdRMin0p3') + " \
-    "2048*filter('hltL1sMu18erTau24erIorMu20erTau24er') + "
+    "2048*filter('hltL1sMu18erTau24erIorMu20erTau24er') + " \
     "4096*filter('hltL1sBigORMu18erTauXXer2p1') + " \
     "8192*filter('hltDoubleL2IsoTau26eta2p2')"
 )
