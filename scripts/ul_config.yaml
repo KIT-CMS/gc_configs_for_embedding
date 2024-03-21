@@ -239,11 +239,11 @@ cmssw_version:
     "main": "CMSSW_10_6_28"
     "hlt": "CMSSW_10_2_16_UL"
 output_paths:
-  "tarballs": "root://cmsxrootd-kit-disk.gridka.de:1094///store/user/{USER}/ul_embedding/tarballs_dez20"
-  "preselection": "root://cmsxrootd-kit-disk.gridka.de:1094///store/user/{USER}/ul_embedding/preselection"
-  "main": "root://cmsxrootd-kit-disk.gridka.de:1094///store/user/{USER}/ul_embedding/miniaod"
-  "large_miniAOD": "root://cmsxrootd-kit-disk.gridka.de:1094///store/user/{USER}/ul_embedding/large_miniAOD"
-  "rerun_puppi": "root://cmsxrootd-kit-disk.gridka.de:1094///store/user/{USER}/ul_embedding/large_miniAOD_v2"
-  "nanoaod": "root://cmsxrootd-kit-disk.gridka.de:1094///store/user/{USER}/ul_embedding_nanoaod/v4"
+  "tarballs": "root://cmsxrootd-kit-disk.gridka.de//store/user/{USER}/ul_embedding/tarballs_dez20"
+  "preselection": "root://cmsxrootd-kit-disk.gridka.de//store/user/{USER}/ul_embedding/preselection"
+  "main": " root://cmsxrootd-kit-disk.gridka.de//store/user/{USER}/ul_embedding/miniaod"
+  "large_miniAOD": " root://cmsxrootd-kit-disk.gridka.de//store/user/{USER}/ul_embedding/large_miniAOD"
+  "rerun_puppi": " root://cmsxrootd-kit-disk.gridka.de//store/user/{USER}/ul_embedding/large_miniAOD_v2"
+  "nanoaod": "root://cmsxrootd-kit-disk.gridka.de//store/user/{USER}/ul_embedding_nanoaod/v7"
 
-tmux_path: "/home/sbrommer/local/bms1/bin/tmux"
+tmux_path: "/usr/bin/tmux"

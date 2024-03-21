@@ -106,7 +106,6 @@ process.pfMetPuppi.metSource = cms.InputTag("slimmedMETsPuppi", "", "RERUNPUPPI"
 # add additional filters to TrigObj_filterBits column in NANOAOD
 # these filters are needed in order to process the correct trigger object matching for applying
 # the trigger scale factors on embedding samples
-# See also https://twiki.cern.ch/twiki/bin/viewauth/CMS/TauTauEmbeddingSamples2017
 
 # modify the electron entry
 process.triggerObjectTable.selections[0].qualityBits = cms.string(
@@ -126,10 +125,9 @@ process.triggerObjectTable.selections[0].qualityBits = cms.string(
     "8192*max(filter('hltEG175HEFilter'),filter('hltEG200HEFilter')) + " \
     "16384*filter('hltEle27WPTightGsfTrackIsoFilter') + " \
     "32768*filter('hltEle32WPTightGsfTrackIsoFilter') + " \
-    "65536*filter('hltEle32L1DoubleEGWPTightGsfTrackIsoFilter') + " \
-    "131072*filter('hltEGL1SingleEGOrFilter') + " \
-    "262144*filter('hltEle35noerWPTightGsfTrackIsoFilter') + " \
-    "524288*filter('hltEle24erWPTightGsfTrackIsoFilterForTau')"
+    "65536*filter('hltEle35noerWPTightGsfTrackIsoFilter') + " \
+    "131072*filter('hltEle32L1DoubleEGWPTightGsfTrackIsoFilter') + " \
+    "262144*filter('hltEle24erWPTightGsfTrackIsoFilterForTau')" \
 )
 
 # add documentation for electron filter bits
@@ -148,12 +146,11 @@ process.triggerObjectTable.selections[0].qualityBitsDoc = cms.string(
     "2048 = 1e (CaloIdVT_GsfTrkIdT), " \
     "4096 = 1e (PFJet), " \
     "8192 = 1e (Photon175_OR_Photon200), " \
-    "16384 = 1e (for e leg trigger object matching in embedding), " \
-    "32768 = 1e (for e leg trigger object matching in embedding), " \
-    "65536 = 1e (for e leg trigger object matching in embedding), " \
-    "131072 = 1e (for e leg trigger object matching in embedding), " \
-    "262144 = 1e (for e leg trigger object matching in embedding), " \
-    "524288 = 1e (for e leg trigger object matching in embedding)"
+    "16384 = 1e (for e leg trigger object matching in embedding, path HLT_Ele27_WPTight_Gsf), " \
+    "32768 = 1e (for e leg trigger object matching in embedding, path HLT_Ele32_WPTight_Gsf), " \
+    "65536 = 1e (for e leg trigger object matching in embedding, path HLT_Ele35_WPTight_Gsf), " \
+    "131072 = 1e (for e leg trigger object matching in embedding, path HLT_Ele32_WPTight_L1DoubleEG), " \
+    "262144 = e-tau (for e leg trigger object matching in embedding, path HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTau*30_eta2p1_CrossL1)"
 )
 
 # modify the muon entry
@@ -172,7 +169,8 @@ process.triggerObjectTable.selections[2].qualityBits = cms.string(
     "2048*max(filter('hltL3fL1sMu*L3Filtered100*'),filter('hltL3fL1sMu*TkFiltered100*')) + " \
     "4096*filter('hltL3crIsoL1sSingleMu22L1f0L2f10QL3f24QL3trkIsoFiltered0p07') + " \
     "8192*filter('hltL3crIsoL1sMu22Or25L1f0L2f10QL3f27QL3trkIsoFiltered0p07') + " \
-    "16384*filter('hltL3crIsoL1sMu18erTau24erIorMu20erTau24erL1f0L2f10QL3f20QL3trkIsoFiltered0p07')"
+    "16384*filter('hltL3crIsoL1sMu18erTau24erIorMu20erTau24erL1f0L2f10QL3f20QL3trkIsoFiltered0p07') + " \
+    "32768*filter('hltL3crIsoBigORMu18erTauXXer2p1L1f0L2f10QL3f20QL3trkIsoFiltered0p07')"
 )
 
 # add documentation for muon filter bits
@@ -189,9 +187,10 @@ process.triggerObjectTable.selections[2].qualityBitsDoc = cms.string(
     "512 = 1mu-2e, " \
     "1024 = 1mu (Mu50), " \
     "2048 = 1mu (Mu100), " \
-    "4096 = 1mu (for mu leg trigger object matching in embedding), " \
-    "8192 = 1mu (for mu leg trigger object matching in embedding), " \
-    "16384 = 1mu (for mu leg trigger object matching in embedding)"
+    "4096 = 1mu (for mu leg trigger object matching in embedding, path HLT_IsoMu24), " \
+    "8192 = 1mu (for mu leg trigger object matching in embedding, path HLT_IsoMu27), " \
+    "16384 = mu-tau (for mu leg trigger object matching in embedding, path HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1 2017), " \
+    "32768 = mu-tau (for mu leg trigger object matching in embedding, path HLT_IsoMu20_eta2p1_LooseChargedIsoPFTauHPS27_eta2p1_CrossL1 2018)"
 )
 
 # modify the selection string in the tau entry
@@ -229,7 +228,8 @@ process.triggerObjectTable.selections[3].qualityBits = cms.string(
     "512*filter('hltDoublePFTau*TrackPt1*ChargedIsolation*') + " \
     "1024*filter('hltL1sBigORLooseIsoEGXXerIsoTauYYerdRMin0p3') + " \
     "2048*filter('hltL1sMu18erTau24erIorMu20erTau24er') + " \
-    "4096*filter('hltDoubleL2IsoTau26eta2p2')"
+    "4096*filter('hltL1sBigORMu18erTauXXer2p1') + " \
+    "8192*filter('hltDoubleL2IsoTau26eta2p2')"
 )
 
 # add documentation for tau filter bits
@@ -244,9 +244,10 @@ process.triggerObjectTable.selections[3].qualityBitsDoc = cms.string(
     "128 = e-tau, " \
     "256 = mu-tau, " \
     "512 = VBF+di-tau, " \
-    "1024 = e-tau (for tau leg trigger object matching in embedding), " \
-    "2048 = mu-tau (for tau leg trigger object matching in embedding), " \
-    "4096 = di-tau (for tau leg trigger object matching in embedding)"
+    "1024 = e-tau (for tau leg trigger object matching in embedding, path HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTau30_eta2p1), " \
+    "2048 = mu-tau (for tau leg trigger object matching in embedding, path HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1 2017), " \
+    "4096 = mu-tau (for tau leg trigger object matching in embedding, path HLT_IsoMu20_eta2p1_LooseChargedIsoPFTauHPS27_eta2p1_CrossL1 2018), " \
+    "8192 = di-tau (for tau leg trigger object matching in embedding, paths HLT_Double*ChargedIsoPFTau*_Trk1*_eta2p1_Reg)"
 )
 
 # Add early deletion of temporary data products to reduce peak memory need
